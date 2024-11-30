@@ -1,0 +1,43 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.11.35431.28
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TiffinMate.API", "TiffinMate.API\TiffinMate.API.csproj", "{70A2C040-2C30-4DA9-B5C7-7B67F80C7D2E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TiffinMate.BLL", "TiffinMate.BLL\TiffinMate.BLL.csproj", "{8D10501F-A4B7-4A5A-A0F5-99CE0883C4AD}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TiffinMate.DAL", "TiffinMate.DAL\TiffinMate.DAL.csproj", "{052685E5-534A-4C5B-AF2A-8A4F40F5A51A}"
+EndProject
+Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{0D48034F-0133-4DD6-8E35-115B3B03C3BA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{70A2C040-2C30-4DA9-B5C7-7B67F80C7D2E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{70A2C040-2C30-4DA9-B5C7-7B67F80C7D2E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{70A2C040-2C30-4DA9-B5C7-7B67F80C7D2E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{70A2C040-2C30-4DA9-B5C7-7B67F80C7D2E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8D10501F-A4B7-4A5A-A0F5-99CE0883C4AD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8D10501F-A4B7-4A5A-A0F5-99CE0883C4AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8D10501F-A4B7-4A5A-A0F5-99CE0883C4AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8D10501F-A4B7-4A5A-A0F5-99CE0883C4AD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{052685E5-534A-4C5B-AF2A-8A4F40F5A51A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{052685E5-534A-4C5B-AF2A-8A4F40F5A51A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{052685E5-534A-4C5B-AF2A-8A4F40F5A51A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{052685E5-534A-4C5B-AF2A-8A4F40F5A51A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0D48034F-0133-4DD6-8E35-115B3B03C3BA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0D48034F-0133-4DD6-8E35-115B3B03C3BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0D48034F-0133-4DD6-8E35-115B3B03C3BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0D48034F-0133-4DD6-8E35-115B3B03C3BA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C152725E-F911-44C0-AA7F-76F8778EE372}
+	EndGlobalSection
+EndGlobal

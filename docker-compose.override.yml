@@ -3,10 +3,8 @@ version: '3.9'
 services:
   tiffinmate.api:
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_HTTP_PORTS=8080
       - ASPNETCORE_HTTPS_PORTS=8081
-      - ConnectionStrings__PostgreSQL=Host=tiffinmate.db;Database=tiffinmate_db;Username=postgres_user;Password=postgres_password
     ports:
       - "8080:8080"
       - "8081:8081"
@@ -20,8 +18,8 @@ services:
 
   tiffinmate.db:
     environment:
-      POSTGRES_USER: postgres_user
-      POSTGRES_PASSWORD: postgres_password
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
       POSTGRES_DB: tiffinmate_db
     volumes:
       - postgres_data:/var/lib/postgresql/data
@@ -35,4 +33,3 @@ networks:
 
 volumes:
   postgres_data:
-    driver: local

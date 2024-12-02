@@ -7,10 +7,8 @@ services:
       context: .
       dockerfile: TiffinMate.API/Dockerfile
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_HTTP_PORTS=8080
       - ASPNETCORE_HTTPS_PORTS=8081
-      - ConnectionStrings__PostgreSQL=Host=tiffinmate.db;Database=tiffinmate_db;Username=postgres_user;Password=postgres_password
     ports:
       - "8080:8080"
       - "8081:8081"
@@ -26,7 +24,7 @@ services:
     image: postgres:15
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 123
+      POSTGRES_PASSWORD: admin
       POSTGRES_DB: tiffinmate_db
     ports:
       - "5433:5432"

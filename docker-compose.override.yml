@@ -9,7 +9,6 @@ services:
       - "8080:8080"
       - "8081:8081"
     volumes:
-      # Mount local directories for live code reloading during development
       - ./TiffinMate.API:/app
       - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
       - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro

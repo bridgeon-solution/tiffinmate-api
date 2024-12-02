@@ -2,13 +2,10 @@ version: '3.9'
 
 services:
   tiffinmate.api:
-    image: ${DOCKER_REGISTRY-}tiffinmateapi
-    build:
-      context: .
-      dockerfile: TiffinMate.API/Dockerfile
+    image: sabithmk7/tiffinmate
     environment:
       - ASPNETCORE_HTTP_PORTS=8080
-      - ASPNETCORE_HTTPS_PORTS=8081
+      - ASPNETCORE_HTTPS_PORTS=8081 
     ports:
       - "8080:8080"
       - "8081:8081"

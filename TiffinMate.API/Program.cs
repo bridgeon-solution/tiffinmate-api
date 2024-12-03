@@ -1,5 +1,6 @@
 
 using Microsoft.EntityFrameworkCore;
+using Supabase;
 using TiffinMate.DAL.DbContexts;
 
 namespace TiffinMate.API
@@ -16,6 +17,12 @@ namespace TiffinMate.API
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+            builder.Services.AddScoped<Supabase.Client>(_ => new Supabase.Client(builder.Configuration.GetConnectionString("HostUrl"), builder.Configuration.GetConnectionString("HostAPI"),
+             new SupabaseOptions
+             {
+                 AutoRefreshToken = true,
+                 AutoConnectRealtime = true,
+             }));
             builder.Services.AddDbContext<AppDbContext>(options =>
                 options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 

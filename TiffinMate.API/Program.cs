@@ -9,7 +9,9 @@ namespace TiffinMate.API
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-
+            
+            DotNetEnv.Env.Load();
+            var env = Environment.GetEnvironmentVariable("IS_DEVELOPMENT");
             // Add services to the container.
 
             builder.Services.AddControllers();
@@ -24,10 +26,14 @@ namespace TiffinMate.API
             app.MapGet("/", () => "Testing..!");
 
             // Configure the HTTP request pipeline.
+            if (env == "Development")
+            {
+                app.UseSwagger();
+                app.UseSwaggerUI();
+                app.UseHttpsRedirection();
+            }
 
-            //app.UseSwagger();
-            //app.UseSwaggerUI();
-            //app.UseHttpsRedirection();
+
 
             app.UseAuthorization();
 

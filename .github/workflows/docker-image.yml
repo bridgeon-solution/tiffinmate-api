@@ -30,4 +30,4 @@ jobs:
       - name: Delete Old Container
         run: docker rm -f tiffinmate-api
       - name: Run New Docker Container
-        run: docker run -d -p 8080:80 --name tiffinmate-api sabithmk7/tiffinmate-api-prod:latest
+        run: docker run -d -p 8080:8080 --name tiffinmate-api sabithmk7/tiffinmate-api-prod:latest

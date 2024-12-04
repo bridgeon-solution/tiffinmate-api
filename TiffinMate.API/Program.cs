@@ -21,9 +21,10 @@ namespace TiffinMate.API
 
 
             var app = builder.Build();
+            app.MapGet("/", () => "Testing..!");
 
             // Configure the HTTP request pipeline.
-           
+
             app.UseSwagger();
             app.UseSwaggerUI();
 

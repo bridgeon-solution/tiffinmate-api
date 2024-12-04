@@ -1,6 +1,7 @@
 
 using Microsoft.EntityFrameworkCore;
 using Supabase;
+using TiffinMate.API.Middlewares;
 using TiffinMate.DAL.DbContexts;
 
 namespace TiffinMate.API
@@ -12,7 +13,8 @@ namespace TiffinMate.API
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-
+            DotNetEnv.Env.Load();
+            var env = Environment.GetEnvironmentVariable("IS_DEVELOPMENT");
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
@@ -28,15 +30,17 @@ namespace TiffinMate.API
 
 
             var app = builder.Build();
+            app.MapGet("/", () => "Hello World!");
 
             // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
+            if (env == "Development")
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();
+                app.UseHttpsRedirection();
             }
+            app.UseMiddleware<LoggingMiddleware>();
 
-            app.UseHttpsRedirection();
 
             app.UseAuthorization();
 

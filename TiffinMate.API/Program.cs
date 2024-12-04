@@ -25,10 +25,9 @@ namespace TiffinMate.API
 
             // Configure the HTTP request pipeline.
 
-            app.UseSwagger();
-            app.UseSwaggerUI();
-
-            app.UseHttpsRedirection();
+            //app.UseSwagger();
+            //app.UseSwaggerUI();
+            //app.UseHttpsRedirection();
 
             app.UseAuthorization();
 

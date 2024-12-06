@@ -7,9 +7,9 @@ using System.Text;
 using System.Threading.Tasks;
 using TiffinMate.DAL.DbContexts;
 using TiffinMate.DAL.Entities;
-using TiffinMate.DAL.Interfaces.AdminInterface;
+using TiffinMate.DAL.Interfaces.AdminInterfaces;
 
-namespace TiffinMate.DAL.Repositories.AdminRepository
+namespace TiffinMate.DAL.Repositories.AdminRepositories
 {
     public class AdminRepository : IAdminRepository
     {

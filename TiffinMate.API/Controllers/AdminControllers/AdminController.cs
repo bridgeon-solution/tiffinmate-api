@@ -2,11 +2,10 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using TiffinMate.API.ApiRespons;
-
 using TiffinMate.BLL.DTOs.AdmiDTO;
 using TiffinMate.BLL.Interfaces.AdminInterface;
 
-namespace TiffinMate.API.Controllers.AdminController
+namespace TiffinMate.API.Controllers.AdminControllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -23,7 +22,7 @@ namespace TiffinMate.API.Controllers.AdminController
             try
             {
                 var response = await _adminService.AdminLogin(loginDTO);
-                if(response=="Not Found")
+                if (response == "Not Found")
                 {
                     return NotFound(new ApiResponse<string>("failure", "Login Failed", null, HttpStatusCode.NotFound, "Admin not found"));
                 }

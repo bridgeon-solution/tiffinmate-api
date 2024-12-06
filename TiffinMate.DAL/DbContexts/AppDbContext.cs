@@ -7,16 +7,24 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TiffinMate.DAL.Entities;
+using User = TiffinMate.DAL.Entities.User;
+
+
 
 
 namespace TiffinMate.DAL.DbContexts
 {
     public class AppDbContext:DbContext
     {
+
         public DbSet<ApiLog> ApiLogs { get; set; }
         public DbSet<Admin> Admins { get; set; }
 
 
+
+        public DbSet<User> users { get; set; }
+
+        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Admin>(entity =>
@@ -27,8 +35,17 @@ namespace TiffinMate.DAL.DbContexts
                 .IsRequired()
                 .HasDefaultValueSql("gen_random_uuid()");
             });
+            modelBuilder.Entity<User>(entity =>
+            {
+                entity.Property(u => u.id)
+                .HasColumnType("uuid")
+                .IsRequired()
+                .HasDefaultValueSql("gen_random_uuid()");
+
+                entity.Property(e => e.is_blocked)
+                    .HasDefaultValue(false);
+            });
         }
-        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
 
 

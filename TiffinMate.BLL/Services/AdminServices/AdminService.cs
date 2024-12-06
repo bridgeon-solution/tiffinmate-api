@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 using TiffinMate.BLL.DTOs.AdmiDTO;
 using TiffinMate.BLL.Interfaces.AdminInterface;
 using TiffinMate.DAL.Entities;
-using TiffinMate.DAL.Interfaces.AdminInterface;
+using TiffinMate.DAL.Interfaces.AdminInterfaces;
 
 namespace TiffinMate.BLL.Services.AdminService
 {

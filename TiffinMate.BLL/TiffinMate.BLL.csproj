@@ -8,8 +8,13 @@
 
   <ItemGroup>
     <PackageReference Include="AutoMapper" Version="13.0.1" />
+<<<<<<< HEAD
     <PackageReference Include="AWSSDK.S3" Version="3.7.410.1" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="7.1.0" />
+=======
+    <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+    <PackageReference Include="Twilio" Version="7.8.0" />
+>>>>>>> c712c6ee4897cb2d2db8161b99f35c3817284a5d
   </ItemGroup>
 
   <ItemGroup>

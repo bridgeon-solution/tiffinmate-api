@@ -6,13 +6,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+<<<<<<< HEAD
 using TiffinMate.DAL.Entities.ProviderEntity;
+=======
+using TiffinMate.DAL.Entities;
+using User = TiffinMate.DAL.Entities.User;
+
+
+>>>>>>> c712c6ee4897cb2d2db8161b99f35c3817284a5d
 
 
 namespace TiffinMate.DAL.DbContexts
 {
     public class AppDbContext:DbContext
     {
+<<<<<<< HEAD
        public DbSet<Provider> provider { get; set; }
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
@@ -33,5 +41,40 @@ namespace TiffinMate.DAL.DbContexts
         }
 
 
+=======
+
+        public DbSet<ApiLog> ApiLogs { get; set; }
+        public DbSet<Admin> Admins { get; set; }
+
+
+
+        public DbSet<User> users { get; set; }
+
+        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Admin>(entity =>
+            {
+                entity.HasKey(a => a.id);
+                entity.Property(a => a.id)
+                .HasColumnType("uuid")
+                .IsRequired()
+                .HasDefaultValueSql("gen_random_uuid()");
+            });
+            modelBuilder.Entity<User>(entity =>
+            {
+                entity.Property(u => u.id)
+                .HasColumnType("uuid")
+                .IsRequired()
+                .HasDefaultValueSql("gen_random_uuid()");
+
+                entity.Property(e => e.is_blocked)
+                    .HasDefaultValue(false);
+            });
+        }
+
+
+
+>>>>>>> c712c6ee4897cb2d2db8161b99f35c3817284a5d
     }
 }

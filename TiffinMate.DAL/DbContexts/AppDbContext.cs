@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TiffinMate.DAL.Entities;
+using TiffinMate.DAL.Entities.ProviderEntity;
 using User = TiffinMate.DAL.Entities.User;
 
 
@@ -20,7 +21,7 @@ namespace TiffinMate.DAL.DbContexts
         public DbSet<ApiLog> ApiLogs { get; set; }
         public DbSet<Admin> Admins { get; set; }
 
-
+        public DbSet<Provider> Providers { get; set; }
 
         public DbSet<User> users { get; set; }
 

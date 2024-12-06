@@ -16,6 +16,11 @@ using TiffinMate.BLL.Interfaces.AuthInterface;
 using TiffinMate.BLL.Mapper;
 using TiffinMate.DAL.Repositories.UserRepositories;
 using TiffinMate.DAL.Repositories.AdminRepositories;
+using TiffinMate.BLL.Interfaces.ProviderServiceInterafce;
+using TiffinMate.BLL.Services.ProviderServices;
+using TiffinMate.DAL.Interfaces.ProviderInterface;
+using TiffinMate.DAL.Repositories.ProviderRepositories;
+using Amazon.S3;
 
 
 
@@ -36,12 +41,13 @@ namespace TiffinMate.API
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
             builder.Services.AddScoped<AppDbContext>();
-            builder.Services.AddScoped<IAdminRepository,AdminRepository>();
+            builder.Services.AddScoped<IAdminRepository, AdminRepository>();
             builder.Services.AddScoped<IAdminService, AdminService>();
             builder.Services.AddScoped<IAuthRepository, AuthRepository>();
             builder.Services.AddScoped<IAuthService, AuthService>();
-            
-
+            builder.Services.AddScoped<IProviderService, ProviderService>();
+            builder.Services.AddScoped<IProviderRepository, ProviderRepository>();
+            builder.Services.AddAWSService<IAmazonS3>();
 
 
             builder.Services.AddCors(options =>
@@ -51,7 +57,6 @@ namespace TiffinMate.API
                     .AllowAnyMethod()
                     .AllowAnyHeader());
             });
-
 
 
             builder.Services.AddScoped<Supabase.Client>(_ => new Supabase.Client(builder.Configuration.GetConnectionString("HostUrl"), builder.Configuration.GetConnectionString("HostAPI"),
@@ -83,12 +88,6 @@ namespace TiffinMate.API
                 };
             });
 
-           
-           
-           
-            
-    
-
             builder.Services.AddSingleton<IOtpService>(provider =>
             {
                 var accountSid = builder.Configuration["Twilio:Sid"];
@@ -99,11 +98,9 @@ namespace TiffinMate.API
             });
 
 
-
-            
-
             var app = builder.Build();
-           
+
+            app.UseCors("AllowAllOrigins");
 
             if (env == "Development")
             {
@@ -111,17 +108,8 @@ namespace TiffinMate.API
                 app.UseSwaggerUI();
                 app.UseHttpsRedirection();
             }
+
             app.UseMiddleware<LoggingMiddleware>();
-
-
-
-            app.UseSwagger();
-            app.UseSwaggerUI();
-            app.UseCors("AllowAnyOrigin");
-
-
-
-
             app.UseAuthentication();
             app.UseAuthorization();
 

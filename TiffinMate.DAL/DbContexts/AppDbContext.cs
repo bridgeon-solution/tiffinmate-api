@@ -13,10 +13,24 @@ namespace TiffinMate.DAL.DbContexts
 {
     public class AppDbContext:DbContext
     {
-       
         public DbSet<ApiLog> ApiLogs { get; set; }
+        public DbSet<Admin> Admins { get; set; }
+
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Admin>(entity =>
+            {
+                entity.HasKey(a => a.id);
+                entity.Property(a => a.id)
+                .HasColumnType("uuid")
+                .IsRequired()
+                .HasDefaultValueSql("gen_random_uuid()");
+            });
+        }
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
-        
+
+
     }
 }

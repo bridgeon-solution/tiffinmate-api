@@ -60,6 +60,7 @@ namespace TiffinMate.DAL.DbContexts
                       .WithOne(pd => pd.Provider)
                       .HasForeignKey<ProviderDetails>(pd => pd.ProviderId)
                       .OnDelete(DeleteBehavior.Cascade);
+                entity.Property(e => e.role).HasDefaultValue("provider");
             });
 
             //modelBuilder.Entity<ProviderDetails>(entity =>
@@ -77,12 +78,9 @@ namespace TiffinMate.DAL.DbContexts
                       .HasColumnType("uuid")
                       .IsRequired()
                       .HasDefaultValueSql("gen_random_uuid()");
-                entity.Property(pd => pd.ProviderId) 
+                entity.Property(pd => pd.ProviderId)
                       .IsRequired();
             });
-
-
-
 
         }
     }

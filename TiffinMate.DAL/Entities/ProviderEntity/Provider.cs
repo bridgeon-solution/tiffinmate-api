@@ -13,7 +13,8 @@ namespace TiffinMate.DAL.Entities.ProviderEntity
         public string? email { get; set; }
         public string? certificate { get; set; }
         public string? password { get; set; }
-   
+        public string role { get; set; }
+
         public string? username { get; set; }
         public DateTime? updated_at { get; set; } = DateTime.UtcNow;
         public bool is_certificate_verified { get; set; } = false;

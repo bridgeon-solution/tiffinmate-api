@@ -5,8 +5,8 @@ namespace TiffinMate.BLL.Interfaces.ProviderServiceInterafce
 {
     public interface IProviderService
     {
-        Task<ProviderDTO> AddProvider(ProviderDTO product, IFormFile certificateFile);
-        Task<string> AddProviderDetails(ProviderDetailsDTO providerDetailsdto, IFormFile logo, IFormFile image);
+        Task<bool> AddProvider(ProviderDTO product, IFormFile certificateFile);
+        Task<bool> AddProviderDetails(ProviderDetailsDTO providerDetailsdto, IFormFile logo, IFormFile image);
 
         Task<ProviderLoginResponse> AddLogin(ProviderLoginDTO providerdto);
 

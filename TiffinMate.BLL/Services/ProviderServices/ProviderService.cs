@@ -34,13 +34,13 @@ namespace TiffinMate.BLL.Services.ProviderServices
         }
 
 
-        public async Task<ProviderDTO> AddProvider(ProviderDTO product, IFormFile certificateFile)
+        public async Task<bool> AddProvider(ProviderDTO product, IFormFile certificateFile)
         {
             try
             {
                 if (certificateFile == null || certificateFile.Length == 0)
                 {
-                    throw new Exception("No certificate file uploaded.");
+                    return false;
                 }
 
 
@@ -52,11 +52,11 @@ namespace TiffinMate.BLL.Services.ProviderServices
                 await _providerRepository.AddProviderAsync(prd);
                 await _providerRepository.SaveChangesAsync();
 
-                return product;
+                return true;
             }
             catch (Exception ex)
             {
-                Console.Write(ex.Message);
+                Console.Write(ex.InnerException?.Message ?? ex.Message);
                 throw new Exception("An error occurred while adding the product: " + ex.Message);
             }
         }
@@ -67,6 +67,7 @@ namespace TiffinMate.BLL.Services.ProviderServices
                 var pro = await _providerRepository.Login(providerdto.email, providerdto.password);
                 if (pro == null)
                 {
+                  
                     throw new Exception("Invalid provider.");
                 }
                 if (pro.password != providerdto.password)
@@ -88,14 +89,14 @@ namespace TiffinMate.BLL.Services.ProviderServices
                 throw new Exception("An error occurred: " + ex.Message);
             }
         }
-        public async Task<string> AddProviderDetails(ProviderDetailsDTO providerDetailsdto, IFormFile logo, IFormFile image)
+        public async Task<bool> AddProviderDetails(ProviderDetailsDTO providerDetailsdto, IFormFile logo, IFormFile image)
         {
             try
             {
                
                 if (logo == null || image == null)
                 {
-                    return "Image or logo is not uploaded";
+                    return false;
                 }
 
                 var logUrl = await _cloudinary.UploadDocumentAsync(logo);
@@ -123,7 +124,7 @@ namespace TiffinMate.BLL.Services.ProviderServices
                 await _providerRepository.AddProviderDetailsAsync(prddetails);
                 await _providerRepository.SaveChangesAsync();
 
-                return "Added successfully";
+                return true;
             }
             catch (Exception ex)
             {
@@ -141,7 +142,7 @@ namespace TiffinMate.BLL.Services.ProviderServices
             {
                 new Claim (ClaimTypes.NameIdentifier, user.id.ToString()),
                 new Claim (ClaimTypes.Name,user.username),
-                //new Claim (ClaimTypes.Role, user.role),
+                new Claim (ClaimTypes.Role, user.role),
                 new Claim(ClaimTypes.Email, user.email)
             };
 

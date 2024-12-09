@@ -1,0 +1,33 @@
+name: CICD
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v3
+
+      - name: Login to Docker Hub
+        run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build Docker Image
+        run: docker build -t sabithmk7/tiffinmate-api-prod:latest .
+
+      - name: Publish Image to Docker Hub
+        run: docker push sabithmk7/tiffinmate-api-prod:latest   
+
+  deploy:
+    needs: build
+    runs-on: self-hosted
+    steps:
+      - name: Pull image from Docker Hub
+        run: docker pull sabithmk7/tiffinmate-api-prod:latest
+      - name: Delete Old Container
+        run: docker rm -f tiffinmate-api
+      - name: Run New Docker Container
+        run: docker run -d -p 8080:8080 --name tiffinmate-api sabithmk7/tiffinmate-api-prod:latest

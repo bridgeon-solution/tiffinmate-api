@@ -33,10 +33,10 @@ namespace TiffinMate.API
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-
-            // Add services to the container.
+            
             DotNetEnv.Env.Load();
             var env = Environment.GetEnvironmentVariable("IS_DEVELOPMENT");
+            // Add services to the container.
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
@@ -93,11 +93,11 @@ namespace TiffinMate.API
                 };
             });
 
-
-
-
-
-
+           
+           
+           
+            
+    
 
             builder.Services.AddSingleton<IOtpService>(provider =>
             {
@@ -113,7 +113,7 @@ namespace TiffinMate.API
 
 
             var app = builder.Build();
-
+           
 
             if (env == "Development")
             {
@@ -125,8 +125,7 @@ namespace TiffinMate.API
 
 
 
-            app.UseSwagger();
-            app.UseSwaggerUI();
+            
             app.UseCors("AllowAllOrigins");
 
 

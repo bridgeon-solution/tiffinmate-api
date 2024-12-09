@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Supabase;
 using TiffinMate.BLL.Interfaces.AdminInterface;
 using TiffinMate.BLL.Services.AdminService;
-using TiffinMate.API.Middlewares;
+//using TiffinMate.API.Middlewares;
 using TiffinMate.DAL.DbContexts;
 using TiffinMate.DAL.Interfaces.AdminInterfaces;
 using TiffinMate.DAL.Interfaces.UserRepositoryInterface;
@@ -16,6 +16,12 @@ using TiffinMate.BLL.Interfaces.AuthInterface;
 using TiffinMate.BLL.Mapper;
 using TiffinMate.DAL.Repositories.UserRepositories;
 using TiffinMate.DAL.Repositories.AdminRepositories;
+using TiffinMate.DAL.Interfaces.ProviderInterface;
+using TiffinMate.DAL.Repositories.ProviderRepositories;
+using TiffinMate.BLL.Interfaces.ProviderServiceInterafce;
+using TiffinMate.BLL.Services.ProviderServices;
+using TiffinMate.BLL.Interfaces.CloudinaryInterface;
+using TiffinMate.BLL.Services.CoudinaryService;
 
 
 
@@ -36,11 +42,15 @@ namespace TiffinMate.API
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
             builder.Services.AddScoped<AppDbContext>();
-            builder.Services.AddScoped<IAdminRepository,AdminRepository>();
+            builder.Services.AddScoped<IAdminRepository, AdminRepository>();
             builder.Services.AddScoped<IAdminService, AdminService>();
             builder.Services.AddScoped<IAuthRepository, AuthRepository>();
             builder.Services.AddScoped<IAuthService, AuthService>();
-            
+            builder.Services.AddScoped<IProviderRepository, ProviderRepository>();
+            builder.Services.AddScoped<IProviderService, ProviderService>();
+           
+            builder.Services.AddScoped<ICloudinaryService, CloudinaryServices>();
+
 
 
 
@@ -83,6 +93,11 @@ namespace TiffinMate.API
                 };
             });
 
+           
+           
+           
+            
+    
 
             builder.Services.AddSingleton<IOtpService>(provider =>
             {
@@ -95,21 +110,25 @@ namespace TiffinMate.API
 
 
 
-            
+
 
             var app = builder.Build();
+           
 
-            // Configure the HTTP request pipeline.
             if (env == "Development")
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();
                 app.UseHttpsRedirection();
             }
-            app.UseMiddleware<LoggingMiddleware>();
+            //app.UseMiddleware<LoggingMiddleware>();
 
 
+
+            
             app.UseCors("AllowAllOrigins");
+
+
 
 
             app.UseAuthentication();

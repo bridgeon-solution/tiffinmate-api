@@ -79,7 +79,7 @@ namespace TiffinMate.API.Controllers.UserControllers
                     return BadRequest(new ApiResponse<string>("failure", "Login Failed", null, HttpStatusCode.BadRequest, "Email or password is incorrect"));
                 }
 
-                var result = new ApiResponse<string>("succes", "Login Successfull", response, HttpStatusCode.OK, "");
+                var result = new ApiResponse<string>("success", "Login Successfull", response, HttpStatusCode.OK, "");
                 return Ok(result);
 
             }

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Supabase;
 using TiffinMate.BLL.Interfaces.AdminInterface;
 using TiffinMate.BLL.Services.AdminService;
-using TiffinMate.API.Middlewares;
+//using TiffinMate.API.Middlewares;
 using TiffinMate.DAL.DbContexts;
 using TiffinMate.DAL.Interfaces.AdminInterfaces;
 using TiffinMate.DAL.Interfaces.UserRepositoryInterface;
@@ -16,11 +16,12 @@ using TiffinMate.BLL.Interfaces.AuthInterface;
 using TiffinMate.BLL.Mapper;
 using TiffinMate.DAL.Repositories.UserRepositories;
 using TiffinMate.DAL.Repositories.AdminRepositories;
-using TiffinMate.BLL.Interfaces.ProviderServiceInterafce;
-using TiffinMate.BLL.Services.ProviderServices;
 using TiffinMate.DAL.Interfaces.ProviderInterface;
 using TiffinMate.DAL.Repositories.ProviderRepositories;
-using Amazon.S3;
+using TiffinMate.BLL.Interfaces.ProviderServiceInterafce;
+using TiffinMate.BLL.Services.ProviderServices;
+using TiffinMate.BLL.Interfaces.CloudinaryInterface;
+using TiffinMate.BLL.Services.CoudinaryService;
 
 
 
@@ -45,9 +46,12 @@ namespace TiffinMate.API
             builder.Services.AddScoped<IAdminService, AdminService>();
             builder.Services.AddScoped<IAuthRepository, AuthRepository>();
             builder.Services.AddScoped<IAuthService, AuthService>();
-            builder.Services.AddScoped<IProviderService, ProviderService>();
             builder.Services.AddScoped<IProviderRepository, ProviderRepository>();
-            builder.Services.AddAWSService<IAmazonS3>();
+            builder.Services.AddScoped<IProviderService, ProviderService>();
+           
+            builder.Services.AddScoped<ICloudinaryService, CloudinaryServices>();
+
+
 
 
             builder.Services.AddCors(options =>
@@ -57,6 +61,7 @@ namespace TiffinMate.API
                     .AllowAnyMethod()
                     .AllowAnyHeader());
             });
+
 
 
             builder.Services.AddScoped<Supabase.Client>(_ => new Supabase.Client(builder.Configuration.GetConnectionString("HostUrl"), builder.Configuration.GetConnectionString("HostAPI"),
@@ -88,6 +93,12 @@ namespace TiffinMate.API
                 };
             });
 
+
+
+
+
+
+
             builder.Services.AddSingleton<IOtpService>(provider =>
             {
                 var accountSid = builder.Configuration["Twilio:Sid"];
@@ -98,9 +109,11 @@ namespace TiffinMate.API
             });
 
 
+
+
+
             var app = builder.Build();
 
-            app.UseCors("AllowAllOrigins");
 
             if (env == "Development")
             {
@@ -108,8 +121,17 @@ namespace TiffinMate.API
                 app.UseSwaggerUI();
                 app.UseHttpsRedirection();
             }
+            //app.UseMiddleware<LoggingMiddleware>();
 
-            app.UseMiddleware<LoggingMiddleware>();
+
+
+            app.UseSwagger();
+            app.UseSwaggerUI();
+            app.UseCors("AllowAllOrigins");
+
+
+
+
             app.UseAuthentication();
             app.UseAuthorization();
 

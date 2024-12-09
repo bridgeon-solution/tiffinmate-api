@@ -99,7 +99,8 @@ namespace TiffinMate.DAL.Migrations
                 {
                     b.Property<Guid>("id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasDefaultValueSql("gen_random_uuid()");
 
                     b.Property<string>("certificate")
                         .HasColumnType("text");
@@ -111,10 +112,9 @@ namespace TiffinMate.DAL.Migrations
                         .HasColumnType("text");
 
                     b.Property<bool>("is_certificate_verified")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("location")
-                        .HasColumnType("text");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
 
                     b.Property<string>("password")
                         .HasColumnType("text");
@@ -128,6 +128,54 @@ namespace TiffinMate.DAL.Migrations
                     b.HasKey("id");
 
                     b.ToTable("Providers");
+                });
+
+            modelBuilder.Entity("TiffinMate.DAL.Entities.ProviderEntity.ProviderDetails", b =>
+                {
+                    b.Property<Guid>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasDefaultValueSql("gen_random_uuid()");
+
+                    b.Property<Guid>("ProviderId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("about")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("account_no")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("address")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("image")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("location")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("logo")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("phone_no")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("resturent_name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("id");
+
+                    b.HasIndex("ProviderId")
+                        .IsUnique();
+
+                    b.ToTable("ProvidersDetails");
                 });
 
             modelBuilder.Entity("TiffinMate.DAL.Entities.User", b =>
@@ -167,6 +215,23 @@ namespace TiffinMate.DAL.Migrations
                     b.HasKey("id");
 
                     b.ToTable("users");
+                });
+
+            modelBuilder.Entity("TiffinMate.DAL.Entities.ProviderEntity.ProviderDetails", b =>
+                {
+                    b.HasOne("TiffinMate.DAL.Entities.ProviderEntity.Provider", "Provider")
+                        .WithOne("ProviderDetails")
+                        .HasForeignKey("TiffinMate.DAL.Entities.ProviderEntity.ProviderDetails", "ProviderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Provider");
+                });
+
+            modelBuilder.Entity("TiffinMate.DAL.Entities.ProviderEntity.Provider", b =>
+                {
+                    b.Navigation("ProviderDetails")
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

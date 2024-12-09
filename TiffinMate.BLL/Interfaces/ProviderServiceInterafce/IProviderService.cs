@@ -1,12 +1,14 @@
-﻿using TiffinMate.BLL.DTOs.ProviderDTOs;
+﻿using Microsoft.AspNetCore.Http;
+using TiffinMate.BLL.DTOs.ProviderDTOs;
 
 namespace TiffinMate.BLL.Interfaces.ProviderServiceInterafce
 {
     public interface IProviderService
     {
-        Task<string> UploadCertificateToS3(Stream certificateStream, string uniqueFileName, string contentType);
-        Task<LoginResponse> LoginProvider(ProviderLoginDTO loginData);
-        Task<string> GenereateAndSendPassword(Guid ProviderId);
+        Task<ProviderDTO> AddProvider(ProviderDTO product, IFormFile certificateFile);
+        Task<string> AddProviderDetails(ProviderDetailsDTO providerDetailsdto, IFormFile logo, IFormFile image);
+
+        Task<ProviderLoginResponse> AddLogin(ProviderLoginDTO providerdto);
 
     }
 }

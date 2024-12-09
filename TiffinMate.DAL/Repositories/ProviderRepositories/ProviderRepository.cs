@@ -20,9 +20,15 @@ namespace TiffinMate.DAL.Repositories.ProviderRepositories
         }
         public async Task<Provider> AddProviderAsync(Provider provider)
         {
-            _context.Set<Provider>().Add(provider);
+            _context.Providers.Add(provider);
             await _context.SaveChangesAsync();
             return provider;
+        }
+        public async Task <string>AddProviderDetailsAsync(ProviderDetails proDetails)
+        {
+            _context.ProvidersDetails.Add(proDetails);
+            await _context.SaveChangesAsync();
+            return "added";
         }
         public async Task<Provider> Login(string email, string password)
         {
@@ -38,9 +44,12 @@ namespace TiffinMate.DAL.Repositories.ProviderRepositories
 
         }
         public async Task SaveChangesAsync()
+
         {
+
             await _context.SaveChangesAsync();
         }
+
 
 
 

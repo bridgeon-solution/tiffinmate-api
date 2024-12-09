@@ -1,183 +1,157 @@
-﻿
-using Amazon.S3;
-using Amazon.S3.Transfer;
-using AutoMapper;
-using System.Text;
-using TiffinMate.BLL.DTOs.ProviderDTOs;
+﻿using TiffinMate.BLL.DTOs.ProviderDTOs;
 using TiffinMate.BLL.Interfaces.ProviderServiceInterafce;
 using TiffinMate.DAL.Interfaces.ProviderInterface;
-using TiffinMate.DAL.Entities.AWS;
+using TiffinMate.DAL.Entities.ProviderEntity;
+using System;
+using System.Security.Claims;
+using System.Threading.Tasks;
+using AutoMapper;
+using TiffinMate.BLL.Interfaces.CloudinaryInterface;
+using Microsoft.AspNetCore.Http;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.IdentityModel.Tokens;
-using System.Security.Claims;
+using System.Text;
 using Microsoft.Extensions.Configuration;
-using System.Security.Cryptography;
-using System.Net.Mail;
-using System.Net;
-using Microsoft.AspNetCore.Identity;
+using TiffinMate.DAL.DbContexts;
 
 namespace TiffinMate.BLL.Services.ProviderServices
 {
     public class ProviderService : IProviderService
     {
-        private readonly IAmazonS3 _s3Client;
-        //private readonly string _bucketName;
         private readonly IProviderRepository _providerRepository;
-        private readonly IConfiguration _configuration;
         private readonly IMapper _mapper;
+        private readonly ICloudinaryService _cloudinary;
+        private readonly IConfiguration _config;
+        private readonly AppDbContext _context;
 
-
-        public ProviderService(IAmazonS3 s3Client, IProviderRepository providerRepository, IConfiguration configuration, IMapper mapper)
+        public ProviderService(IProviderRepository providerRepository, IMapper mapper, ICloudinaryService cloudinary, IConfiguration config, AppDbContext context)
         {
-            _s3Client = s3Client;
-            //string _bucketName = AwsConfig.BucketName;
             _providerRepository = providerRepository;
-            _configuration = configuration;
             _mapper = mapper;
-
+            _cloudinary = cloudinary;
+            _config = config;
+           _context=context;
         }
 
-        public async Task<string> UploadCertificateToS3(Stream certificateStream, string uniqueFileName, string contentType)
+
+        public async Task<ProviderDTO> AddProvider(ProviderDTO product, IFormFile certificateFile)
         {
             try
             {
-                var uploadRequest = new TransferUtilityUploadRequest
+                if (certificateFile == null || certificateFile.Length == 0)
                 {
-                    InputStream = certificateStream,
-                    Key = uniqueFileName,
-                    BucketName = AwsConfig.BucketName,
-                    ContentType = contentType
-                };
-
-                var transferUtility = new TransferUtility(_s3Client);
-                await transferUtility.UploadAsync(uploadRequest);
-
-                // Generate the file URL after uploading to S3
-                var region = _s3Client.Config.RegionEndpoint.SystemName;
-                var certificateUrl = $"https://{AwsConfig.BucketName}.s3.{region}.amazonaws.com/{uniqueFileName}";
+                    throw new Exception("No certificate file uploaded.");
+                }
 
 
+                var certificateUrl = await _cloudinary.UploadDocumentAsync(certificateFile);
 
-                return certificateUrl;
+                var prd = _mapper.Map<Provider>(product);
 
+                prd.certificate = certificateUrl;
+                await _providerRepository.AddProviderAsync(prd);
+                await _providerRepository.SaveChangesAsync();
+
+                return product;
             }
             catch (Exception ex)
             {
-                throw new InvalidOperationException("An error occurred while uploading the certificate to S3.", ex);
+                Console.Write(ex.Message);
+                throw new Exception("An error occurred while adding the product: " + ex.Message);
             }
         }
-
-
-        public async Task<LoginResponse> LoginProvider(ProviderLoginDTO loginData)
+        public async Task<ProviderLoginResponse> AddLogin(ProviderLoginDTO providerdto)
         {
-            var provider = await _providerRepository.Login(loginData.email, loginData.password);
-            if (provider == null)
+            try
             {
-                return new LoginResponse
+                var pro = await _providerRepository.Login(providerdto.email, providerdto.password);
+                if (pro == null)
                 {
-                    Token = null,
-                    Message = "Invalid email or password"
+                    throw new Exception("Invalid provider.");
+                }
+                if (pro.password != providerdto.password)
+                {
+                    throw new Exception("Incorrect password.");
+                }
+
+                var token = CreateToken(pro);
+
+                return new ProviderLoginResponse
+                {
+                    id = pro.id,
+                    email = pro.email,
+                    token = token
                 };
             }
-
-            var token = GenerateJwtToken(provider);
-            return new LoginResponse
+            catch (Exception ex)
             {
-                Id = provider.id.ToString(),
-                username = provider.username,
-                Token = token,
-                Message = "Login successful."
-            };
+                throw new Exception("An error occurred: " + ex.Message);
+            }
         }
-        private string GenerateJwtToken(DAL.Entities.ProviderEntity.Provider provider)
+        public async Task<string> AddProviderDetails(ProviderDetailsDTO providerDetailsdto, IFormFile logo, IFormFile image)
         {
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
+            try
+            {
+               
+                if (logo == null || image == null)
+                {
+                    return "Image or logo is not uploaded";
+                }
+
+                var logUrl = await _cloudinary.UploadDocumentAsync(logo);
+                var imageUrl = await _cloudinary.UploadDocumentAsync(image);
+
+                //var providerDetails = new ProviderDetails
+                //{
+
+                //    resturent_name = providerDetailsdto.resturent_name,
+                //    address = providerDetailsdto.address,
+                //    phone_no = providerDetailsdto.phone_no,
+                //    location = providerDetailsdto.location,
+                //    logo = logUrl,
+                //    image = imageUrl,
+                //    about = providerDetailsdto.about,
+                //    account_no = providerDetailsdto.account_no
+                //};
+
+
+                var prddetails = _mapper.Map<ProviderDetails>(providerDetailsdto);
+
+                prddetails.logo = logUrl;
+                prddetails.image = imageUrl;
+
+                await _providerRepository.AddProviderDetailsAsync(prddetails);
+                await _providerRepository.SaveChangesAsync();
+
+                return "Added successfully";
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+
+        private string CreateToken(Provider user)
+        {
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:key"]));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
             var claims = new[]
             {
-                new Claim(ClaimTypes.NameIdentifier, provider.id.ToString()),
-                new Claim(ClaimTypes.Name, provider.username),
-
+                new Claim (ClaimTypes.NameIdentifier, user.id.ToString()),
+                new Claim (ClaimTypes.Name,user.username),
+                //new Claim (ClaimTypes.Role, user.role),
+                new Claim(ClaimTypes.Email, user.email)
             };
 
             var token = new JwtSecurityToken(
-                issuer: _configuration["Jwt:Issuer"],
-                audience: _configuration["Jwt:Audience"],
-                claims: claims,
-                signingCredentials: credentials,
-                expires: DateTime.UtcNow.AddDays(1)
-            );
-
+                    claims: claims,
+                    signingCredentials: credentials,
+                    expires: DateTime.Now.AddDays(1)
+                );
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
-        public async Task<string> GenereateAndSendPassword(Guid ProviderId)
-        {
-            var provider = await _providerRepository.GetProviderById(ProviderId);
-            if (provider == null)
-            {
-                return "Provider not found";
-            }
-            var newPassword = GenerateRandomPassword();
-            var passwordHasher = new PasswordHasher<DAL.Entities.ProviderEntity.Provider>();
-            var hashPasssword = passwordHasher.HashPassword(provider, newPassword);
-            provider.password = hashPasssword;
-            _providerRepository.Update(provider);
-            _providerRepository.SaveChangesAsync();
-            var emailSend = await SendPasswordEmailAsync(provider.email, provider.password);
 
-            if (emailSend)
-            {
-                return "Password has been updated and sent to the provider's email.";
-            }
-            else
-            {
-                return "Password updated, but failed to send email.";
-            }
-
-        }
-        private string GenerateRandomPassword()
-        {
-            using (var rng = new RNGCryptoServiceProvider())
-            {
-                var byteArray = new byte[5];
-                rng.GetBytes(byteArray);
-
-                // Convert byte array to a Base64 string to create a password
-                var password = Convert.ToBase64String(byteArray);
-                return password;
-            }
-        }
-        private async Task<bool> SendPasswordEmailAsync(string email, string password)
-        {
-            try
-            {
-                var mailMessage = new MailMessage
-                {
-                    From = new MailAddress("sherinshamna78@gmail.com"),
-                    Subject = "Your New Account Password",
-                    Body = $"Your new password is: {password}",
-                    IsBodyHtml = true
-                };
-                mailMessage.To.Add(email);
-
-                // configure
-                var smtpClient = new SmtpClient("smtp.gmail.com")
-                {
-                    Port = 587,
-                    Credentials = new NetworkCredential("sherinshamna78@gmail.com", "your-app-password"),
-                    EnableSsl = true
-                };
-                await smtpClient.SendMailAsync(mailMessage);
-                return true;
-            }
-            catch (Exception ex)
-            {
-
-                Console.WriteLine($"Failed to send email: {ex.Message}");
-                return false;
-            }
-        }
     }
-
 }

@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace TiffinMate.BLL.DTOs.ProviderDTOs
 {
-    public class ProviderDTO
+  public class ProviderLoginResponse
     {
-        public string username { get; set; }
+        public Guid id { get; set; }
         public string email { get; set; }
-       
+        public string token { get; set; }
     }
 }

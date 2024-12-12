@@ -5,6 +5,7 @@ using System.Net;
 using TiffinMate.API.ApiRespons;
 using TiffinMate.BLL.DTOs.UserDTOs;
 using TiffinMate.BLL.Interfaces.AuthInterface;
+using TiffinMate.BLL.Services.UserService;
 
 namespace TiffinMate.API.Controllers.UserControllers
 {
@@ -47,13 +48,13 @@ namespace TiffinMate.API.Controllers.UserControllers
         [HttpPost("verify-otp")]
         public async Task<IActionResult> VerifyOtp(VerifyOtpDto verifyOtpDto)
         {
-            if (string.IsNullOrEmpty(verifyOtpDto.Phone) || string.IsNullOrEmpty(verifyOtpDto.Otp))
+            if (string.IsNullOrEmpty(verifyOtpDto.phone) || string.IsNullOrEmpty(verifyOtpDto.otp))
             {
                 return NotFound(new ApiResponse<string>("failure", "Phone number and OTP are required.", null, HttpStatusCode.BadRequest, "Phone number and OTP are required"));
 
             }
 
-            var res = await _userService.VerifyUserOtp(verifyOtpDto.Phone, verifyOtpDto.Otp);
+            var res = await _userService.VerifyUserOtp(verifyOtpDto);
             if (!res)
             {
                 return BadRequest(new ApiResponse<string>("failure", "invalid OTP.", null, HttpStatusCode.BadRequest, "Invalid or expired OTP."));
@@ -108,5 +109,24 @@ namespace TiffinMate.API.Controllers.UserControllers
             }
            
         }
+        [HttpPost("forgot-passowrd")]
+        public async Task<IActionResult>ForgotPassword(ForgotPasswordDto forgotPasswordDto)
+        {
+           var res=await _userService.SendResetOtp(forgotPasswordDto);
+            return Ok(res);
+        }
+        [HttpPost("verify-email-otp")]
+        public async Task<IActionResult> VerifyEmailOtp(VerifyEmailOtpDto verifyEmailOtp)
+        {
+            var res=_userService.VerifyEmailOtp(verifyEmailOtp);
+            return Ok(res);
+        }
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto resetPasswordDto)
+        {
+            var result = await _userService.ResetPassword(resetPasswordDto);
+            return Ok(result);
+        }
+
     }
 }

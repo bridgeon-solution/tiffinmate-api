@@ -25,6 +25,7 @@ using TiffinMate.BLL.Services.CoudinaryService;
 using TiffinMate.DAL.Entities;
 using TiffinMate.BLL.Interfaces.UserInterfaces;
 using TiffinMate.BLL.Services.UserServices;
+using TiffinMate.DAL.Interfaces.UserInterfaces;
 
 
 
@@ -52,6 +53,8 @@ namespace TiffinMate.API
             builder.Services.AddScoped<IProviderRepository, ProviderRepository>();
             builder.Services.AddScoped<IProviderService, ProviderService>();
             builder.Services.AddScoped<IBrevoMailService,BrevoMailService>();
+            builder.Services.AddScoped<IUserRepository, UserRepository>();
+            builder.Services.AddScoped<IUserService, UserService>();
            
             builder.Services.AddScoped<ICloudinaryService, CloudinaryServices>();
             builder.Services.Configure<BrevoSettings>(builder.Configuration.GetSection("Brevo"));

@@ -45,11 +45,18 @@ namespace TiffinMate.BLL.Services.UserService
             _otpStore[userDto.phone] = userDto;
 
             var otpSent = await _otpService.SendSmsAsync(userDto.phone);
+            if (!otpSent)
+            {
+                
+                _otpStore.Remove(userDto.phone);
+                return false;
+            }
             return true;
         }
+    
         public async Task<bool> VerifyUserOtp(VerifyOtpDto verifyOtpDto)
         {
-            var isValid=await _otpService.VerifyOtpAsync(verifyOtpDto.phone,verifyOtpDto.otp);
+            var isValid=await _otpService.VerifyOtpAsync(verifyOtpDto);
             if (isValid)
             {
                 if (_otpStore.TryGetValue(verifyOtpDto.phone, out var userDto))
@@ -76,22 +83,38 @@ namespace TiffinMate.BLL.Services.UserService
             }
             return false;
         }
-        public async Task<string>LoginUser(LoginUserDto userDto)
+        public async Task<LoginResponseDto>LoginUser(LoginUserDto userDto)
         {
             var user = await _userRepository.GetUserByEmail(userDto.email);
             if (user == null)
             {
-                return "Not Found";
+                return new LoginResponseDto
+                {
+                    id = user.id,
+                    name = user.name,
+                    message = "User Not Found"
+                };
 
             }
             bool isPasswordValid = BCrypt.Net.BCrypt.Verify(userDto.password, user.password);
             if (!isPasswordValid)
             {
-                return "Invalid Password";
+                return new LoginResponseDto
+                {
+                    id = user.id,
+                    name = user.name,
+                    message = "Invalid Email"
+                };
             }
             var token = GenerateJwtToken(user);
 
-            return token;
+            return new LoginResponseDto
+            {
+                id = user.id,
+                name = user.name,
+                token=token,
+                message = "successfull"
+            };
 
         }
         private string GenerateJwtToken(User user)
@@ -162,11 +185,11 @@ namespace TiffinMate.BLL.Services.UserService
 
                 if (passwordUpdated)
                 {
-                    return "Password updated successfully.";
+                    return "Password updated";
                 }
                 else
                 {
-                    return "Failed to update password.";
+                    return "updation failed";
                 }
             }
         }

@@ -50,7 +50,7 @@ namespace TiffinMate.DAL.Migrations
 
                     b.HasKey("id");
 
-                    b.ToTable("Admins");
+                    b.ToTable("Admins", (string)null);
                 });
 
             modelBuilder.Entity("TiffinMate.DAL.Entities.ApiLog", b =>
@@ -92,7 +92,7 @@ namespace TiffinMate.DAL.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ApiLogs");
+                    b.ToTable("ApiLogs", (string)null);
                 });
 
             modelBuilder.Entity("TiffinMate.DAL.Entities.ProviderEntity.Provider", b =>
@@ -133,7 +133,7 @@ namespace TiffinMate.DAL.Migrations
 
                     b.HasKey("id");
 
-                    b.ToTable("Providers");
+                    b.ToTable("Providers", (string)null);
                 });
 
             modelBuilder.Entity("TiffinMate.DAL.Entities.ProviderEntity.ProviderDetails", b =>
@@ -181,7 +181,7 @@ namespace TiffinMate.DAL.Migrations
                     b.HasIndex("ProviderId")
                         .IsUnique();
 
-                    b.ToTable("ProvidersDetails");
+                    b.ToTable("ProvidersDetails", (string)null);
                 });
 
             modelBuilder.Entity("TiffinMate.DAL.Entities.User", b =>
@@ -220,7 +220,7 @@ namespace TiffinMate.DAL.Migrations
 
                     b.HasKey("id");
 
-                    b.ToTable("users");
+                    b.ToTable("users", (string)null);
                 });
 
             modelBuilder.Entity("TiffinMate.DAL.Entities.ProviderEntity.ProviderDetails", b =>

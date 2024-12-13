@@ -11,7 +11,7 @@ namespace TiffinMate.BLL.Interfaces.AuthInterface
     {
         Task<bool> RegisterUser(RegisterUserDto userDto);
         Task<bool> VerifyUserOtp(VerifyOtpDto verifyOtpDto);
-        Task<string> LoginUser(LoginUserDto userDto);
+        Task<LoginResponseDto> LoginUser(LoginUserDto userDto);
         Task<string> SendResetOtp(ForgotPasswordDto forgotPasswordDto);
         bool VerifyEmailOtp(VerifyEmailOtpDto verifyEmailOtp);
         Task<string> ResetPassword(ResetPasswordDto resetPasswordDto);

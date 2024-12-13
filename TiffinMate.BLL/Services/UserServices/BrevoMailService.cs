@@ -48,17 +48,16 @@ namespace TiffinMate.BLL.Services.UserServices
 
                     if (!response.IsSuccessStatusCode)
                     {
-                        Console.WriteLine($"Email sending failed: {response.StatusCode} - {responseBody}");
+                       
                         return false;
                     }
 
-                    Console.WriteLine($"Email sent successfully to {to}");
                     return true;
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error sending email: {ex.Message}");
+               
                 return false;
             }
         }

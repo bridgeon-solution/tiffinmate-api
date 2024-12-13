@@ -12,8 +12,8 @@ using TiffinMate.DAL.DbContexts;
 namespace TiffinMate.DAL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20241209071046_UpdatedProvider")]
-    partial class UpdatedProvider
+    [Migration("20241212162709_creating Fooditem")]
+    partial class creatingFooditem
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -96,6 +96,75 @@ namespace TiffinMate.DAL.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("ApiLogs");
+                });
+
+            modelBuilder.Entity("TiffinMate.DAL.Entities.ProviderEntity.Categories", b =>
+                {
+                    b.Property<Guid>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("categoryname")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("created_at")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("updated_at")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("id");
+
+                    b.ToTable("Categories");
+                });
+
+            modelBuilder.Entity("TiffinMate.DAL.Entities.ProviderEntity.FoodItem", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("categoryid")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("created_at")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("foodname")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("image")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("is_available")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("is_veg")
+                        .HasColumnType("boolean");
+
+                    b.Property<decimal>("price")
+                        .HasColumnType("numeric");
+
+                    b.Property<Guid>("providerid")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("updated_at")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("categoryid");
+
+                    b.HasIndex("providerid");
+
+                    b.ToTable("FoodItems");
                 });
 
             modelBuilder.Entity("TiffinMate.DAL.Entities.ProviderEntity.Provider", b =>
@@ -226,6 +295,25 @@ namespace TiffinMate.DAL.Migrations
                     b.ToTable("users");
                 });
 
+            modelBuilder.Entity("TiffinMate.DAL.Entities.ProviderEntity.FoodItem", b =>
+                {
+                    b.HasOne("TiffinMate.DAL.Entities.ProviderEntity.Categories", "category")
+                        .WithMany("foodItems")
+                        .HasForeignKey("categoryid")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TiffinMate.DAL.Entities.ProviderEntity.Provider", "provider")
+                        .WithMany("FoodItems")
+                        .HasForeignKey("providerid")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("category");
+
+                    b.Navigation("provider");
+                });
+
             modelBuilder.Entity("TiffinMate.DAL.Entities.ProviderEntity.ProviderDetails", b =>
                 {
                     b.HasOne("TiffinMate.DAL.Entities.ProviderEntity.Provider", "Provider")
@@ -237,8 +325,15 @@ namespace TiffinMate.DAL.Migrations
                     b.Navigation("Provider");
                 });
 
+            modelBuilder.Entity("TiffinMate.DAL.Entities.ProviderEntity.Categories", b =>
+                {
+                    b.Navigation("foodItems");
+                });
+
             modelBuilder.Entity("TiffinMate.DAL.Entities.ProviderEntity.Provider", b =>
                 {
+                    b.Navigation("FoodItems");
+
                     b.Navigation("ProviderDetails")
                         .IsRequired();
                 });

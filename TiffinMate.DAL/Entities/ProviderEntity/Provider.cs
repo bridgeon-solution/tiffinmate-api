@@ -20,5 +20,7 @@ namespace TiffinMate.DAL.Entities.ProviderEntity
         public bool is_certificate_verified { get; set; } = false;
 
         public ProviderDetails ProviderDetails { get; set; }
+
+        public ICollection<FoodItem> FoodItems { get; set; }
     }
 }

@@ -23,6 +23,8 @@ namespace TiffinMate.DAL.DbContexts
 
         public DbSet<Provider> Providers { get; set; }
         public DbSet<ProviderDetails> ProvidersDetails { get; set; }
+        public DbSet<Categories> Categories { get; set; }
+        public DbSet<FoodItem> FoodItems { get; set; }
 
         public DbSet<User> users { get; set; }
 
@@ -81,6 +83,24 @@ namespace TiffinMate.DAL.DbContexts
                 entity.Property(pd => pd.ProviderId)
                       .IsRequired();
             });
+
+            modelBuilder.Entity<FoodItem>(entity =>
+            {
+                entity.HasOne(e => e.category)
+                .WithMany(c => c.foodItems)
+                .HasForeignKey(d => d.categoryid);
+
+            });
+
+            modelBuilder.Entity<FoodItem>(entity =>
+            {
+                entity.HasOne(f => f.provider)
+                .WithMany(c => c.FoodItems)
+                .HasForeignKey(d => d.providerid)
+                .OnDelete(DeleteBehavior.Cascade);
+            });
+
+
 
         }
     }

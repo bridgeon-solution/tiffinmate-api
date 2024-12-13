@@ -34,8 +34,8 @@ namespace TiffinMate.API
         {
             var builder = WebApplication.CreateBuilder(args);
             
-            DotNetEnv.Env.Load();
-            var env = Environment.GetEnvironmentVariable("IS_DEVELOPMENT");
+             DotNetEnv.Env.Load();
+             var env = Environment.GetEnvironmentVariable("IS_DEVELOPMENT");
             // Add services to the container.
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -48,6 +48,8 @@ namespace TiffinMate.API
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<IProviderRepository, ProviderRepository>();
             builder.Services.AddScoped<IProviderService, ProviderService>();
+            builder.Services.AddScoped<IFoodItemRepository, FoodItemRepository>();
+            builder.Services.AddScoped<IFoodItemService, FoodItemService>();
            
             builder.Services.AddScoped<ICloudinaryService, CloudinaryServices>();
 

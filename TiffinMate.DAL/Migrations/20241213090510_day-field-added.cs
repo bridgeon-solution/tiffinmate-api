@@ -5,25 +5,25 @@
 namespace TiffinMate.DAL.Migrations
 {
     /// <inheritdoc />
-    public partial class UpdatedProvider : Migration
+    public partial class dayfieldadded : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<string>(
-                name: "role",
-                table: "Providers",
+                name: "day",
+                table: "FoodItems",
                 type: "text",
                 nullable: false,
-                defaultValue: "provider");
+                defaultValue: "");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "role",
-                table: "Providers");
+                name: "day",
+                table: "FoodItems");
         }
     }
 }

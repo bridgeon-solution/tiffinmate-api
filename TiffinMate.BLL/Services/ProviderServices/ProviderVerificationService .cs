@@ -8,10 +8,10 @@ namespace TiffinMate.BLL.Services.ProviderVerification
 {
     public class ProviderVerificationService : IProviderVerificationService
     {
-        private readonly IBrevoMailService _mailService;
+        private readonly IProviderBrevoMailService _mailService;
         private readonly IProviderRepository _providerRepository;
 
-        public ProviderVerificationService(IBrevoMailService mailService, IProviderRepository providerRepository)
+        public ProviderVerificationService(IProviderBrevoMailService mailService, IProviderRepository providerRepository)
         {
             _mailService = mailService;
             _providerRepository = providerRepository;

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TiffinMate.BLL.Interfaces.ProviderVerification
 {
-    public interface IBrevoMailService
+    public interface IProviderBrevoMailService
     {
         Task<bool> SendOtpEmailAsync(string to, string otp);
         Task<bool> Rejectmail(string to);

@@ -9,11 +9,11 @@ using TiffinMate.DAL.Entities;
 
 namespace TiffinMate.BLL.Services.ProviderVerification
 {
-    public class BrevoMailService : IBrevoMailService
+    public class ProviderBrevoMailService : IProviderBrevoMailService
     {
         private readonly BrevoSettings _brevoSettings;
 
-        public BrevoMailService(IOptions<BrevoSettings> brevoSettings)
+        public ProviderBrevoMailService(IOptions<BrevoSettings> brevoSettings)
         {
             _brevoSettings = brevoSettings.Value;
         }

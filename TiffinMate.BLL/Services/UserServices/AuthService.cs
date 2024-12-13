@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TiffinMate.BLL.DTOs.UserDTOs;
 using TiffinMate.BLL.Interfaces.AuthInterface;
+using TiffinMate.BLL.Interfaces.UserInterfaces;
 using TiffinMate.DAL.Entities;
 using TiffinMate.DAL.Interfaces.UserRepositoryInterface;
 
@@ -16,20 +17,23 @@ namespace TiffinMate.BLL.Services.UserService
 {
     public class AuthService:IAuthService
     {
-        private readonly IAuthRepository _userRepository;
+        private readonly IAuthRepository _authRepository;
         private readonly IOtpService _otpService;
+        private readonly IBrevoMailService _brevoMailService;
         private readonly IConfiguration _configuration;
         private static Dictionary<string,RegisterUserDto> _otpStore= new Dictionary<string,RegisterUserDto>();
-        public AuthService(IAuthRepository userRepository,IOtpService otpService,IConfiguration configuration)
+        private static Dictionary<string, string> _emailOtpStore = new Dictionary<string, string>();
+        public AuthService(IAuthRepository authRepository,IOtpService otpService,IConfiguration configuration,IBrevoMailService brevoMailService)
         {
-            _userRepository = userRepository;
+            _authRepository = authRepository;
             _otpService = otpService;
             _configuration = configuration;
+            _brevoMailService = brevoMailService;
             
         }
         public async Task<bool> RegisterUser(RegisterUserDto userDto)
         {
-            if (await _userRepository.UserExists(userDto.email))
+            if (await _authRepository.UserExists(userDto.email))
             {
                 return false;
 
@@ -41,27 +45,34 @@ namespace TiffinMate.BLL.Services.UserService
             _otpStore[userDto.phone] = userDto;
 
             var otpSent = await _otpService.SendSmsAsync(userDto.phone);
+            if (!otpSent)
+            {
+                
+                _otpStore.Remove(userDto.phone);
+                return false;
+            }
             return true;
         }
-        public async Task<bool> VerifyUserOtp(string phone, string otp)
+    
+        public async Task<bool> VerifyUserOtp(VerifyOtpDto verifyOtpDto)
         {
-            var isValid=await _otpService.VerifyOtpAsync(phone, otp);
+            var isValid=await _otpService.VerifyOtpAsync(verifyOtpDto);
             if (isValid)
             {
-                if (_otpStore.TryGetValue(phone, out var userDto))
+                if (_otpStore.TryGetValue(verifyOtpDto.phone, out var userDto))
                 {
                     var user = new User
                     {
                         name = userDto.name,
                         email = userDto.email,
-                        phone = phone,
+                        phone =verifyOtpDto. phone,
                         created_at = DateTime.UtcNow,
                         is_blocked = false,
                         password = userDto.password,
                         updated_at = DateTime.UtcNow,
                     };
-                    await _userRepository.CreateUser(user);
-                    _otpStore.Remove(phone);
+                    await _authRepository.CreateUser(user);
+                    _otpStore.Remove(verifyOtpDto.phone);
                     return true;
 
                 }
@@ -72,23 +83,38 @@ namespace TiffinMate.BLL.Services.UserService
             }
             return false;
         }
-        public async Task<string>LoginUser(LoginUserDto userDto)
+        public async Task<LoginResponseDto>LoginUser(LoginUserDto userDto)
         {
-            var user = await _userRepository.GetUserByEmail(userDto.email);
+            var user = await _authRepository.GetUserByEmail(userDto.email);
             if (user == null)
             {
-                return "Not Found";
+                return new LoginResponseDto
+                {
+                    id = user.id,
+                    name = user.name,
+                    message = "User Not Found"
+                };
 
             }
             bool isPasswordValid = BCrypt.Net.BCrypt.Verify(userDto.password, user.password);
             if (!isPasswordValid)
             {
-                return "Invalid Password";
+                return new LoginResponseDto
+                {
+                    id = user.id,
+                    name = user.name,
+                    message = "Invalid Email"
+                };
             }
             var token = GenerateJwtToken(user);
 
-            return token;
-
+            return new LoginResponseDto
+            {
+                id = user.id,
+                name = user.name,
+                token=token,
+                message = "successfull"
+            };
 
         }
         private string GenerateJwtToken(User user)
@@ -111,9 +137,62 @@ namespace TiffinMate.BLL.Services.UserService
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
-      
+        public async Task<string>SendResetOtp(ForgotPasswordDto forgotPasswordDto)
+        {
+            var user = _authRepository.GetUserByEmail(forgotPasswordDto.email);
+            if (user==null)
+            {
+                return "User Not Found";
+            }
+            string otp = _brevoMailService.GenerateOtp();
+            var res=await _brevoMailService.SendOtpEmailAsync(forgotPasswordDto.email, otp);
+            if (res)
+            {
+                _emailOtpStore[forgotPasswordDto.email] = otp;
+                return "otp sended";
+            }
+            else
+            {
+                return "failed";
+            }
+            
+        }
+        public bool VerifyEmailOtp(VerifyEmailOtpDto verifyEmailOtp)
+        {
+            var storedOtp= _emailOtpStore[verifyEmailOtp.email];
+            if (storedOtp == verifyEmailOtp.otp)
+            {
+                _emailOtpStore.Remove(verifyEmailOtp.email);
+                return true;
+                
+            }
+            else
+            {
+                return false;
+            }
+        }
+        public async Task<string> ResetPassword(ResetPasswordDto resetPasswordDto)
+        {
+            var user = await _authRepository.GetUserByEmail(resetPasswordDto. email);
+            if (user == null)
+            {
+                return "User Not Found";
+            }
+            else
+            {
+                string hashedPassword = BCrypt.Net.BCrypt.HashPassword(resetPasswordDto. password);
+                bool passwordUpdated = await _authRepository.UpdatePassword(user, hashedPassword);
 
-
+                if (passwordUpdated)
+                {
+                    return "Password updated";
+                }
+                else
+                {
+                    return "updation failed";
+                }
+            }
+        }
 
     }
 }

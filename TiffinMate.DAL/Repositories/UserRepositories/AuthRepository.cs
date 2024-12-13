@@ -33,5 +33,14 @@ namespace TiffinMate.DAL.Repositories.UserRepositories
             return await _context.users.FirstOrDefaultAsync(e => e.email == email);
             
         }
+        public async Task<bool> UpdatePassword(User user, string password)
+        {
+            user.password = password;
+            user.updated_at = DateTime.UtcNow;
+
+            
+            await _context.SaveChangesAsync();
+            return true;
+        }
     }
 }

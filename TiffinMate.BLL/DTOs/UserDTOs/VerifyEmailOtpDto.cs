@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace TiffinMate.BLL.DTOs.UserDTOs
 {
-    public class VerifyOtpDto
+    public class VerifyEmailOtpDto
     {
-        public string phone { get; set; }
+        public string email { get; set; }
         public string otp { get; set; }
     }
 }

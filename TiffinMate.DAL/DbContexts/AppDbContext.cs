@@ -56,6 +56,7 @@ namespace TiffinMate.DAL.DbContexts
                       .HasDefaultValueSql("gen_random_uuid()");
                 entity.Property(p => p.is_certificate_verified)
                       .HasDefaultValue(false);
+
                 entity.HasOne(p => p.ProviderDetails)
                       .WithOne(pd => pd.Provider)
                       .HasForeignKey<ProviderDetails>(pd => pd.ProviderId)
@@ -63,14 +64,20 @@ namespace TiffinMate.DAL.DbContexts
                 entity.Property(e => e.role).HasDefaultValue("provider");
             });
 
+
+
+
             //modelBuilder.Entity<ProviderDetails>(entity =>
             //{
-            //    entity.HasKey(u => u.id);
-            //    entity.Property(u => u.id)
+            //    entity.HasKey(pd => pd.id);
+            //    entity.Property(pd => pd.id)
             //          .HasColumnType("uuid")
             //          .IsRequired()
             //          .HasDefaultValueSql("gen_random_uuid()");
+            //    entity.Property(pd => pd.ProviderId)
+            //          .IsRequired();
             //});
+
             modelBuilder.Entity<ProviderDetails>(entity =>
             {
                 entity.HasKey(pd => pd.id);
@@ -78,10 +85,19 @@ namespace TiffinMate.DAL.DbContexts
                       .HasColumnType("uuid")
                       .IsRequired()
                       .HasDefaultValueSql("gen_random_uuid()");
+
                 entity.Property(pd => pd.ProviderId)
                       .IsRequired();
+
+                entity.HasOne(pd => pd.Provider)
+                      .WithOne(p => p.ProviderDetails)
+                      .HasForeignKey<ProviderDetails>(pd => pd.ProviderId)
+                      .OnDelete(DeleteBehavior.Cascade);
             });
 
+
         }
+
+
     }
 }

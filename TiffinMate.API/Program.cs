@@ -22,6 +22,9 @@ using TiffinMate.BLL.Interfaces.ProviderServiceInterafce;
 using TiffinMate.BLL.Services.ProviderServices;
 using TiffinMate.BLL.Interfaces.CloudinaryInterface;
 using TiffinMate.BLL.Services.CoudinaryService;
+using TiffinMate.BLL.Interfaces.ProviderVerification;
+using TiffinMate.BLL.Services.ProviderVerification;
+using TiffinMate.DAL.Entities;
 
 
 
@@ -33,8 +36,9 @@ namespace TiffinMate.API
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-            
+
             DotNetEnv.Env.Load();
+           
             var env = Environment.GetEnvironmentVariable("IS_DEVELOPMENT");
             // Add services to the container.
             builder.Services.AddControllers();
@@ -48,10 +52,13 @@ namespace TiffinMate.API
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<IProviderRepository, ProviderRepository>();
             builder.Services.AddScoped<IProviderService, ProviderService>();
-           
+            builder.Services.AddScoped<IProviderVerificationService, ProviderVerificationService>();
+
+            builder.Services.AddScoped<IBrevoMailService, BrevoMailService>();
+
             builder.Services.AddScoped<ICloudinaryService, CloudinaryServices>();
 
-
+            builder.Services.Configure<BrevoSettings>(builder.Configuration.GetSection("Brevo"));
 
 
             builder.Services.AddCors(options =>

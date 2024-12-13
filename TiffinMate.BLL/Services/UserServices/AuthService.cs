@@ -17,15 +17,15 @@ namespace TiffinMate.BLL.Services.UserService
 {
     public class AuthService:IAuthService
     {
-        private readonly IAuthRepository _userRepository;
+        private readonly IAuthRepository _authRepository;
         private readonly IOtpService _otpService;
         private readonly IBrevoMailService _brevoMailService;
         private readonly IConfiguration _configuration;
         private static Dictionary<string,RegisterUserDto> _otpStore= new Dictionary<string,RegisterUserDto>();
         private static Dictionary<string, string> _emailOtpStore = new Dictionary<string, string>();
-        public AuthService(IAuthRepository userRepository,IOtpService otpService,IConfiguration configuration,IBrevoMailService brevoMailService)
+        public AuthService(IAuthRepository authRepository,IOtpService otpService,IConfiguration configuration,IBrevoMailService brevoMailService)
         {
-            _userRepository = userRepository;
+            _authRepository = authRepository;
             _otpService = otpService;
             _configuration = configuration;
             _brevoMailService = brevoMailService;
@@ -33,7 +33,7 @@ namespace TiffinMate.BLL.Services.UserService
         }
         public async Task<bool> RegisterUser(RegisterUserDto userDto)
         {
-            if (await _userRepository.UserExists(userDto.email))
+            if (await _authRepository.UserExists(userDto.email))
             {
                 return false;
 
@@ -71,7 +71,7 @@ namespace TiffinMate.BLL.Services.UserService
                         password = userDto.password,
                         updated_at = DateTime.UtcNow,
                     };
-                    await _userRepository.CreateUser(user);
+                    await _authRepository.CreateUser(user);
                     _otpStore.Remove(verifyOtpDto.phone);
                     return true;
 
@@ -85,7 +85,7 @@ namespace TiffinMate.BLL.Services.UserService
         }
         public async Task<LoginResponseDto>LoginUser(LoginUserDto userDto)
         {
-            var user = await _userRepository.GetUserByEmail(userDto.email);
+            var user = await _authRepository.GetUserByEmail(userDto.email);
             if (user == null)
             {
                 return new LoginResponseDto
@@ -139,7 +139,7 @@ namespace TiffinMate.BLL.Services.UserService
 
         public async Task<string>SendResetOtp(ForgotPasswordDto forgotPasswordDto)
         {
-            var user = _userRepository.GetUserByEmail(forgotPasswordDto.email);
+            var user = _authRepository.GetUserByEmail(forgotPasswordDto.email);
             if (user==null)
             {
                 return "User Not Found";
@@ -173,7 +173,7 @@ namespace TiffinMate.BLL.Services.UserService
         }
         public async Task<string> ResetPassword(ResetPasswordDto resetPasswordDto)
         {
-            var user = await _userRepository.GetUserByEmail(resetPasswordDto. email);
+            var user = await _authRepository.GetUserByEmail(resetPasswordDto. email);
             if (user == null)
             {
                 return "User Not Found";
@@ -181,7 +181,7 @@ namespace TiffinMate.BLL.Services.UserService
             else
             {
                 string hashedPassword = BCrypt.Net.BCrypt.HashPassword(resetPasswordDto. password);
-                bool passwordUpdated = await _userRepository.UpdatePassword(user, hashedPassword);
+                bool passwordUpdated = await _authRepository.UpdatePassword(user, hashedPassword);
 
                 if (passwordUpdated)
                 {

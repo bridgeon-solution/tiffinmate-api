@@ -9,6 +9,8 @@ namespace TiffinMate.BLL.Interfaces.UserInterfaces
 {
     public interface IUserService
     {
-       
+        Task<UserResponseDto> GetUserById(Guid id);
+
+
     }
 }

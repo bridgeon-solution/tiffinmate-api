@@ -11,8 +11,6 @@ using TiffinMate.DAL.Entities.ProviderEntity;
 using User = TiffinMate.DAL.Entities.User;
 
 
-
-
 namespace TiffinMate.DAL.DbContexts
 {
     public class AppDbContext:DbContext

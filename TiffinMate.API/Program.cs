@@ -23,9 +23,9 @@ using TiffinMate.BLL.Services.ProviderServices;
 using TiffinMate.BLL.Interfaces.CloudinaryInterface;
 using TiffinMate.BLL.Services.CoudinaryService;
 using TiffinMate.DAL.Entities;
-using TiffinMate.BLL.Interfaces.UserInterfaces;
-using TiffinMate.BLL.Services.UserServices;
-using TiffinMate.DAL.Interfaces.UserInterfaces;
+//using TiffinMate.BLL.Interfaces.UserInterfaces;
+//using TiffinMate.BLL.Services.UserServices;
+//using TiffinMate.DAL.Interfaces.UserInterfaces;
 
 
 
@@ -51,10 +51,14 @@ namespace TiffinMate.API
             builder.Services.AddScoped<IAuthRepository, AuthRepository>();
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<IProviderRepository, ProviderRepository>();
+            builder.Services.AddScoped<IFoodItemRepository, FoodItemRepository>();
+            builder.Services.AddScoped<IFoodItemService, FoodItemService>();
+            
+
             
 
             builder.Services.AddScoped<ICloudinaryService, CloudinaryServices>();
-            builder.Services.Configure<BrevoSettings>(builder.Configuration.GetSection("Brevo"));
+            //builder.Services.Configure<BrevoSettings>(builder.Configuration.GetSection("Brevo"));
 
 
 

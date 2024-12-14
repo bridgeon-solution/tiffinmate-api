@@ -13,6 +13,10 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.Extensions.Configuration;
 using TiffinMate.DAL.DbContexts;
+using TiffinMate.DAL.Entities;
+using CloudinaryDotNet.Actions;
+using sib_api_v3_sdk.Client;
+using System.Net;
 
 namespace TiffinMate.BLL.Services.ProviderServices
 {
@@ -64,6 +68,7 @@ namespace TiffinMate.BLL.Services.ProviderServices
         {
             try
             {
+
                 var pro = await _providerRepository.Login(providerdto.email, providerdto.password);
                 if (pro == null)
                 {
@@ -74,14 +79,25 @@ namespace TiffinMate.BLL.Services.ProviderServices
                 {
                     throw new Exception("Incorrect password.");
                 }
+                if (pro.RefreshTokenExpiryDate < DateTime.UtcNow)
+                {
+                    throw new Exception("Refresh token expired");
+                }
 
+                var newRefreshToken = TokenHelper.GenerateRefreshToken();
+                pro.refresh_token = newRefreshToken;
+                pro.RefreshTokenExpiryDate = DateTime.UtcNow.AddDays(7);
+                pro.UpdatedAt= DateTime.UtcNow;
                 var token = CreateToken(pro);
+                _providerRepository.Update(pro);
+                await _providerRepository.SaveChangesAsync();
 
                 return new ProviderLoginResponse
                 {
                     id = pro.id,
                     email = pro.email,
-                    token = token
+                    token = token,
+                    refresh_token= newRefreshToken
                 };
             }
             catch (Exception ex)
@@ -120,6 +136,7 @@ namespace TiffinMate.BLL.Services.ProviderServices
 
                 prddetails.logo = logUrl;
                 prddetails.image = imageUrl;
+                prddetails.UpdatedAt = DateTime.UtcNow;
 
                 await _providerRepository.AddProviderDetailsAsync(prddetails);
                 await _providerRepository.SaveChangesAsync();
@@ -132,6 +149,7 @@ namespace TiffinMate.BLL.Services.ProviderServices
             }
         }
 
+        
 
         private string CreateToken(Provider user)
         {
@@ -156,3 +174,4 @@ namespace TiffinMate.BLL.Services.ProviderServices
 
     }
 }
+

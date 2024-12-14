@@ -12,8 +12,8 @@ using TiffinMate.DAL.DbContexts;
 namespace TiffinMate.DAL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20241209071046_UpdatedProvider")]
-    partial class UpdatedProvider
+    [Migration("20241212113247_addclass")]
+    partial class addclass
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -105,11 +105,17 @@ namespace TiffinMate.DAL.Migrations
                         .HasColumnType("uuid")
                         .HasDefaultValueSql("gen_random_uuid()");
 
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("RefreshTokenExpiryDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("certificate")
                         .HasColumnType("text");
-
-                    b.Property<DateTime?>("created_at")
-                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("email")
                         .HasColumnType("text");
@@ -122,14 +128,15 @@ namespace TiffinMate.DAL.Migrations
                     b.Property<string>("password")
                         .HasColumnType("text");
 
+                    b.Property<string>("refresh_token")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<string>("role")
                         .IsRequired()
                         .ValueGeneratedOnAdd()
                         .HasColumnType("text")
                         .HasDefaultValue("provider");
-
-                    b.Property<DateTime?>("updated_at")
-                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("username")
                         .HasColumnType("text");
@@ -160,6 +167,9 @@ namespace TiffinMate.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<DateTime?>("created_at")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("image")
                         .IsRequired()
                         .HasColumnType("text");
@@ -178,6 +188,9 @@ namespace TiffinMate.DAL.Migrations
                     b.Property<string>("resturent_name")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<DateTime?>("updated_at")
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("id");
 

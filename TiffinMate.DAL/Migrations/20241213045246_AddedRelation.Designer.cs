@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TiffinMate.DAL.DbContexts;
@@ -11,9 +12,11 @@ using TiffinMate.DAL.DbContexts;
 namespace TiffinMate.DAL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241213045246_AddedRelation")]
+    partial class AddedRelation
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -50,7 +53,7 @@ namespace TiffinMate.DAL.Migrations
 
                     b.HasKey("id");
 
-                    b.ToTable("Admins", (string)null);
+                    b.ToTable("Admins");
                 });
 
             modelBuilder.Entity("TiffinMate.DAL.Entities.ApiLog", b =>
@@ -92,7 +95,7 @@ namespace TiffinMate.DAL.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ApiLogs", (string)null);
+                    b.ToTable("ApiLogs");
                 });
 
             modelBuilder.Entity("TiffinMate.DAL.Entities.ProviderEntity.Provider", b =>
@@ -140,7 +143,7 @@ namespace TiffinMate.DAL.Migrations
 
                     b.HasKey("id");
 
-                    b.ToTable("Providers", (string)null);
+                    b.ToTable("Providers");
                 });
 
             modelBuilder.Entity("TiffinMate.DAL.Entities.ProviderEntity.ProviderDetails", b =>
@@ -194,7 +197,7 @@ namespace TiffinMate.DAL.Migrations
                     b.HasIndex("ProviderId")
                         .IsUnique();
 
-                    b.ToTable("ProvidersDetails", (string)null);
+                    b.ToTable("ProvidersDetails");
                 });
 
             modelBuilder.Entity("TiffinMate.DAL.Entities.User", b =>
@@ -233,7 +236,7 @@ namespace TiffinMate.DAL.Migrations
 
                     b.HasKey("id");
 
-                    b.ToTable("users", (string)null);
+                    b.ToTable("users");
                 });
 
             modelBuilder.Entity("TiffinMate.DAL.Entities.ProviderEntity.ProviderDetails", b =>

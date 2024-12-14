@@ -23,5 +23,7 @@ namespace TiffinMate.DAL.Entities.ProviderEntity
         public string refresh_token { get; set; } = string.Empty;
         public DateTime RefreshTokenExpiryDate { get; set; }
         public ProviderDetails ProviderDetails { get; set; }
+
+        public ICollection<FoodItem> FoodItems { get; set; }
     }
 }

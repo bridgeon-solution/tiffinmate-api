@@ -23,6 +23,9 @@ using TiffinMate.BLL.Services.ProviderServices;
 using TiffinMate.BLL.Interfaces.CloudinaryInterface;
 using TiffinMate.BLL.Services.CoudinaryService;
 using TiffinMate.DAL.Entities;
+//using TiffinMate.BLL.Interfaces.UserInterfaces;
+//using TiffinMate.BLL.Services.UserServices;
+//using TiffinMate.DAL.Interfaces.UserInterfaces;
 using TiffinMate.BLL.Interfaces.ProviderVerification;
 using TiffinMate.BLL.Services.ProviderVerification;
 using TiffinMate.BLL.Interfaces.UserInterfaces;
@@ -39,10 +42,11 @@ namespace TiffinMate.API
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+            
+             DotNetEnv.Env.Load();
+             var env = Environment.GetEnvironmentVariable("IS_DEVELOPMENT");
 
-            DotNetEnv.Env.Load();
-           
-            var env = Environment.GetEnvironmentVariable("IS_DEVELOPMENT");
+          
             // Add services to the container.
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -54,6 +58,15 @@ namespace TiffinMate.API
             builder.Services.AddScoped<IAuthRepository, AuthRepository>();
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<IProviderRepository, ProviderRepository>();
+            builder.Services.AddScoped<IFoodItemRepository, FoodItemRepository>();
+            builder.Services.AddScoped<IFoodItemService, FoodItemService>();
+            
+
+            
+
+            builder.Services.AddScoped<ICloudinaryService, CloudinaryServices>();
+            //builder.Services.Configure<BrevoSettings>(builder.Configuration.GetSection("Brevo"));
+
             builder.Services.AddScoped<IProviderService, ProviderService>();
             builder.Services.AddScoped<IProviderBrevoMailService, ProviderBrevoMailService>();
             builder.Services.AddScoped<IBrevoMailService, BrevoMailService>();

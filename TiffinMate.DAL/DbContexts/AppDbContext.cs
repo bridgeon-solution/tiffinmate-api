@@ -61,6 +61,10 @@ namespace TiffinMate.DAL.DbContexts
                       .HasForeignKey<ProviderDetails>(pd => pd.ProviderId)
                       .OnDelete(DeleteBehavior.Cascade);
                 entity.Property(e => e.role).HasDefaultValue("provider");
+                entity.Property(p => p.created_at)
+                .HasColumnName("CreatedAt");
+                entity.Property(p => p.updated_at)
+                .HasColumnName("UpdatedAt");
             });
 
             //modelBuilder.Entity<ProviderDetails>(entity =>

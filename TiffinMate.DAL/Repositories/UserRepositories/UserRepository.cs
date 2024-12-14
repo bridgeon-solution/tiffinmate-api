@@ -24,6 +24,11 @@ namespace TiffinMate.DAL.Repositories.UserRepositories
             var user = await _appDbContext.users.SingleOrDefaultAsync(u => u.id == id);
             return user;
         }
+        public async Task<List<User>> GetUsers()
+        {
+            return await _appDbContext.users.ToListAsync();
+        }
+
 
     }
 }

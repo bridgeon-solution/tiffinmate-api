@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Sprache;
 using System.Net;
 using TiffinMate.API.ApiRespons;
 using TiffinMate.BLL.DTOs.ProviderDTOs;
@@ -11,6 +12,7 @@ using TiffinMate.BLL.Interfaces.ProviderServiceInterafce;
 using TiffinMate.BLL.Services.ProviderServices;
 using TiffinMate.DAL.DbContexts;
 using TiffinMate.DAL.Entities;
+using TiffinMate.DAL.Entities.ProviderEntity;
 using TiffinMate.DAL.Interfaces.ProviderInterface;
 
 namespace TiffinMate.API.Controllers.ControllerProvider
@@ -99,6 +101,22 @@ public async Task<IActionResult> LoginProvider([FromBody] ProviderLoginDTO provi
                 return StatusCode((int)HttpStatusCode.InternalServerError, response);
 
             }
+        }
+
+        [HttpGet("All_providers")]
+        public async Task<IActionResult> AllProviders()
+        {
+            try
+            {
+                var response = await _providerService.GetProviders();
+                return Ok(new ApiResponse<List<Provider>>("success", "providers getted succesfuly", response, HttpStatusCode.OK, ""));
+            }
+            catch (Exception ex) {
+                var response = new ApiResponse<string>("failed", "", ex.Message, HttpStatusCode.InternalServerError, "error occured");
+                return StatusCode((int)HttpStatusCode.InternalServerError, response);
+            }
+            
+
         }
 
     }

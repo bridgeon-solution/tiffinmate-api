@@ -50,6 +50,11 @@ namespace TiffinMate.DAL.Repositories.ProviderRepositories
             await _context.SaveChangesAsync();
         }
 
+        public async Task<List<Provider>> GetProviders()
+        {
+            return await _context.Providers.ToListAsync();
+        }
+
 
 
 

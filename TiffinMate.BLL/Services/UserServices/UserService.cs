@@ -26,7 +26,7 @@ namespace TiffinMate.BLL.Services.UserServices
         }
         public async Task<List<User>> GetAllUsers()
         {
-            return await _authRepository.GetUsers();
+            return await _userRepository.GetUsers();
         }
        public async Task<BlockUnblockResponse> BlockUnblock(Guid id)
         {

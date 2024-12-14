@@ -22,6 +22,9 @@ using TiffinMate.BLL.Interfaces.ProviderServiceInterafce;
 using TiffinMate.BLL.Services.ProviderServices;
 using TiffinMate.BLL.Interfaces.CloudinaryInterface;
 using TiffinMate.BLL.Services.CoudinaryService;
+using TiffinMate.BLL.Interfaces.UserInterfaces;
+using TiffinMate.BLL.Services.UserServices;
+using TiffinMate.DAL.Interfaces.UserInterfaces;
 
 
 
@@ -48,6 +51,8 @@ namespace TiffinMate.API
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<IProviderRepository, ProviderRepository>();
             builder.Services.AddScoped<IProviderService, ProviderService>();
+            builder.Services.AddScoped<IUserService,UserService>();
+            builder.Services.AddScoped<IUserRepository, UserRepository>();
            
             builder.Services.AddScoped<ICloudinaryService, CloudinaryServices>();
 

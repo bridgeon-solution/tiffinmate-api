@@ -26,249 +26,243 @@ namespace TiffinMate.DAL.Migrations
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("TiffinMate.DAL.Entities.Admin", b =>
-                {
-                    b.Property<Guid>("id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasDefaultValueSql("gen_random_uuid()");
+            {
+                b.Property<Guid>("id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("uuid")
+                    .HasDefaultValueSql("gen_random_uuid()");
 
-                    b.Property<DateTime>("created_at")
-                        .HasColumnType("timestamp with time zone");
+                b.Property<DateTime>("created_at")
+                    .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("email")
-                        .IsRequired()
-                        .HasColumnType("text");
+                b.Property<string>("email")
+                    .IsRequired()
+                    .HasColumnType("text");
 
-                    b.Property<string>("password")
-                        .IsRequired()
-                        .HasColumnType("text");
+                b.Property<string>("password")
+                    .IsRequired()
+                    .HasColumnType("text");
 
-                    b.Property<string>("role")
-                        .IsRequired()
-                        .HasColumnType("text");
+                b.Property<string>("role")
+                    .IsRequired()
+                    .HasColumnType("text");
 
-                    b.Property<string>("username")
-                        .IsRequired()
-                        .HasColumnType("text");
+                b.Property<string>("username")
+                    .IsRequired()
+                    .HasColumnType("text");
 
-                    b.HasKey("id");
+                b.HasKey("id");
 
-                    b.ToTable("Admins");
-                });
+                b.ToTable("Admins");
+            });
 
             modelBuilder.Entity("TiffinMate.DAL.Entities.ApiLog", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
+            {
+                b.Property<int>("Id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("HttpMethod")
-                        .IsRequired()
-                        .HasColumnType("text");
+                b.Property<string>("HttpMethod")
+                    .IsRequired()
+                    .HasColumnType("text");
 
-                    b.Property<DateTime>("LoggedAt")
-                        .HasColumnType("timestamp with time zone");
+                b.Property<DateTime>("LoggedAt")
+                    .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("QueryString")
-                        .IsRequired()
-                        .HasColumnType("text");
+                b.Property<string>("QueryString")
+                    .IsRequired()
+                    .HasColumnType("text");
 
-                    b.Property<string>("RequestBody")
-                        .IsRequired()
-                        .HasColumnType("text");
+                b.Property<string>("RequestBody")
+                    .IsRequired()
+                    .HasColumnType("text");
 
-                    b.Property<string>("RequestPath")
-                        .IsRequired()
-                        .HasColumnType("text");
+                b.Property<string>("RequestPath")
+                    .IsRequired()
+                    .HasColumnType("text");
 
-                    b.Property<string>("ResponseBody")
-                        .IsRequired()
-                        .HasColumnType("text");
+                b.Property<string>("ResponseBody")
+                    .IsRequired()
+                    .HasColumnType("text");
 
-                    b.Property<int>("ResponseStatusCode")
-                        .HasColumnType("integer");
+                b.Property<int>("ResponseStatusCode")
+                    .HasColumnType("integer");
 
-                    b.Property<long>("TimeTaken")
-                        .HasColumnType("bigint");
+                b.Property<long>("TimeTaken")
+                    .HasColumnType("bigint");
 
-                    b.HasKey("Id");
+                b.HasKey("Id");
 
-                    b.ToTable("ApiLogs");
-                });
+                b.ToTable("ApiLogs");
+            });
 
             modelBuilder.Entity("TiffinMate.DAL.Entities.ProviderEntity.Categories", b =>
-                {
-                    b.Property<Guid>("id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+            {
+                b.Property<Guid>("id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("uuid");
 
-                    b.Property<string>("categoryname")
-                        .IsRequired()
-                        .HasColumnType("text");
+                b.Property<string>("categoryname")
+                    .IsRequired()
+                    .HasColumnType("text");
 
-                    b.Property<DateTime?>("created_at")
-                        .HasColumnType("timestamp with time zone");
+                b.Property<DateTime?>("created_at")
+                    .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateTime?>("updated_at")
-                        .HasColumnType("timestamp with time zone");
+                b.Property<DateTime?>("updated_at")
+                    .HasColumnType("timestamp with time zone");
 
-                    b.HasKey("id");
+                b.HasKey("id");
 
-                    b.ToTable("Categories");
-                });
+                b.ToTable("Categories");
+            });
 
             modelBuilder.Entity("TiffinMate.DAL.Entities.ProviderEntity.Provider", b =>
-                {
-                    b.Property<Guid>("id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasDefaultValueSql("gen_random_uuid()");
+            {
+                b.Property<Guid>("id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("uuid")
+                    .HasDefaultValueSql("gen_random_uuid()");
 
-                    b.Property<string>("certificate")
-                        .HasColumnType("text");
+                b.Property<string>("certificate")
+                    .HasColumnType("text");
 
-                    b.Property<DateTime?>("created_at")
-                        .HasColumnType("timestamp with time zone");
+                b.Property<DateTime?>("created_at")
+                    .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("email")
-                        .HasColumnType("text");
+                b.Property<string>("email")
+                    .HasColumnType("text");
 
-                    b.Property<bool>("is_certificate_verified")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(false);
+                b.Property<bool>("is_certificate_verified")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("boolean")
+                    .HasDefaultValue(false);
 
-                    b.Property<string>("password")
-                        .HasColumnType("text");
+                b.Property<string>("password")
+                    .HasColumnType("text");
 
-                    b.Property<string>("role")
-                        .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("text")
-                        .HasDefaultValue("provider");
+                b.Property<string>("role")
+                    .IsRequired()
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("text")
+                    .HasDefaultValue("provider");
 
-                    b.Property<DateTime?>("updated_at")
-                        .HasColumnType("timestamp with time zone");
+                b.Property<DateTime?>("updated_at")
+                    .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("username")
-                        .HasColumnType("text");
+                b.Property<string>("username")
+                    .HasColumnType("text");
 
-                    b.HasKey("id");
+                b.HasKey("id");
 
-                    b.ToTable("Providers");
-                });
+                b.ToTable("Providers");
+            });
 
             modelBuilder.Entity("TiffinMate.DAL.Entities.ProviderEntity.ProviderDetails", b =>
-                {
-                    b.Property<Guid>("id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasDefaultValueSql("gen_random_uuid()");
+            {
+                b.Property<Guid>("id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("uuid")
+                    .HasDefaultValueSql("gen_random_uuid()");
 
-                    b.Property<Guid>("ProviderId")
-                        .HasColumnType("uuid");
+                b.Property<Guid>("ProviderId")
+                    .HasColumnType("uuid");
 
-                    b.Property<string>("about")
-                        .IsRequired()
-                        .HasColumnType("text");
+                b.Property<string>("about")
+                    .IsRequired()
+                    .HasColumnType("text");
 
-                    b.Property<int>("account_no")
-                        .HasColumnType("integer");
+                b.Property<int>("account_no")
+                    .HasColumnType("integer");
 
-                    b.Property<string>("address")
-                        .IsRequired()
-                        .HasColumnType("text");
+                b.Property<string>("address")
+                    .IsRequired()
+                    .HasColumnType("text");
 
-                    b.Property<DateTime?>("created_at")
-                        .HasColumnType("timestamp with time zone");
+                b.Property<string>("image")
+                    .IsRequired()
+                    .HasColumnType("text");
 
-                    b.Property<string>("image")
-                        .IsRequired()
-                        .HasColumnType("text");
+                b.Property<string>("location")
+                    .IsRequired()
+                    .HasColumnType("text");
 
-                    b.Property<string>("location")
-                        .IsRequired()
-                        .HasColumnType("text");
+                b.Property<string>("logo")
+                    .IsRequired()
+                    .HasColumnType("text");
 
-                    b.Property<string>("logo")
-                        .IsRequired()
-                        .HasColumnType("text");
+                b.Property<int>("phone_no")
+                    .HasColumnType("integer");
 
-                    b.Property<int>("phone_no")
-                        .HasColumnType("integer");
+                b.Property<string>("resturent_name")
+                    .IsRequired()
+                    .HasColumnType("text");
 
-                    b.Property<string>("resturent_name")
-                        .IsRequired()
-                        .HasColumnType("text");
+                b.HasKey("id");
 
-                    b.Property<DateTime?>("updated_at")
-                        .HasColumnType("timestamp with time zone");
+                b.HasIndex("ProviderId")
+                    .IsUnique();
 
-                    b.HasKey("id");
-
-                    b.HasIndex("ProviderId")
-                        .IsUnique();
-
-                    b.ToTable("ProvidersDetails");
-                });
+                b.ToTable("ProvidersDetails");
+            });
 
             modelBuilder.Entity("TiffinMate.DAL.Entities.User", b =>
-                {
-                    b.Property<Guid>("id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasDefaultValueSql("gen_random_uuid()");
+            {
+                b.Property<Guid>("id")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("uuid")
+                    .HasDefaultValueSql("gen_random_uuid()");
 
-                    b.Property<DateTime>("created_at")
-                        .HasColumnType("timestamp with time zone");
+                b.Property<DateTime>("created_at")
+                    .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("email")
-                        .IsRequired()
-                        .HasColumnType("text");
+                b.Property<string>("email")
+                    .IsRequired()
+                    .HasColumnType("text");
 
-                    b.Property<bool>("is_blocked")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(false);
+                b.Property<bool>("is_blocked")
+                    .ValueGeneratedOnAdd()
+                    .HasColumnType("boolean")
+                    .HasDefaultValue(false);
 
-                    b.Property<string>("name")
-                        .IsRequired()
-                        .HasColumnType("text");
+                b.Property<string>("name")
+                    .IsRequired()
+                    .HasColumnType("text");
 
-                    b.Property<string>("password")
-                        .IsRequired()
-                        .HasColumnType("text");
+                b.Property<string>("password")
+                    .IsRequired()
+                    .HasColumnType("text");
 
-                    b.Property<string>("phone")
-                        .IsRequired()
-                        .HasColumnType("text");
+                b.Property<string>("phone")
+                    .IsRequired()
+                    .HasColumnType("text");
 
-                    b.Property<DateTime>("updated_at")
-                        .HasColumnType("timestamp with time zone");
+                b.Property<DateTime>("updated_at")
+                    .HasColumnType("timestamp with time zone");
 
-                    b.HasKey("id");
+                b.HasKey("id");
 
-                    b.ToTable("users");
-                });
+                b.ToTable("users");
+            });
 
             modelBuilder.Entity("TiffinMate.DAL.Entities.ProviderEntity.ProviderDetails", b =>
-                {
-                    b.HasOne("TiffinMate.DAL.Entities.ProviderEntity.Provider", "Provider")
-                        .WithOne("ProviderDetails")
-                        .HasForeignKey("TiffinMate.DAL.Entities.ProviderEntity.ProviderDetails", "ProviderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+            {
+                b.HasOne("TiffinMate.DAL.Entities.ProviderEntity.Provider", "Provider")
+                    .WithOne("ProviderDetails")
+                    .HasForeignKey("TiffinMate.DAL.Entities.ProviderEntity.ProviderDetails", "ProviderId")
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .IsRequired();
 
-                    b.Navigation("Provider");
-                });
+                b.Navigation("Provider");
+            });
 
             modelBuilder.Entity("TiffinMate.DAL.Entities.ProviderEntity.Provider", b =>
-                {
-                    b.Navigation("ProviderDetails")
-                        .IsRequired();
-                });
+            {
+                b.Navigation("ProviderDetails")
+                    .IsRequired();
+            });
 #pragma warning restore 612, 618
         }
     }

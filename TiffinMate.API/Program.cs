@@ -23,17 +23,14 @@ using TiffinMate.BLL.Services.ProviderServices;
 using TiffinMate.BLL.Interfaces.CloudinaryInterface;
 using TiffinMate.BLL.Services.CoudinaryService;
 using TiffinMate.DAL.Entities;
-<<<<<<< HEAD
 //using TiffinMate.BLL.Interfaces.UserInterfaces;
 //using TiffinMate.BLL.Services.UserServices;
 //using TiffinMate.DAL.Interfaces.UserInterfaces;
-=======
 using TiffinMate.BLL.Interfaces.ProviderVerification;
 using TiffinMate.BLL.Services.ProviderVerification;
 using TiffinMate.BLL.Interfaces.UserInterfaces;
 using TiffinMate.BLL.Services.UserServices;
 using TiffinMate.DAL.Interfaces.UserInterfaces;
->>>>>>> 126ef5d1c85422f0e46ef18eda180324bb6dae31
 
 
 
@@ -45,16 +42,11 @@ namespace TiffinMate.API
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-<<<<<<< HEAD
             
              DotNetEnv.Env.Load();
              var env = Environment.GetEnvironmentVariable("IS_DEVELOPMENT");
-=======
 
-            DotNetEnv.Env.Load();
-           
-            var env = Environment.GetEnvironmentVariable("IS_DEVELOPMENT");
->>>>>>> 126ef5d1c85422f0e46ef18eda180324bb6dae31
+          
             // Add services to the container.
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -66,7 +58,6 @@ namespace TiffinMate.API
             builder.Services.AddScoped<IAuthRepository, AuthRepository>();
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<IProviderRepository, ProviderRepository>();
-<<<<<<< HEAD
             builder.Services.AddScoped<IFoodItemRepository, FoodItemRepository>();
             builder.Services.AddScoped<IFoodItemService, FoodItemService>();
             
@@ -75,7 +66,7 @@ namespace TiffinMate.API
 
             builder.Services.AddScoped<ICloudinaryService, CloudinaryServices>();
             //builder.Services.Configure<BrevoSettings>(builder.Configuration.GetSection("Brevo"));
-=======
+
             builder.Services.AddScoped<IProviderService, ProviderService>();
             builder.Services.AddScoped<IProviderBrevoMailService, ProviderBrevoMailService>();
             builder.Services.AddScoped<IBrevoMailService, BrevoMailService>();
@@ -84,7 +75,6 @@ namespace TiffinMate.API
 
             builder.Services.AddScoped<ICloudinaryService, CloudinaryServices>();
             builder.Services.Configure<BrevoSettings>(builder.Configuration.GetSection("Brevo"));
->>>>>>> 126ef5d1c85422f0e46ef18eda180324bb6dae31
 
            
 

@@ -96,7 +96,6 @@ namespace TiffinMate.DAL.DbContexts
                       .OnDelete(DeleteBehavior.Cascade);
             });
 
-<<<<<<< HEAD
             modelBuilder.Entity<FoodItem>(entity =>
             {
                 entity.HasOne(e => e.category)
@@ -114,8 +113,6 @@ namespace TiffinMate.DAL.DbContexts
             });
 
 
-=======
->>>>>>> 126ef5d1c85422f0e46ef18eda180324bb6dae31
 
         }
 

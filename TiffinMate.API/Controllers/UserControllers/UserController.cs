@@ -1,12 +1,14 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Sprache;
 using System.Net;
 using TiffinMate.API.ApiRespons;
 using TiffinMate.BLL.DTOs.UserDTOs;
 using TiffinMate.BLL.Interfaces.AuthInterface;
 using TiffinMate.BLL.Interfaces.UserInterfaces;
 using TiffinMate.BLL.Services.UserService;
+using TiffinMate.DAL.Entities;
 
 namespace TiffinMate.API.Controllers.UserControllers
 {
@@ -17,7 +19,8 @@ namespace TiffinMate.API.Controllers.UserControllers
         private readonly IAuthService _authService;
         private readonly IOtpService _otpService;
         private readonly IUserService _userService;
-        public UserController(IAuthService authService, IOtpService otpService,IUserService userService)
+
+        public UserController(IAuthService authService, IOtpService otpService, IUserService userService)
         {
             _authService = authService;
             _otpService = otpService;
@@ -35,8 +38,8 @@ namespace TiffinMate.API.Controllers.UserControllers
                 {
                     return Conflict(new ApiResponse<string>("failure", "registration failed", null, HttpStatusCode.Conflict, "user already exist"));
                 }
-               
-                var result = new ApiResponse<bool>("success", "registration Successfull", response, HttpStatusCode.OK, "");
+                var result = new ApiResponse<bool>("succes", "registration Successfull", response, HttpStatusCode.OK, "");
+
                 return Ok(result);
 
             }
@@ -51,20 +54,34 @@ namespace TiffinMate.API.Controllers.UserControllers
         [HttpPost("verify-otp")]
         public async Task<IActionResult> VerifyOtp(VerifyOtpDto verifyOtpDto)
         {
-            if (string.IsNullOrEmpty(verifyOtpDto.phone) || string.IsNullOrEmpty(verifyOtpDto.otp))
+            try
             {
-                return BadRequest(new ApiResponse<string>("failure", "Phone number and OTP are required.", null, HttpStatusCode.BadRequest, "Phone number and OTP are required"));
+                if (string.IsNullOrEmpty(verifyOtpDto.phone) || string.IsNullOrEmpty(verifyOtpDto.otp))
+
+                {
+                    return BadRequest(new ApiResponse<string>("failure", "Phone number and OTP are required.", null, HttpStatusCode.BadRequest, "Phone number and OTP are required"));
+
+
+                }
+                var res = await _authService.VerifyUserOtp(verifyOtpDto);
+
+
+                if (!res)
+                {
+                    return BadRequest(new ApiResponse<string>("failure", "invalid OTP.", null, HttpStatusCode.BadRequest, "Invalid or expired OTP."));
+
+
+                }
+                return Ok(new ApiResponse<bool>("success", "OTP verification succesful",res , HttpStatusCode.OK, ""));
 
             }
-
-            var res = await _authService.VerifyUserOtp(verifyOtpDto);
-            if (!res)
+            catch(Exception ex)
             {
-                return BadRequest(new ApiResponse<string>("failure", "invalid OTP.", null, HttpStatusCode.BadRequest, "Invalid or expired OTP."));
 
-
+                var response = new ApiResponse<string>("failed", "", ex.Message, HttpStatusCode.InternalServerError, "error occured");
+                return StatusCode((int)HttpStatusCode.InternalServerError, response);
             }
-            return Ok(new ApiResponse<string>("success", "OTP verification succesful", null, HttpStatusCode.OK, ""));
+            
 
         }
         [HttpPost("login")]
@@ -73,19 +90,19 @@ namespace TiffinMate.API.Controllers.UserControllers
             try
             {
                 var response = await _authService.LoginUser(userDto);
+
                 if (response.message == "User Not Found")
                 {
                     return NotFound(new ApiResponse<string>("failure", "Login Failed", null, HttpStatusCode.NotFound, "user not found"));
                 }
-                if (response.message =="Invalid Password")
-                {
 
+                if (response.message == "Invalid Email")
+                {
                     return BadRequest(new ApiResponse<string>("failure", "Login Failed", null, HttpStatusCode.BadRequest, "Email or password is incorrect"));
                 }
 
-                var result = new ApiResponse<LoginResponseDto>("success", "Login Successfull", response, HttpStatusCode.OK, "");
+                var result = new ApiResponse<LoginResponseDto>("success", "Login Successful", response, HttpStatusCode.OK, "");
                 return Ok(result);
-
             }
             catch (Exception ex)
             {
@@ -101,19 +118,19 @@ namespace TiffinMate.API.Controllers.UserControllers
         {
             try
             {
-               var res= await _otpService.SendSmsAsync(phone);
+                var res = await _otpService.SendSmsAsync(phone);
                 return Ok(new ApiResponse<string>("success", "OTP sended succesful", null, HttpStatusCode.OK, ""));
 
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 var response = new ApiResponse<string>("failed", "", ex.Message, HttpStatusCode.InternalServerError, "error occured");
                 return StatusCode((int)HttpStatusCode.InternalServerError, response);
             }
-           
+
         }
         [HttpPost("forgot-passowrd")]
-        public async Task<IActionResult>ForgotPassword(ForgotPasswordDto forgotPasswordDto)
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordDto forgotPasswordDto)
         {
             try
             {
@@ -138,7 +155,7 @@ namespace TiffinMate.API.Controllers.UserControllers
                 return StatusCode((int)HttpStatusCode.InternalServerError, response);
 
             }
-            
+
         }
         [HttpPost("verify-email-otp")]
         public async Task<IActionResult> VerifyEmailOtp(VerifyEmailOtpDto verifyEmailOtp)
@@ -162,7 +179,8 @@ namespace TiffinMate.API.Controllers.UserControllers
 
             }
 
-            
+
+
         }
         [HttpPost("reset-password")]
         public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto resetPasswordDto)
@@ -190,7 +208,7 @@ namespace TiffinMate.API.Controllers.UserControllers
                 return StatusCode((int)HttpStatusCode.InternalServerError, response);
 
             }
-            
+
         }
         [HttpPost("resend-mail-otp")]
         public async Task<IActionResult> ResendMailOtp(ForgotPasswordDto forgotPasswordDto)
@@ -221,11 +239,16 @@ namespace TiffinMate.API.Controllers.UserControllers
 
         }
         [HttpGet("id")]
-        public async Task<IActionResult>GetUserById(Guid id)
+        public async Task<IActionResult> GetUserById(Guid id)
         {
             try
             {
                 var user = await _userService.GetUserById(id);
+                if (user == null)
+                {
+                    var notFoundResponse = new ApiResponse<string>("failed", "User not found", "", HttpStatusCode.NotFound, "User not found");
+                    return NotFound(notFoundResponse);
+                }
 
                 var result = new ApiResponse<UserResponseDto>("success", "fetched Successfully", user, HttpStatusCode.OK, "");
                 return Ok(result);
@@ -239,5 +262,38 @@ namespace TiffinMate.API.Controllers.UserControllers
             }
         }
 
+        [HttpGet("all_users")]
+        public async Task<IActionResult> GetUsers()
+        {
+            try
+            {
+                var result = await _userService.GetAllUsers();
+                return Ok(new ApiResponse<List<User>>("success", "users getted succesfuly", result, HttpStatusCode.OK, ""));
+
+
+            }
+            catch (Exception ex)
+            {
+                var response = new ApiResponse<string>("failed", "", ex.Message, HttpStatusCode.InternalServerError, "error occured");
+                return StatusCode((int)HttpStatusCode.InternalServerError, response);
+
+            }
+        }
+        [HttpPut("block_unblock")]
+        public async Task<IActionResult> BlockUnblockUser(Guid id)
+        {
+            try
+            {
+                var response = await _userService.BlockUnblock(id);
+                return Ok(new ApiResponse<BlockUnblockResponse>("success", "user blocked/unblocked succesfuly", response, HttpStatusCode.OK, ""));
+
+            }
+            catch (Exception ex)
+            {
+                var response = new ApiResponse<string>("failed", "", ex.Message, HttpStatusCode.InternalServerError, "error occured");
+                return StatusCode((int)HttpStatusCode.InternalServerError, response);
+
+            }
+        }
     }
 }

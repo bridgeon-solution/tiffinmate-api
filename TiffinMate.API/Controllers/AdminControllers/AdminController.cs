@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using TiffinMate.API.ApiRespons;
 using TiffinMate.BLL.DTOs.AdmiDTO;
+using TiffinMate.BLL.DTOs.AdmiDTOs;
 using TiffinMate.BLL.Interfaces.AdminInterface;
 
 namespace TiffinMate.API.Controllers.AdminControllers
@@ -16,23 +17,23 @@ namespace TiffinMate.API.Controllers.AdminControllers
         {
             _adminService = adminService;
         }
-        [HttpPost]
+        [HttpPost("login")]
         public async Task<IActionResult> Login(AdminLoginDTO loginDTO)
         {
             try
             {
                 var response = await _adminService.AdminLogin(loginDTO);
-                if (response == "Not Found")
+                if (response.message == "Not Found")
                 {
-                    return NotFound(new ApiResponse<string>("failure", "Login Failed", null, HttpStatusCode.NotFound, "Admin not found"));
+                    return Ok(new ApiResponse<string>("failure", "Login Failed", null, HttpStatusCode.NotFound, "Admin not found"));
                 }
-                if (response == "invalid email" || response == "invalid password")
+                if (response.message == "inccorect password")
                 {
 
-                    return BadRequest(new ApiResponse<string>("failure", "Login Failed", null, HttpStatusCode.BadRequest, "Email or password is incorrect"));
+                    return Ok(new ApiResponse<string>("failure", "Login Failed", null, HttpStatusCode.BadRequest, "Email or password is incorrect"));
                 }
 
-                var result = new ApiResponse<string>("success", "Login Successfull", response, HttpStatusCode.OK, "");
+                var result = new ApiResponse<LoginResponseDTO>("success", "Login Successfull", response, HttpStatusCode.OK, "");
                 return Ok(result);
 
             }

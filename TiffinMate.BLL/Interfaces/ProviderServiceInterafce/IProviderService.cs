@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using TiffinMate.BLL.DTOs.ProviderDTOs;
+using TiffinMate.DAL.Entities.ProviderEntity;
 
 namespace TiffinMate.BLL.Interfaces.ProviderServiceInterafce
 {
@@ -9,6 +10,7 @@ namespace TiffinMate.BLL.Interfaces.ProviderServiceInterafce
         Task<bool> AddProviderDetails(ProviderDetailsDTO providerDetailsdto, IFormFile logo, IFormFile image);
 
         Task<ProviderLoginResponse> AddLogin(ProviderLoginDTO providerdto);
+        Task<List<Provider>> GetProviders();
 
     }
 }

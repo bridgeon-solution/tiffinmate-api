@@ -83,39 +83,35 @@ namespace TiffinMate.BLL.Services.UserService
             }
             return false;
         }
-        public async Task<LoginResponseDto>LoginUser(LoginUserDto userDto)
+        public async Task<LoginResponseDto> LoginUser(LoginUserDto userDto)
         {
             var user = await _authRepository.GetUserByEmail(userDto.email);
             if (user == null)
             {
                 return new LoginResponseDto
                 {
-                    id = user.id,
-                    name = user.name,
                     message = "User Not Found"
                 };
-
             }
+
             bool isPasswordValid = BCrypt.Net.BCrypt.Verify(userDto.password, user.password);
             if (!isPasswordValid)
             {
                 return new LoginResponseDto
                 {
-                    id = user.id,
-                    name = user.name,
                     message = "Invalid Email"
                 };
             }
+
             var token = GenerateJwtToken(user);
 
             return new LoginResponseDto
             {
                 id = user.id,
                 name = user.name,
-                token=token,
-                message = "successfull"
+                token = token,
+                message = "Successful"
             };
-
         }
         private string GenerateJwtToken(User user)
         {

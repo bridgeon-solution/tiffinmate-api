@@ -49,7 +49,6 @@ namespace TiffinMate.DAL.Repositories.ProviderRepositories
 
             await _context.SaveChangesAsync();
         }
-
         public async Task<bool> ExistsAsync(Guid providerId)
         {
             return await _context.ProvidersDetails.AnyAsync(p => p.ProviderId == providerId);
@@ -60,6 +59,12 @@ namespace TiffinMate.DAL.Repositories.ProviderRepositories
             _context.Providers.Remove(remove);
             return true;
         }
+        public async Task<List<Provider>> GetProviders()
+        {
+            return await _context.Providers.ToListAsync();
+        }
+
+
 
     }
 }

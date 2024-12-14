@@ -172,6 +172,13 @@ namespace TiffinMate.BLL.Services.ProviderServices
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
+        public async Task<List<Provider>> GetProviders()
+        {
+            var provider = await _providerRepository.GetProviders();
+            return provider;
+        }
+
+
     }
 }
 

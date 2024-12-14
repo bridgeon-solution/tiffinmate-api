@@ -11,8 +11,6 @@ using TiffinMate.DAL.Entities.ProviderEntity;
 using User = TiffinMate.DAL.Entities.User;
 
 
-
-
 namespace TiffinMate.DAL.DbContexts
 {
     public class AppDbContext:DbContext
@@ -58,21 +56,29 @@ namespace TiffinMate.DAL.DbContexts
                       .HasDefaultValueSql("gen_random_uuid()");
                 entity.Property(p => p.is_certificate_verified)
                       .HasDefaultValue(false);
+
                 entity.HasOne(p => p.ProviderDetails)
                       .WithOne(pd => pd.Provider)
                       .HasForeignKey<ProviderDetails>(pd => pd.ProviderId)
                       .OnDelete(DeleteBehavior.Cascade);
                 entity.Property(e => e.role).HasDefaultValue("provider");
+               
             });
+
+
+
 
             //modelBuilder.Entity<ProviderDetails>(entity =>
             //{
-            //    entity.HasKey(u => u.id);
-            //    entity.Property(u => u.id)
+            //    entity.HasKey(pd => pd.id);
+            //    entity.Property(pd => pd.id)
             //          .HasColumnType("uuid")
             //          .IsRequired()
             //          .HasDefaultValueSql("gen_random_uuid()");
+            //    entity.Property(pd => pd.ProviderId)
+            //          .IsRequired();
             //});
+
             modelBuilder.Entity<ProviderDetails>(entity =>
             {
                 entity.HasKey(pd => pd.id);
@@ -80,10 +86,17 @@ namespace TiffinMate.DAL.DbContexts
                       .HasColumnType("uuid")
                       .IsRequired()
                       .HasDefaultValueSql("gen_random_uuid()");
+
                 entity.Property(pd => pd.ProviderId)
                       .IsRequired();
+
+                entity.HasOne(pd => pd.Provider)
+                      .WithOne(p => p.ProviderDetails)
+                      .HasForeignKey<ProviderDetails>(pd => pd.ProviderId)
+                      .OnDelete(DeleteBehavior.Cascade);
             });
 
+<<<<<<< HEAD
             modelBuilder.Entity<FoodItem>(entity =>
             {
                 entity.HasOne(e => e.category)
@@ -101,7 +114,11 @@ namespace TiffinMate.DAL.DbContexts
             });
 
 
+=======
+>>>>>>> 126ef5d1c85422f0e46ef18eda180324bb6dae31
 
         }
+
+
     }
 }

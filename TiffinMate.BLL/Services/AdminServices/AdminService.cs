@@ -9,6 +9,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using TiffinMate.BLL.DTOs.AdmiDTO;
+using TiffinMate.BLL.DTOs.AdmiDTOs;
 using TiffinMate.BLL.Interfaces.AdminInterface;
 using TiffinMate.DAL.Entities;
 using TiffinMate.DAL.Interfaces.AdminInterfaces;
@@ -25,20 +26,33 @@ namespace TiffinMate.BLL.Services.AdminService
             _adminRepository = adminRepository;
             _config = configuration;
         }
-        public async Task<string> AdminLogin(AdminLoginDTO adminLoginDTO)
+        public async Task<LoginResponseDTO> AdminLogin(AdminLoginDTO adminLoginDTO)
         {
             
             var user = await _adminRepository.AdminLogin(adminLoginDTO.email);
             if (user == null)
             {
-                return "Not Found"; 
+                return new LoginResponseDTO
+                {
+                    message = "Not Found"
+                };
             }
             if (user.password != adminLoginDTO.password)
             {
-                return "invalid password";
+                return new LoginResponseDTO
+                {
+                    message = "inccorect password"
+
+                };
             }
             var token = CreateToken(user);
-            return token;
+            return new LoginResponseDTO
+            {
+                id = user.id,
+                name = user.username,
+                token = token,
+                message="success"
+            };
 
 
             

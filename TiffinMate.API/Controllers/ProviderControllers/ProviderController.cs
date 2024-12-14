@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Sprache;
 using System.Net;
 using TiffinMate.API.ApiRespons;
 using TiffinMate.BLL.DTOs.ProviderDTOs;
@@ -11,6 +12,7 @@ using TiffinMate.BLL.Interfaces.ProviderServiceInterafce;
 using TiffinMate.BLL.Services.ProviderServices;
 using TiffinMate.DAL.DbContexts;
 using TiffinMate.DAL.Entities;
+using TiffinMate.DAL.Entities.ProviderEntity;
 using TiffinMate.DAL.Interfaces.ProviderInterface;
 
 namespace TiffinMate.API.Controllers.ControllerProvider
@@ -25,16 +27,16 @@ namespace TiffinMate.API.Controllers.ControllerProvider
         {
 
             _providerService = providerService;
-           
+
         }
 
         [HttpPost("addprovider")]
-        public async Task<IActionResult> Register([FromForm] ProviderDTO providerDTO,IFormFile certificateFile)
+        public async Task<IActionResult> Register([FromForm] ProviderDTO providerDTO, IFormFile certificateFile)
         {
-            
+
             try
             {
-                var response = await _providerService.AddProvider(providerDTO,certificateFile);
+                var response = await _providerService.AddProvider(providerDTO, certificateFile);
                 if (!response)
                 {
                     return BadRequest(new ApiResponse<string>("failure", "registration failed", null, HttpStatusCode.BadRequest, "certificate is not uploaded"));
@@ -52,35 +54,35 @@ namespace TiffinMate.API.Controllers.ControllerProvider
             }
         }
 
-[HttpPost("Login")]
-public async Task<IActionResult> LoginProvider([FromBody] ProviderLoginDTO providerdto)
-{
-    var startTime = DateTime.UtcNow;
-    object responseBody = null;
+        [HttpPost("Login")]
+        public async Task<IActionResult> LoginProvider([FromBody] ProviderLoginDTO providerdto)
+        {
+            var startTime = DateTime.UtcNow;
+            object responseBody = null;
 
-    try
-    {
-       
-        var response = await _providerService.AddLogin(providerdto);
+            try
+            {
 
-        
-        responseBody = new ApiResponse<ProviderLoginResponse>("success","Login successful",response,HttpStatusCode.OK,null );
+                var response = await _providerService.AddLogin(providerdto);
 
-        return Ok(responseBody);
-    }
-    catch (Exception ex)
-    {
-        responseBody = new ApiResponse<string>("failure","Login failed",ex.Message,HttpStatusCode.InternalServerError,"An error occurred while processing the request.");
 
-        return StatusCode((int)HttpStatusCode.InternalServerError, responseBody);
-    }
-}
+                responseBody = new ApiResponse<ProviderLoginResponse>("success", "Login successful", response, HttpStatusCode.OK, null);
+
+                return Ok(responseBody);
+            }
+            catch (Exception ex)
+            {
+                responseBody = new ApiResponse<string>("failure", "Login failed", ex.Message, HttpStatusCode.InternalServerError, "An error occurred while processing the request.");
+
+                return StatusCode((int)HttpStatusCode.InternalServerError, responseBody);
+            }
+        }
 
         [HttpPost("providerdetails")]
         public async Task<IActionResult> ProviderDetails([FromForm] ProviderDetailsDTO providerDetailsDTO, IFormFile logo, IFormFile image)
         {
 
-          
+
             try
             {
                 var response = await _providerService.AddProviderDetails(providerDetailsDTO, logo, image);
@@ -99,6 +101,22 @@ public async Task<IActionResult> LoginProvider([FromBody] ProviderLoginDTO provi
                 return StatusCode((int)HttpStatusCode.InternalServerError, response);
 
             }
+        }
+
+        [HttpGet("All_providers")]
+        public async Task<IActionResult> AllProviders()
+        {
+            try
+            {
+                var response = await _providerService.GetProviders();
+                return Ok(new ApiResponse<List<Provider>>("success", "providers getted succesfuly", response, HttpStatusCode.OK, ""));
+            }
+            catch (Exception ex) {
+                var response = new ApiResponse<string>("failed", "", ex.Message, HttpStatusCode.InternalServerError, "error occured");
+                return StatusCode((int)HttpStatusCode.InternalServerError, response);
+            }
+            
+
         }
 
     }

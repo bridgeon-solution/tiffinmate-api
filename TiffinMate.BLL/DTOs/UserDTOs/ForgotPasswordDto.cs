@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace TiffinMate.BLL.DTOs.UserDTOs
 {
-    public class VerifyOtpDto
+    public class ForgotPasswordDto
     {
-        public string phone { get; set; }
-        public string otp { get; set; }
+        public string email { get; set; }
     }
 }

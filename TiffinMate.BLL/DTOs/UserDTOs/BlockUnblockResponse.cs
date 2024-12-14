@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace TiffinMate.BLL.DTOs.UserDTOs
 {
-    public class VerifyOtpDto
+    public class BlockUnblockResponse
     {
-        public string phone { get; set; }
-        public string otp { get; set; }
+        public bool is_blocked { get; set; }
+        public string message { get; set; }
     }
 }

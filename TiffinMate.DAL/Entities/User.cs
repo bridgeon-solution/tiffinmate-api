@@ -21,6 +21,8 @@ namespace TiffinMate.DAL.Entities
         [Required]
         [EmailAddress]
         public string email { get; set; }
+        public string address { get; set; }
+        public string city { get; set; }
         public bool is_blocked { get; set; }
         public DateTime created_at { get; set; }
         public DateTime updated_at { get; set; }

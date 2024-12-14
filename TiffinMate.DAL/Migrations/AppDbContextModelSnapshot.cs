@@ -50,7 +50,7 @@ namespace TiffinMate.DAL.Migrations
 
                     b.HasKey("id");
 
-                    b.ToTable("Admins");
+                    b.ToTable("Admins", (string)null);
                 });
 
             modelBuilder.Entity("TiffinMate.DAL.Entities.ApiLog", b =>
@@ -92,7 +92,7 @@ namespace TiffinMate.DAL.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ApiLogs");
+                    b.ToTable("ApiLogs", (string)null);
                 });
 
             modelBuilder.Entity("TiffinMate.DAL.Entities.ProviderEntity.Categories", b =>
@@ -175,11 +175,17 @@ namespace TiffinMate.DAL.Migrations
                         .HasColumnType("uuid")
                         .HasDefaultValueSql("gen_random_uuid()");
 
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("RefreshTokenExpiryDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("certificate")
                         .HasColumnType("text");
-
-                    b.Property<DateTime?>("created_at")
-                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("email")
                         .HasColumnType("text");
@@ -192,21 +198,22 @@ namespace TiffinMate.DAL.Migrations
                     b.Property<string>("password")
                         .HasColumnType("text");
 
+                    b.Property<string>("refresh_token")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<string>("role")
                         .IsRequired()
                         .ValueGeneratedOnAdd()
                         .HasColumnType("text")
                         .HasDefaultValue("provider");
 
-                    b.Property<DateTime?>("updated_at")
-                        .HasColumnType("timestamp with time zone");
-
                     b.Property<string>("username")
                         .HasColumnType("text");
 
                     b.HasKey("id");
 
-                    b.ToTable("Providers");
+                    b.ToTable("Providers", (string)null);
                 });
 
             modelBuilder.Entity("TiffinMate.DAL.Entities.ProviderEntity.ProviderDetails", b =>
@@ -216,8 +223,14 @@ namespace TiffinMate.DAL.Migrations
                         .HasColumnType("uuid")
                         .HasDefaultValueSql("gen_random_uuid()");
 
+                    b.Property<DateTime?>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<Guid>("ProviderId")
                         .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("about")
                         .IsRequired()
@@ -254,7 +267,7 @@ namespace TiffinMate.DAL.Migrations
                     b.HasIndex("ProviderId")
                         .IsUnique();
 
-                    b.ToTable("ProvidersDetails");
+                    b.ToTable("ProvidersDetails", (string)null);
                 });
 
             modelBuilder.Entity("TiffinMate.DAL.Entities.User", b =>
@@ -293,7 +306,7 @@ namespace TiffinMate.DAL.Migrations
 
                     b.HasKey("id");
 
-                    b.ToTable("users");
+                    b.ToTable("users", (string)null);
                 });
 
             modelBuilder.Entity("TiffinMate.DAL.Entities.ProviderEntity.FoodItem", b =>

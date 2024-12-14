@@ -5,24 +5,24 @@
 namespace TiffinMate.DAL.Migrations
 {
     /// <inheritdoc />
-    public partial class UpdatedProvider : Migration
+    public partial class updateprovider : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<string>(
-                name: "role",
+                name: "refresh_token",
                 table: "Providers",
                 type: "text",
                 nullable: false,
-                defaultValue: "provider");
+                defaultValue: "");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "role",
+                name: "refresh_token",
                 table: "Providers");
         }
     }

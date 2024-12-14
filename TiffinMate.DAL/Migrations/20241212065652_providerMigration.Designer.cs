@@ -12,8 +12,8 @@ using TiffinMate.DAL.DbContexts;
 namespace TiffinMate.DAL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20241209055607_newMigration")]
-    partial class newMigration
+    [Migration("20241212065652_providerMigration")]
+    partial class providerMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -122,6 +122,12 @@ namespace TiffinMate.DAL.Migrations
                     b.Property<string>("password")
                         .HasColumnType("text");
 
+                    b.Property<string>("role")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("text")
+                        .HasDefaultValue("provider");
+
                     b.Property<DateTime?>("updated_at")
                         .HasColumnType("timestamp with time zone");
 
@@ -154,6 +160,9 @@ namespace TiffinMate.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<DateTime?>("created_at")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("image")
                         .IsRequired()
                         .HasColumnType("text");
@@ -172,6 +181,9 @@ namespace TiffinMate.DAL.Migrations
                     b.Property<string>("resturent_name")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<DateTime?>("updated_at")
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("id");
 

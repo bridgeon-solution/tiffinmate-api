@@ -10,6 +10,7 @@ namespace TiffinMate.BLL.Interfaces.UserInterfaces
 {
     public interface IUserService
     {
+        Task<UserResponseDto> GetUserById(Guid id);
         Task<List<User>> GetAllUsers();
         Task<BlockUnblockResponse> BlockUnblock(Guid id);
     }

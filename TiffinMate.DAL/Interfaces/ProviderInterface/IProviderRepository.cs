@@ -16,5 +16,7 @@ namespace TiffinMate.DAL.Interfaces.ProviderInterface
         void Update(Provider provider);
         Task SaveChangesAsync();
         Task<List<Provider>> GetProviders();
+        Task<bool> ExistsAsync(Guid providerId);
+        Task<bool> Remove(Guid id);
     }
 }

@@ -11,22 +11,29 @@ using TiffinMate.DAL.Interfaces.UserInterfaces;
 
 namespace TiffinMate.DAL.Repositories.UserRepositories
 {
-  public  class UserRepository:IUserRepository
-    {
-        private readonly AppDbContext _appDbContext;
+    public class UserRepository : IUserRepository
 
-        public UserRepository(AppDbContext appDbContext)
+    {
+        private readonly AppDbContext _context;
+        public UserRepository(AppDbContext context)
         {
-            _appDbContext = appDbContext;
+            _context = context;
         }
-      public async  Task<User> BlockUnblockUser(Guid id)
+
+        public async Task<User> BlockUnblockUser(Guid id)
+
         {
-            var user = await _appDbContext.users.SingleOrDefaultAsync(u => u.id == id);
+            var user = await _context.users.SingleOrDefaultAsync(u => u.id == id);
             return user;
         }
         public async Task<List<User>> GetUsers()
         {
-            return await _appDbContext.users.ToListAsync();
+            return await _context.users.ToListAsync();
+
+        }
+        public async Task<User> GetUserById(Guid id)
+        {
+            return await _context.users.FirstOrDefaultAsync(x => x.id == id);
         }
 
 

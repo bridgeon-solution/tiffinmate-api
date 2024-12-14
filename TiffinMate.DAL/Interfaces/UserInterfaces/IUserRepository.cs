@@ -7,10 +7,11 @@ using TiffinMate.DAL.Entities;
 
 namespace TiffinMate.DAL.Interfaces.UserInterfaces
 {
-   public interface IUserRepository
+    public interface IUserRepository
     {
         Task<User> BlockUnblockUser(Guid id);
         Task<List<User>> GetUsers();
+        Task<User> GetUserById(Guid id);
 
 
     }

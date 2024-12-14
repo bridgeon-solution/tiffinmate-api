@@ -18,7 +18,8 @@ namespace TiffinMate.BLL.Services.UserServices
         private readonly IAuthRepository _authRepository;
         private readonly IUserRepository _userRepository;
         private readonly AppDbContext _appDbContext;
-        public UserService(IAuthRepository authRepository,IUserRepository userRepository,AppDbContext appDbContext)
+        public UserService(IAuthRepository authRepository, IUserRepository userRepository, AppDbContext appDbContext)
+
         {
             _authRepository = authRepository;
             _userRepository = userRepository;
@@ -28,30 +29,45 @@ namespace TiffinMate.BLL.Services.UserServices
         {
             return await _userRepository.GetUsers();
         }
-       public async Task<BlockUnblockResponse> BlockUnblock(Guid id)
+        public async Task<BlockUnblockResponse> BlockUnblock(Guid id)
         {
-           
-                var user = await _userRepository.BlockUnblockUser(id);
-                if (user != null)
-                {
-                    user.is_blocked = !user.is_blocked;
-                    _appDbContext.SaveChanges();
+            var user = await _userRepository.BlockUnblockUser(id);
+            if (user != null)
+            {
+                user.is_blocked = !user.is_blocked;
+                _appDbContext.SaveChanges();
                 return new BlockUnblockResponse
                 {
                     is_blocked = user.is_blocked == true ? true : false,
                     message = user.is_blocked == true ? "user is blocked" : "user is unblocked"
                 };
+            }
 
-                }
             return new BlockUnblockResponse
             {
                 message = "invalid user"
             };
-           
-           
-
-
         }
 
+        public async Task<UserResponseDto> GetUserById(Guid id)
+        {
+            var user = await _userRepository.GetUserById(id);
+
+            if (user == null)
+            {
+                return null;
+            }
+
+            return new UserResponseDto
+            {
+                name = user.name,
+                phone = user.phone,
+                email = user.email
+            };
+        }
+
+
     }
-}
+
+    }
+

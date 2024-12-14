@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TiffinMate.DAL.Entities.ProviderEntity
 {
-    public class ProviderDetails
+    public class ProviderDetails:AuditableEntity
     {
         public Guid id { get; set; }
         public Guid ProviderId { get; set; }
@@ -18,7 +18,8 @@ namespace TiffinMate.DAL.Entities.ProviderEntity
         public string about { get; set; }
         public string image { get; set; }
         public int account_no { get; set; }
-
+        //public DateTime? created_at { get; set; } = DateTime.UtcNow;
+        //public DateTime? updated_at { get; set; } = DateTime.UtcNow;
         public Provider Provider { get; set; }
     }
 }

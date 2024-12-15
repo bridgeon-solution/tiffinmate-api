@@ -27,17 +27,18 @@ namespace TiffinMate.BLL.Services.ProviderServices
         private readonly ICloudinaryService _cloudinary;
         private readonly IConfiguration _config;
         private readonly AppDbContext _context;
-
+        private readonly string _jwtKey;
         public ProviderService(IProviderRepository providerRepository, IMapper mapper, ICloudinaryService cloudinary, IConfiguration config, AppDbContext context)
         {
             _providerRepository = providerRepository;
             _mapper = mapper;
             _cloudinary = cloudinary;
             _config = config;
-           _context=context;
+            _context = context;
+            _jwtKey = Environment.GetEnvironmentVariable("JWT_KEY");
         }
 
-
+        //register
         public async Task<bool> AddProvider(ProviderDTO product, IFormFile certificateFile)
         {
             try
@@ -64,30 +65,52 @@ namespace TiffinMate.BLL.Services.ProviderServices
                 throw new Exception("An error occurred while adding the product: " + ex.Message);
             }
         }
+
+        //addlogin
         public async Task<ProviderLoginResponse> AddLogin(ProviderLoginDTO providerdto)
         {
             try
             {
+                if (string.IsNullOrEmpty(providerdto.email) || string.IsNullOrEmpty(providerdto.password))
+                {
+                    throw new Exception("Email or password cannot be null or empty.");
+                }
 
                 var pro = await _providerRepository.Login(providerdto.email, providerdto.password);
+
                 if (pro == null)
                 {
-                  
                     throw new Exception("Invalid provider.");
                 }
+
+                if (pro.password == null || providerdto.password == null)
+                {
+                    throw new Exception("Password cannot be null.");
+                }
+
                 if (pro.password != providerdto.password)
                 {
                     throw new Exception("Incorrect password.");
                 }
+
                 if (pro.RefreshTokenExpiryDate < DateTime.UtcNow)
                 {
                     throw new Exception("Refresh token expired");
                 }
 
-                var newRefreshToken = TokenHelper.GenerateRefreshToken();
+                var tokenHelper = new TokenHelper();
+
+                var newRefreshToken = tokenHelper.GenerateRefreshToken(pro);
+
+                if (string.IsNullOrEmpty(newRefreshToken))
+                {
+                    throw new Exception("Failed to generate refresh token.");
+                }
+
                 pro.refresh_token = newRefreshToken;
                 pro.RefreshTokenExpiryDate = DateTime.UtcNow.AddDays(7);
-                pro.UpdatedAt= DateTime.UtcNow;
+                pro.UpdatedAt = DateTime.UtcNow;
+
                 var token = CreateToken(pro);
                 _providerRepository.Update(pro);
                 await _providerRepository.SaveChangesAsync();
@@ -97,19 +120,25 @@ namespace TiffinMate.BLL.Services.ProviderServices
                     id = pro.id,
                     email = pro.email,
                     token = token,
-                    refresh_token= newRefreshToken
+                    refresh_token = newRefreshToken
                 };
             }
             catch (Exception ex)
             {
+
+                Console.WriteLine($"Error during login: {ex.Message}");
+                Console.WriteLine($"Query Parameters - Email: {providerdto.email}, Password: {providerdto.password}");
+
                 throw new Exception("An error occurred: " + ex.Message);
             }
         }
+
+        //addproviderdetails
         public async Task<bool> AddProviderDetails(ProviderDetailsDTO providerDetailsdto, IFormFile logo, IFormFile image)
         {
             try
             {
-               
+
                 if (logo == null || image == null)
                 {
                     return false;
@@ -149,11 +178,42 @@ namespace TiffinMate.BLL.Services.ProviderServices
             }
         }
 
-        
+        //get refresh token
+        public async Task<ProviderLoginResponse> GetRefreshToken(string refreshToken)
+        {
+            try
+            {
+                var provider = await _providerRepository.GetUserByRefreshTokenAsync(refreshToken);
+                if (provider == null || provider.RefreshTokenExpiryDate < DateTime.UtcNow)
+                {
+                    throw new Exception("Invalid or expired refresh token.");
+                }
+                var newAccessToken = CreateToken(provider);
+                var tokenHelper = new TokenHelper();
+                var newRefreshToken = tokenHelper.GenerateRefreshToken(provider);
 
+                //update
+                provider.refresh_token = newRefreshToken;
+                provider.RefreshTokenExpiryDate = DateTime.UtcNow.AddDays(7);
+                provider.UpdatedAt = DateTime.UtcNow;
+
+                return new ProviderLoginResponse
+                {
+                    id = provider.id,
+                    email = provider.email,
+                    token = newAccessToken,
+                    refresh_token = newRefreshToken,
+                };
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"{ex.Message}");
+            }
+        }
+        //Token
         private string CreateToken(Provider user)
         {
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:key"]));
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtKey));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
             var claims = new[]
@@ -171,6 +231,8 @@ namespace TiffinMate.BLL.Services.ProviderServices
                 );
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+
+        //get all provider
 
         public async Task<List<Provider>> GetProviders()
         {

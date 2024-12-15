@@ -30,7 +30,7 @@ namespace TiffinMate.API.Controllers.ControllerProvider
 
         }
 
-        [HttpPost("addprovider")]
+        [HttpPost("register")]
         public async Task<IActionResult> Register([FromForm] ProviderDTO providerDTO, IFormFile certificateFile)
         {
 
@@ -54,7 +54,7 @@ namespace TiffinMate.API.Controllers.ControllerProvider
             }
         }
 
-        [HttpPost("Login")]
+        [HttpPost("login")]
         public async Task<IActionResult> LoginProvider([FromBody] ProviderLoginDTO providerdto)
         {
             var startTime = DateTime.UtcNow;
@@ -103,7 +103,7 @@ namespace TiffinMate.API.Controllers.ControllerProvider
             }
         }
 
-        [HttpGet("All_providers")]
+        [HttpGet("providers")]
         public async Task<IActionResult> AllProviders()
         {
             try

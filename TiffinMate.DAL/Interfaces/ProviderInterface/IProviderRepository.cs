@@ -18,5 +18,6 @@ namespace TiffinMate.DAL.Interfaces.ProviderInterface
         Task<List<Provider>> GetProviders();
         Task<bool> ExistsAsync(Guid providerId);
         Task<bool> Remove(Guid id);
+        Task<Provider> GetUserByRefreshTokenAsync(string refreshToken);
     }
 }

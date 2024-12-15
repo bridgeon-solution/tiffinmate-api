@@ -42,11 +42,17 @@ namespace TiffinMate.API
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-            
-             DotNetEnv.Env.Load();
-             var env = Environment.GetEnvironmentVariable("IS_DEVELOPMENT");
 
-          
+            DotNetEnv.Env.Load();
+            var jwtKey = Environment.GetEnvironmentVariable("JWT_KEY");
+            var jwtRefreshKey = Environment.GetEnvironmentVariable("JWT_REFRESH_KEY");
+            var env = Environment.GetEnvironmentVariable("IS_DEVELOPMENT");
+            //db
+            var defaultConnection = Environment.GetEnvironmentVariable("DefaultConnection");
+            var hostUrl = Environment.GetEnvironmentVariable("HostUrl");
+            var hostApi = Environment.GetEnvironmentVariable("HostAPI");
+
+
             // Add services to the container.
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -60,12 +66,12 @@ namespace TiffinMate.API
             builder.Services.AddScoped<IProviderRepository, ProviderRepository>();
             builder.Services.AddScoped<IFoodItemRepository, FoodItemRepository>();
             builder.Services.AddScoped<IFoodItemService, FoodItemService>();
-            
 
-            
+
+           
 
             builder.Services.AddScoped<ICloudinaryService, CloudinaryServices>();
-            //builder.Services.Configure<BrevoSettings>(builder.Configuration.GetSection("Brevo"));
+            
 
             builder.Services.AddScoped<IProviderService, ProviderService>();
             builder.Services.AddScoped<IProviderBrevoMailService, ProviderBrevoMailService>();
@@ -88,41 +94,53 @@ namespace TiffinMate.API
             });
 
 
-
-            builder.Services.AddScoped<Supabase.Client>(_ => new Supabase.Client(builder.Configuration.GetConnectionString("HostUrl"), builder.Configuration.GetConnectionString("HostAPI"),
-             new SupabaseOptions
-             {
-                 AutoRefreshToken = true,
-                 AutoConnectRealtime = true,
-             }));
-
             builder.Services.AddDbContext<AppDbContext>(options =>
-               options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseNpgsql(defaultConnection));
+
+            builder.Services.AddScoped<Supabase.Client>(_ => new Supabase.Client(hostUrl, hostApi,
+                new SupabaseOptions
+                {
+                    AutoRefreshToken = true,
+                    AutoConnectRealtime = true,
+                }));
+
             builder.Services.AddAutoMapper(typeof(MappingProfile));
 
+         
             builder.Services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-            }).AddJwtBearer(o =>
+            })
+        .AddJwtBearer("AccessToken", options =>
+        {
+            options.TokenValidationParameters = new TokenValidationParameters
             {
-                o.TokenValidationParameters = new TokenValidationParameters
-                {
-                    IssuerSigningKey = new SymmetricSecurityKey
-                    (Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])),
-                    ValidateIssuer = false,
-                    ValidateAudience = false,
-                    ValidateLifetime = true,
-                    ValidateIssuerSigningKey = true
-                };
-            });
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
+                ValidateIssuer = false,
+                ValidateAudience = false,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true
+            };
+        })
+        .AddJwtBearer("RefreshToken", options =>
+        {
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtRefreshKey)),
+                ValidateIssuer = false,
+                ValidateAudience = false,
+                ValidateLifetime = false, // Refresh tokens usually don't validate lifetime
+                ValidateIssuerSigningKey = true
+            };
+        });
 
-           
-           
-           
-            
-    
+
+
+
+
+
 
             builder.Services.AddSingleton<IOtpService>(provider =>
             {

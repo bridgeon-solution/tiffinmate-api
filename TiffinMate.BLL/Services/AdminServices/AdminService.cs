@@ -20,11 +20,12 @@ namespace TiffinMate.BLL.Services.AdminService
     {
         private readonly IAdminRepository _adminRepository;
         private readonly IConfiguration _config;
-      
+        private readonly string _jwtKey;
         public AdminService(IAdminRepository adminRepository,IConfiguration configuration)
         {
             _adminRepository = adminRepository;
             _config = configuration;
+            _jwtKey = Environment.GetEnvironmentVariable("JWT_KEY");
         }
         public async Task<LoginResponseDTO> AdminLogin(AdminLoginDTO adminLoginDTO)
         {
@@ -60,7 +61,7 @@ namespace TiffinMate.BLL.Services.AdminService
 
         private string CreateToken(Admin user)
         {
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:key"]));
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtKey));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
             var claims = new[]

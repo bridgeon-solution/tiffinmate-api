@@ -47,8 +47,12 @@ namespace TiffinMate.API
             var jwtKey = Environment.GetEnvironmentVariable("JWT_KEY");
             var jwtRefreshKey = Environment.GetEnvironmentVariable("JWT_REFRESH_KEY");
             var env = Environment.GetEnvironmentVariable("IS_DEVELOPMENT");
+            //db
+            var defaultConnection = Environment.GetEnvironmentVariable("DefaultConnection");
+            var hostUrl = Environment.GetEnvironmentVariable("HostUrl");
+            var hostApi = Environment.GetEnvironmentVariable("HostAPI");
 
-          
+
             // Add services to the container.
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -90,35 +94,19 @@ namespace TiffinMate.API
             });
 
 
-
-            builder.Services.AddScoped<Supabase.Client>(_ => new Supabase.Client(builder.Configuration.GetConnectionString("HostUrl"), builder.Configuration.GetConnectionString("HostAPI"),
-             new SupabaseOptions
-             {
-                 AutoRefreshToken = true,
-                 AutoConnectRealtime = true,
-             }));
-
             builder.Services.AddDbContext<AppDbContext>(options =>
-               options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseNpgsql(defaultConnection));
+
+            builder.Services.AddScoped<Supabase.Client>(_ => new Supabase.Client(hostUrl, hostApi,
+                new SupabaseOptions
+                {
+                    AutoRefreshToken = true,
+                    AutoConnectRealtime = true,
+                }));
+
             builder.Services.AddAutoMapper(typeof(MappingProfile));
 
-            //builder.Services.AddAuthentication(options =>
-            //{
-            //    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-            //    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            //    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-            //}).AddJwtBearer(o =>
-            //{
-            //    o.TokenValidationParameters = new TokenValidationParameters
-            //    {
-            //        IssuerSigningKey = new SymmetricSecurityKey
-            //        (Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])),
-            //        ValidateIssuer = false,
-            //        ValidateAudience = false,
-            //        ValidateLifetime = true,
-            //        ValidateIssuerSigningKey = true
-            //    };
-            //});
+         
             builder.Services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

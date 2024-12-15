@@ -103,7 +103,7 @@ namespace TiffinMate.API.Controllers.ControllerProvider
             }
         }
 
-        [HttpGet("all_providers")]
+        [HttpGet("providers")]
         public async Task<IActionResult> AllProviders()
         {
             try

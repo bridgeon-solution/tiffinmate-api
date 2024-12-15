@@ -63,6 +63,10 @@ namespace TiffinMate.DAL.Repositories.ProviderRepositories
         {
             return await _context.Providers.ToListAsync();
         }
+        public async Task<Provider> GetUserByRefreshTokenAsync(string refreshToken)
+        {
+            return await _context.Providers.FirstOrDefaultAsync(u => u.refresh_token == refreshToken);
+        }
 
 
 

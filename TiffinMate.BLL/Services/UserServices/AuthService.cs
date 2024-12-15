@@ -23,13 +23,15 @@ namespace TiffinMate.BLL.Services.UserService
         private readonly IConfiguration _configuration;
         private static Dictionary<string,RegisterUserDto> _otpStore= new Dictionary<string,RegisterUserDto>();
         private static Dictionary<string, string> _emailOtpStore = new Dictionary<string, string>();
+        private readonly string _jwtKey;
         public AuthService(IAuthRepository authRepository,IOtpService otpService,IConfiguration configuration,IBrevoMailService brevoMailService)
         {
             _authRepository = authRepository;
             _otpService = otpService;
             _configuration = configuration;
             _brevoMailService = brevoMailService;
-            
+            _jwtKey = Environment.GetEnvironmentVariable("JWT_KEY");
+
         }
         public async Task<bool> RegisterUser(RegisterUserDto userDto)
         {
@@ -115,7 +117,7 @@ namespace TiffinMate.BLL.Services.UserService
         }
         private string GenerateJwtToken(User user)
         {
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtKey));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
             var claims = new[]

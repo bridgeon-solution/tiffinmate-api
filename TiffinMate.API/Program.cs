@@ -42,9 +42,11 @@ namespace TiffinMate.API
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-            
-             DotNetEnv.Env.Load();
-             var env = Environment.GetEnvironmentVariable("IS_DEVELOPMENT");
+
+            DotNetEnv.Env.Load();
+            var jwtKey = Environment.GetEnvironmentVariable("JWT_KEY");
+            var jwtRefreshKey = Environment.GetEnvironmentVariable("JWT_REFRESH_KEY");
+            var env = Environment.GetEnvironmentVariable("IS_DEVELOPMENT");
 
           
             // Add services to the container.
@@ -60,12 +62,12 @@ namespace TiffinMate.API
             builder.Services.AddScoped<IProviderRepository, ProviderRepository>();
             builder.Services.AddScoped<IFoodItemRepository, FoodItemRepository>();
             builder.Services.AddScoped<IFoodItemService, FoodItemService>();
-            
 
-            
+
+           
 
             builder.Services.AddScoped<ICloudinaryService, CloudinaryServices>();
-            //builder.Services.Configure<BrevoSettings>(builder.Configuration.GetSection("Brevo"));
+            
 
             builder.Services.AddScoped<IProviderService, ProviderService>();
             builder.Services.AddScoped<IProviderBrevoMailService, ProviderBrevoMailService>();
@@ -100,29 +102,57 @@ namespace TiffinMate.API
                options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
             builder.Services.AddAutoMapper(typeof(MappingProfile));
 
+            //builder.Services.AddAuthentication(options =>
+            //{
+            //    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            //    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            //    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+            //}).AddJwtBearer(o =>
+            //{
+            //    o.TokenValidationParameters = new TokenValidationParameters
+            //    {
+            //        IssuerSigningKey = new SymmetricSecurityKey
+            //        (Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])),
+            //        ValidateIssuer = false,
+            //        ValidateAudience = false,
+            //        ValidateLifetime = true,
+            //        ValidateIssuerSigningKey = true
+            //    };
+            //});
             builder.Services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-            }).AddJwtBearer(o =>
+            })
+        .AddJwtBearer("AccessToken", options =>
+        {
+            options.TokenValidationParameters = new TokenValidationParameters
             {
-                o.TokenValidationParameters = new TokenValidationParameters
-                {
-                    IssuerSigningKey = new SymmetricSecurityKey
-                    (Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])),
-                    ValidateIssuer = false,
-                    ValidateAudience = false,
-                    ValidateLifetime = true,
-                    ValidateIssuerSigningKey = true
-                };
-            });
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
+                ValidateIssuer = false,
+                ValidateAudience = false,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true
+            };
+        })
+        .AddJwtBearer("RefreshToken", options =>
+        {
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtRefreshKey)),
+                ValidateIssuer = false,
+                ValidateAudience = false,
+                ValidateLifetime = false, // Refresh tokens usually don't validate lifetime
+                ValidateIssuerSigningKey = true
+            };
+        });
 
-           
-           
-           
-            
-    
+
+
+
+
+
 
             builder.Services.AddSingleton<IOtpService>(provider =>
             {

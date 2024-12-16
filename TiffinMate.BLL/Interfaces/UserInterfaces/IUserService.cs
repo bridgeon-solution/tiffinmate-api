@@ -14,6 +14,7 @@ namespace TiffinMate.BLL.Interfaces.UserInterfaces
         Task<UserProfileDto> GetUserById(Guid id);
         Task<List<User>> GetAllUsers();
         Task<BlockUnblockResponse> BlockUnblock(Guid id);
+        Task<string> UploadImage(IFormFile image);
         Task<string> UpdateUser(Guid id, UserProfileDto reqDto);
     }
 }

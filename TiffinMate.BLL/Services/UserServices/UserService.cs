@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using TiffinMate.BLL.DTOs.UserDTOs;
 using TiffinMate.BLL.Interfaces.CloudinaryInterface;
 using TiffinMate.BLL.Interfaces.UserInterfaces;
+using TiffinMate.BLL.Services.CoudinaryService;
 using TiffinMate.DAL.DbContexts;
 using TiffinMate.DAL.Entities;
 using TiffinMate.DAL.Interfaces.UserInterfaces;
@@ -69,6 +70,13 @@ namespace TiffinMate.BLL.Services.UserServices
                 email = user.email
             };
         }
+
+        public async Task<string> UploadImage(IFormFile image)
+        {
+           
+            var imageUrl = await _cloudinary.UploadDocumentAsync(image);
+            return imageUrl;
+        }
         public async Task<string> UpdateUser(Guid id, UserProfileDto reqDto)
         {
             var user = await _userRepository.GetUserById(id);
@@ -85,11 +93,10 @@ namespace TiffinMate.BLL.Services.UserServices
             user.updated_at = DateTime.UtcNow;
 
            
-            if (reqDto.image != null)
+            if (!string.IsNullOrEmpty(reqDto.image))
             {
                 
-                var imageUrl = await _cloudinary.UploadDocumentAsync(reqDto.image);
-                user.image = imageUrl;
+                user.image = reqDto.image;
             }
 
             await _userRepository.UpdateUser(user);

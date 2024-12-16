@@ -10,11 +10,11 @@ namespace TiffinMate.BLL.Services.CoudinaryService
     {
         private readonly Cloudinary _cloudinary;
 
-        public CloudinaryServices(IConfiguration configuration)
+        public CloudinaryServices()
         {
-            var cloudName = configuration["Cloudinary:CloudName"];
-            var apiKey = configuration["Cloudinary:ApiKey"];
-            var apiSecret = configuration["Cloudinary:ApiSecret"];
+            var cloudName = Environment.GetEnvironmentVariable("CLOUDINARY_CLOUD_NAME");
+            var apiKey = Environment.GetEnvironmentVariable("CLOUDINARY_API_KEY");
+            var apiSecret = Environment.GetEnvironmentVariable("CLOUDINARY_API_SECRET");
 
             if (string.IsNullOrEmpty(cloudName) || string.IsNullOrEmpty(apiKey) || string.IsNullOrEmpty(apiSecret))
             {
@@ -33,14 +33,14 @@ namespace TiffinMate.BLL.Services.CoudinaryService
                 var uploadParams = new RawUploadParams
                 {
                     File = new FileDescription(file.FileName, stream),
-                    // Optional: You can adjust upload transformation settings here, though it's not typically needed for non-image files
+                  
                 };
 
                 var uploadResult = await _cloudinary.UploadAsync(uploadParams);
 
                 if (uploadResult.StatusCode == System.Net.HttpStatusCode.OK)
                 {
-                    return uploadResult.SecureUrl.ToString();  // Return the URL of the uploaded document
+                    return uploadResult.SecureUrl.ToString();
                 }
                 else
                 {

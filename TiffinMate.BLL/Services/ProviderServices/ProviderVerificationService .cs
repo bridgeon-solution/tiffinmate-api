@@ -41,7 +41,7 @@ namespace TiffinMate.BLL.Services.ProviderVerification
             try
             {
                 provider.password = otp;
-                provider.UpdatedAt= DateTime.Now;
+                provider.UpdatedAt= DateTime.UtcNow;
                 _providerRepository.Update(provider);
                await _providerRepository.SaveChangesAsync();
                 Console.WriteLine($"Password updated for provider {providerId}");
@@ -70,7 +70,7 @@ namespace TiffinMate.BLL.Services.ProviderVerification
             }
             try
             {
-                provider.UpdatedAt = DateTime.Now;
+                provider.UpdatedAt = DateTime.UtcNow;
                 await _providerRepository.Remove(providerId);
                 await _providerRepository.SaveChangesAsync();
 

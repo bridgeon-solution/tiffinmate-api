@@ -25,6 +25,7 @@ namespace TiffinMate.DAL.DbContexts
         public DbSet<FoodItem> FoodItems { get; set; }
 
         public DbSet<User> users { get; set; }
+        public DbSet<Review> Reviews { get; set; }
 
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
         protected override void OnModelCreating(ModelBuilder modelBuilder)

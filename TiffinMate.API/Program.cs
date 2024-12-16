@@ -49,7 +49,7 @@ namespace TiffinMate.API
             var brevoApiKey = Environment.GetEnvironmentVariable("BREVO_API_KEY");
             var brevoApiUrl = Environment.GetEnvironmentVariable("BREVO_API_URL");
             var brevoFromEmail = Environment.GetEnvironmentVariable("BREVO_FROM_EMAIL");
-
+            Console.WriteLine($"Brevo API Key: {brevoApiKey}");
             // Add services to the container.
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

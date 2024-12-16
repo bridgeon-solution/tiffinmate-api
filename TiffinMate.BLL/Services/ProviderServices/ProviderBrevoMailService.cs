@@ -6,16 +6,18 @@ using System.Threading.Tasks;
 using TiffinMate.BLL.Interfaces.ProviderVerification;
 using Microsoft.Extensions.Options;
 using TiffinMate.DAL.Entities;
+using Microsoft.Extensions.Logging;
 
 namespace TiffinMate.BLL.Services.ProviderVerification
 {
     public class ProviderBrevoMailService : IProviderBrevoMailService
     {
         private readonly BrevoSettings _brevoSettings;
-
-        public ProviderBrevoMailService(IOptions<BrevoSettings> brevoSettings)
+        private readonly ILogger<ProviderBrevoMailService> _logger;
+        public ProviderBrevoMailService(IOptions<BrevoSettings> brevoSettings, ILogger<ProviderBrevoMailService> logger)
         {
             _brevoSettings = brevoSettings.Value;
+            _logger= logger;
         }
 
         public async Task<bool> SendOtpEmailAsync(string to, string otp)
@@ -42,6 +44,7 @@ namespace TiffinMate.BLL.Services.ProviderVerification
                     if (!response.IsSuccessStatusCode)
                     {
                         Console.WriteLine($"Email sending failed: {response.StatusCode} - {responseBody}");
+                        _logger.LogError("Failed to send OTP email. Status Code: {StatusCode}, Response: {ResponseBody}", response.StatusCode, responseBody);
                         return false;
                     }
 
@@ -51,6 +54,7 @@ namespace TiffinMate.BLL.Services.ProviderVerification
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "An error occurred while sending OTP email to {Recipient}", to);
                 Console.WriteLine($"Error sending email: {ex.Message}");
                 return false;
             }
@@ -62,8 +66,8 @@ namespace TiffinMate.BLL.Services.ProviderVerification
             {
                 sender = new { email = _brevoSettings.FromEmail },
                 to = new[] { new { email = to } },
-                subject = "Reject Verification",
-                textContent = $"Hello,\n\nYour Verification is rejected.\n\nThank you,\nTiffinMate"
+                subject = "Your password",
+                textContent = $"Hello,\n\nYour verification is rejected \n\nThank you,\nTiffinMate "
             };
 
             try
@@ -80,6 +84,7 @@ namespace TiffinMate.BLL.Services.ProviderVerification
                     if (!response.IsSuccessStatusCode)
                     {
                         Console.WriteLine($"Email sending failed: {response.StatusCode} - {responseBody}");
+                        _logger.LogError("Failed to send  email. Status Code: {StatusCode}, Response: {ResponseBody}", response.StatusCode, responseBody);
                         return false;
                     }
 
@@ -89,6 +94,7 @@ namespace TiffinMate.BLL.Services.ProviderVerification
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "An error occurred while sending OTP email to {Recipient}", to);
                 Console.WriteLine($"Error sending email: {ex.Message}");
                 return false;
             }

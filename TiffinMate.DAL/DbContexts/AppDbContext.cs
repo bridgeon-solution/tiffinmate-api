@@ -25,6 +25,7 @@ namespace TiffinMate.DAL.DbContexts
         public DbSet<FoodItem> FoodItems { get; set; }
 
         public DbSet<User> users { get; set; }
+        public DbSet<Review> Reviews { get; set; }
 
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -54,7 +55,7 @@ namespace TiffinMate.DAL.DbContexts
                       .HasColumnType("uuid")
                       .IsRequired()
                       .HasDefaultValueSql("gen_random_uuid()");
-                entity.Property(p => p.is_certificate_verified)
+                entity.Property(p => p.verification_status)
                       .HasDefaultValue(false);
 
                 entity.HasOne(p => p.ProviderDetails)
@@ -110,6 +111,25 @@ namespace TiffinMate.DAL.DbContexts
                 .WithMany(c => c.FoodItems)
                 .HasForeignKey(d => d.providerid)
                 .OnDelete(DeleteBehavior.Cascade);
+            });
+            modelBuilder.Entity<Review>(entity =>
+            {
+                entity.HasKey(r => new { r.ProviderId, r.UserId });
+
+                entity.HasOne(r => r.User)
+                      .WithMany(u => u.Review)
+                      .HasForeignKey(r => r.UserId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+
+                entity.HasOne(r => r.Provider)
+                      .WithMany(p => p.Review)
+                      .HasForeignKey(r => r.ProviderId)
+                      .OnDelete(DeleteBehavior.Cascade);
+
+
+                entity.Property(r => r.review)
+                      .IsRequired();
             });
 
 

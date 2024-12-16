@@ -93,7 +93,10 @@ namespace TiffinMate.BLL.Services.ProviderServices
                     throw new Exception("Incorrect password.");
                 }
 
-            
+                //if (pro.RefreshTokenExpiryDate < DateTime.UtcNow)
+                //{
+                //    throw new Exception("Refresh token expired");
+                //}
 
                 var tokenHelper = new TokenHelper();
 
@@ -105,7 +108,7 @@ namespace TiffinMate.BLL.Services.ProviderServices
                 }
 
                 pro.refresh_token = newRefreshToken;
-                pro.RefreshTokenExpiryDate = DateTime.UtcNow.AddDays(7);
+                pro.refreshtoken_expiryDate = DateTime.UtcNow.AddDays(7);
                 pro.UpdatedAt = DateTime.UtcNow;
 
                 var token = CreateToken(pro);
@@ -181,7 +184,7 @@ namespace TiffinMate.BLL.Services.ProviderServices
             try
             {
                 var provider = await _providerRepository.GetUserByRefreshTokenAsync(refreshToken);
-                if (provider == null || provider.RefreshTokenExpiryDate < DateTime.UtcNow)
+                if (provider == null || provider.refreshtoken_expiryDate < DateTime.UtcNow)
                 {
                     throw new Exception("Invalid or expired refresh token.");
                 }
@@ -191,7 +194,7 @@ namespace TiffinMate.BLL.Services.ProviderServices
 
                 //update
                 provider.refresh_token = newRefreshToken;
-                provider.RefreshTokenExpiryDate = DateTime.UtcNow.AddDays(7);
+                provider.refreshtoken_expiryDate = DateTime.UtcNow.AddDays(7);
                 provider.UpdatedAt = DateTime.UtcNow;
 
                 return new ProviderLoginResponse

@@ -27,5 +27,6 @@ namespace TiffinMate.DAL.Entities
         public bool is_blocked { get; set; }
         public DateTime created_at { get; set; }
         public DateTime updated_at { get; set; }
+        public ICollection<Review> Review { get; set; }
     }
 }

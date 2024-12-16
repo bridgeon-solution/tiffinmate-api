@@ -86,5 +86,17 @@ namespace TiffinMate.BLL.Services.ProviderServices
             return _mapper.Map<List<FoodItemDto>>(result);
         }
 
+        public async Task<List<CategoryDto>> GetCategoryAsync()
+        {
+            var result = await _foodItemRepository.GetAllCategory();
+            if (result==null)
+            {
+                return null;
+            }
+            return _mapper.Map<List<CategoryDto>>(result);
+            
+            
+        }
+
     }
 }

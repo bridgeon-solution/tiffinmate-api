@@ -17,6 +17,9 @@ namespace TiffinMate.BLL.Interfaces.ProviderServiceInterafce
 
         Task<string> AddCategories( CategoryDto category);
         Task<List<FoodItemDto>> GetByProviderAsync(Guid id);
+        Task<List<CategoryDto>> GetCategoryAsync();
+
+
 
     }
 }

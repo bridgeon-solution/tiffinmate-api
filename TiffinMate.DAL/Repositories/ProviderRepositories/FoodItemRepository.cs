@@ -63,7 +63,11 @@ namespace TiffinMate.DAL.Repositories.ProviderRepositories
         
         }
 
+        public async Task<List<Categories>> GetAllCategory()
+        {
 
+            return await _context.Categories.ToListAsync();
+        }
 
 
     } 

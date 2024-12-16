@@ -24,7 +24,7 @@ namespace TiffinMate.API.Controllers.ProviderControllers
         }
 
 
-        [HttpPost("AddFoodItem")]
+        [HttpPost("FoodItem")]
         public async Task<IActionResult> AddItem([FromForm] FoodItemDto foodItemDto, IFormFile image)
         {
             var response = await _foodItemService.AddFoodItemAsync(foodItemDto, image);
@@ -37,7 +37,7 @@ namespace TiffinMate.API.Controllers.ProviderControllers
         }
 
 
-        [HttpPost("AddCategery")]
+        [HttpPost("Categery")]
         public async Task<IActionResult> AddCategory([FromBody] CategoryDto category)
         {
             var response= await _foodItemService.AddCategories(category);
@@ -50,7 +50,7 @@ namespace TiffinMate.API.Controllers.ProviderControllers
         }
 
 
-        [HttpGet("GetFoodItem")]
+        [HttpGet("FoodItem")]
         public async Task<IActionResult> GetFoodItems()
         {
             var result=await _foodItemService.GetFoodItemsAsync();
@@ -66,7 +66,7 @@ namespace TiffinMate.API.Controllers.ProviderControllers
         }
 
 
-        [HttpGet("GetById")]
+        [HttpGet("ById")]
         public async Task<IActionResult> GetFoodItem(Guid id)
         {
             var result = await _foodItemService.GetFoodItemAsync(id);
@@ -79,7 +79,7 @@ namespace TiffinMate.API.Controllers.ProviderControllers
             return Ok(response);
         }
 
-        [HttpGet("GetByProvider")]
+        [HttpGet("ByProvider")]
         public async Task<IActionResult> GetByProvider(Guid id)
         {
             var result = await _foodItemService.GetByProviderAsync(id);
@@ -94,6 +94,23 @@ namespace TiffinMate.API.Controllers.ProviderControllers
             return Ok(responce);
 
         }
+
+        [HttpGet("category")]
+        public async Task<IActionResult> Getcategory()
+        {
+            var result = await _foodItemService.GetCategoryAsync();
+            if (result == null || !result.Any())
+            {
+                return NotFound(new ApiResponse<string>("failure", "No categories found", null, HttpStatusCode.NotFound, "No categories found"
+            ));
+
+            }
+
+            var responce = new ApiResponse<List<CategoryDto>>("success", "categories retrieved successfully", result, HttpStatusCode.OK, "");
+            return Ok(responce);
+        }
+
+
 
     }
 }

@@ -35,6 +35,11 @@ namespace TiffinMate.DAL.Repositories.UserRepositories
         {
             return await _context.users.FirstOrDefaultAsync(x => x.id == id);
         }
+        public async Task UpdateUser(User user)
+        {
+            _context.users.Update(user);
+            await _context.SaveChangesAsync();
+        }
 
 
     }

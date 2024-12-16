@@ -250,7 +250,7 @@ namespace TiffinMate.API.Controllers.UserControllers
                     return NotFound(notFoundResponse);
                 }
 
-                var result = new ApiResponse<UserResponseDto>("success", "fetched Successfully", user, HttpStatusCode.OK, "");
+                var result = new ApiResponse<UserProfileDto>("success", "fetched Successfully", user, HttpStatusCode.OK, "");
                 return Ok(result);
 
             }
@@ -286,6 +286,30 @@ namespace TiffinMate.API.Controllers.UserControllers
             {
                 var response = await _userService.BlockUnblock(id);
                 return Ok(new ApiResponse<BlockUnblockResponse>("success", "user blocked/unblocked succesfuly", response, HttpStatusCode.OK, ""));
+
+            }
+            catch (Exception ex)
+            {
+                var response = new ApiResponse<string>("failed", "", ex.Message, HttpStatusCode.InternalServerError, "error occured");
+                return StatusCode((int)HttpStatusCode.InternalServerError, response);
+
+            }
+        }
+        [HttpPut("id")]
+        public async Task<IActionResult> UpdateUser(Guid id,[FromForm] UserProfileDto reqDto)
+        {
+            try
+            {
+                var result = await _userService.UpdateUser(id, reqDto);
+                if (result == null)
+                {
+                    var notfoundRes = new ApiResponse<string>("failed", "User not found", "", HttpStatusCode.NotFound, "User not found");
+                    return NotFound(notfoundRes);
+                }
+
+                var res = new ApiResponse<string>("success", "updated", result, HttpStatusCode.OK, "");
+                return Ok(res);
+
 
             }
             catch (Exception ex)

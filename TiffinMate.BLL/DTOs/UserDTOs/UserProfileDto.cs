@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -15,7 +14,7 @@ namespace TiffinMate.BLL.DTOs.UserDTOs
         public string email { get; set; }
         public string? address { get; set; }
         public string? city { get; set; }
-        public IFormFile? image { get; set; }
+        public string? image { get; set; }
 
     }
 }

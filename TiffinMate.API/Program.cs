@@ -151,6 +151,7 @@ namespace TiffinMate.API
             app.UseAuthentication();
             app.UseAuthorization();
             app.MapControllers();
+            app.MapGet("/ping", () => "ping");
             app.Run();
         }
     }

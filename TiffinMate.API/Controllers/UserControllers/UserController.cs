@@ -38,7 +38,7 @@ namespace TiffinMate.API.Controllers.UserControllers
                 {
                     return Conflict(new ApiResponse<string>("failure", "registration failed", null, HttpStatusCode.Conflict, "user already exist"));
                 }
-                var result = new ApiResponse<bool>("succes", "registration Successfull", response, HttpStatusCode.OK, "");
+                var result = new ApiResponse<bool>("success", "registration Successfull", response, HttpStatusCode.OK, "");
 
                 return Ok(result);
 

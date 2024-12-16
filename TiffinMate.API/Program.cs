@@ -23,17 +23,11 @@ using TiffinMate.BLL.Services.ProviderServices;
 using TiffinMate.BLL.Interfaces.CloudinaryInterface;
 using TiffinMate.BLL.Services.CoudinaryService;
 using TiffinMate.DAL.Entities;
-//using TiffinMate.BLL.Interfaces.UserInterfaces;
-//using TiffinMate.BLL.Services.UserServices;
-//using TiffinMate.DAL.Interfaces.UserInterfaces;
 using TiffinMate.BLL.Interfaces.ProviderVerification;
 using TiffinMate.BLL.Services.ProviderVerification;
 using TiffinMate.BLL.Interfaces.UserInterfaces;
 using TiffinMate.BLL.Services.UserServices;
 using TiffinMate.DAL.Interfaces.UserInterfaces;
-
-
-
 
 namespace TiffinMate.API
 {
@@ -47,11 +41,14 @@ namespace TiffinMate.API
             var jwtKey = Environment.GetEnvironmentVariable("JWT_KEY");
             var jwtRefreshKey = Environment.GetEnvironmentVariable("JWT_REFRESH_KEY");
             var env = Environment.GetEnvironmentVariable("IS_DEVELOPMENT");
-            //db
-            var defaultConnection = Environment.GetEnvironmentVariable("DefaultConnection");
-            var hostUrl = Environment.GetEnvironmentVariable("HostUrl");
-            var hostApi = Environment.GetEnvironmentVariable("HostAPI");
+            
+            var defaultConnection = Environment.GetEnvironmentVariable("DEFAULT_CONNECTION");
+            var hostUrl = Environment.GetEnvironmentVariable("HOST_URL");
+            var hostApi = Environment.GetEnvironmentVariable("HOST_API");
 
+            var brevoApiKey = Environment.GetEnvironmentVariable("BREVO_API_KEY");
+            var brevoApiUrl = Environment.GetEnvironmentVariable("BREVO_API_URL");
+            var brevoFromEmail = Environment.GetEnvironmentVariable("BREVO_FROM_EMAIL");
 
             // Add services to the container.
             builder.Services.AddControllers();
@@ -66,23 +63,20 @@ namespace TiffinMate.API
             builder.Services.AddScoped<IProviderRepository, ProviderRepository>();
             builder.Services.AddScoped<IFoodItemRepository, FoodItemRepository>();
             builder.Services.AddScoped<IFoodItemService, FoodItemService>();
-
-
-           
-
             builder.Services.AddScoped<ICloudinaryService, CloudinaryServices>();
-            
-
             builder.Services.AddScoped<IProviderService, ProviderService>();
             builder.Services.AddScoped<IProviderBrevoMailService, ProviderBrevoMailService>();
             builder.Services.AddScoped<IBrevoMailService, BrevoMailService>();
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IUserRepository, UserRepository>();
-
             builder.Services.AddScoped<ICloudinaryService, CloudinaryServices>();
-            builder.Services.Configure<BrevoSettings>(builder.Configuration.GetSection("Brevo"));
-
-           
+            builder.Services.AddScoped<IProviderVerificationService, ProviderVerificationService>();
+            builder.Services.Configure<BrevoSettings>(options =>
+            {
+                options.ApiKey = brevoApiKey;
+                options.ApiUrl = brevoApiUrl;
+                options.FromEmail = brevoFromEmail;
+            });
 
 
             builder.Services.AddCors(options =>
@@ -105,7 +99,6 @@ namespace TiffinMate.API
                 }));
 
             builder.Services.AddAutoMapper(typeof(MappingProfile));
-
          
             builder.Services.AddAuthentication(options =>
             {
@@ -131,55 +124,33 @@ namespace TiffinMate.API
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtRefreshKey)),
                 ValidateIssuer = false,
                 ValidateAudience = false,
-                ValidateLifetime = false, // Refresh tokens usually don't validate lifetime
+                ValidateLifetime = false, 
                 ValidateIssuerSigningKey = true
             };
         });
 
-
-
-
-
-
-
             builder.Services.AddSingleton<IOtpService>(provider =>
             {
-                var accountSid = builder.Configuration["Twilio:Sid"];
-                var authToken = builder.Configuration["Twilio:Token"];
-                var verifySid = builder.Configuration["Twilio:verifySid"];
+                var accountSid = Environment.GetEnvironmentVariable("TWILIO_SID");
+                var authToken = Environment.GetEnvironmentVariable("TWILIO_TOKEN");
+                var verifySid = Environment.GetEnvironmentVariable("TWILIO_VERIFY_SID");
 
                 return new OtpService(accountSid, authToken, verifySid);
             });
 
-
-
-
-
             var app = builder.Build();
            
-
             if (env == "Development")
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();
                 app.UseHttpsRedirection();
             }
-            //app.UseMiddleware<LoggingMiddleware>();
-
-
-
-            
+            //app.UseMiddleware<LoggingMiddleware>();          
             app.UseCors("AllowAllOrigins");
-
-
-
-
             app.UseAuthentication();
             app.UseAuthorization();
-
-
             app.MapControllers();
-
             app.Run();
         }
     }

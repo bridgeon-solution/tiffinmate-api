@@ -1,10 +1,12 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TiffinMate.BLL.DTOs.UserDTOs;
+using TiffinMate.BLL.Interfaces.CloudinaryInterface;
 using TiffinMate.BLL.Interfaces.UserInterfaces;
 using TiffinMate.DAL.DbContexts;
 using TiffinMate.DAL.Entities;
@@ -18,12 +20,14 @@ namespace TiffinMate.BLL.Services.UserServices
         private readonly IAuthRepository _authRepository;
         private readonly IUserRepository _userRepository;
         private readonly AppDbContext _appDbContext;
-        public UserService(IAuthRepository authRepository, IUserRepository userRepository, AppDbContext appDbContext)
+        private readonly ICloudinaryService _cloudinary;
+        public UserService(IAuthRepository authRepository, IUserRepository userRepository, AppDbContext appDbContext, ICloudinaryService cloudinary)
 
         {
             _authRepository = authRepository;
             _userRepository = userRepository;
             _appDbContext = appDbContext;
+            _cloudinary = cloudinary;
         }
         public async Task<List<User>> GetAllUsers()
         {
@@ -49,7 +53,7 @@ namespace TiffinMate.BLL.Services.UserServices
             };
         }
 
-        public async Task<UserResponseDto> GetUserById(Guid id)
+        public async Task<UserProfileDto> GetUserById(Guid id)
         {
             var user = await _userRepository.GetUserById(id);
 
@@ -58,16 +62,43 @@ namespace TiffinMate.BLL.Services.UserServices
                 return null;
             }
 
-            return new UserResponseDto
+            return new UserProfileDto
             {
                 name = user.name,
                 phone = user.phone,
                 email = user.email
             };
         }
+        public async Task<string> UpdateUser(Guid id, UserProfileDto reqDto)
+        {
+            var user = await _userRepository.GetUserById(id);
+            if (user == null)
+            {
+                return null;
+            }
+
+            user.name = reqDto.name;
+            user.phone = reqDto.phone;
+            user.email = reqDto.email;
+            user.address = reqDto.address;
+            user.city = reqDto.city;
+            user.updated_at = DateTime.UtcNow;
+
+           
+            if (reqDto.image != null)
+            {
+                
+                var imageUrl = await _cloudinary.UploadDocumentAsync(reqDto.image);
+                user.image = imageUrl;
+            }
+
+            await _userRepository.UpdateUser(user);
+            return "Updated successfully";
+        }
+
 
 
     }
 
-    }
+}
 

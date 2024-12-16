@@ -12,6 +12,7 @@ namespace TiffinMate.DAL.Interfaces.UserInterfaces
         Task<User> BlockUnblockUser(Guid id);
         Task<List<User>> GetUsers();
         Task<User> GetUserById(Guid id);
+        Task UpdateUser(User user);
 
 
     }

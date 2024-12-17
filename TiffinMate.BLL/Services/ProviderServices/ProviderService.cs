@@ -17,6 +17,7 @@ using TiffinMate.DAL.Entities;
 using CloudinaryDotNet.Actions;
 using sib_api_v3_sdk.Client;
 using System.Net;
+using TiffinMate.BLL.DTOs.UserDTOs;
 
 namespace TiffinMate.BLL.Services.ProviderServices
 {
@@ -109,7 +110,7 @@ namespace TiffinMate.BLL.Services.ProviderServices
 
                 pro.refresh_token = newRefreshToken;
                 pro.refreshtoken_expiryDate = DateTime.UtcNow.AddDays(7);
-                pro.UpdatedAt = DateTime.UtcNow;
+                pro.updated_at = DateTime.UtcNow;
 
                 var token = CreateToken(pro);
                 _providerRepository.Update(pro);
@@ -165,7 +166,7 @@ namespace TiffinMate.BLL.Services.ProviderServices
 
                 prddetails.logo = logUrl;
                 prddetails.image = imageUrl;
-                prddetails.UpdatedAt = DateTime.UtcNow;
+                prddetails.updated_at = DateTime.UtcNow;
 
                 await _providerRepository.AddProviderDetailsAsync(prddetails);
                 await _providerRepository.SaveChangesAsync();
@@ -195,7 +196,7 @@ namespace TiffinMate.BLL.Services.ProviderServices
                 //update
                 provider.refresh_token = newRefreshToken;
                 provider.refreshtoken_expiryDate = DateTime.UtcNow.AddDays(7);
-                provider.UpdatedAt = DateTime.UtcNow;
+                provider.updated_at = DateTime.UtcNow;
 
                 return new ProviderLoginResponse
                 {
@@ -234,11 +235,35 @@ namespace TiffinMate.BLL.Services.ProviderServices
 
         //get all provider
 
-        public async Task<List<Provider>> GetProviders()
+        public async Task<List<ProviderResponseDTO>> GetProviders()
         {
             var provider = await _providerRepository.GetProviders();
-            return provider;
+            return _mapper.Map<List<ProviderResponseDTO>>(provider);
         }
+
+        public async Task<BlockUnblockResponse> BlockUnblock(Guid id)
+        {
+            var user = await _providerRepository.BlockUnblockUser(id);
+            if (user != null)
+            {
+                user.is_blocked = !user.is_blocked;
+                _context.SaveChanges();
+                return new BlockUnblockResponse
+                {
+                    is_blocked = user.is_blocked == true ? true : false,
+                    message = user.is_blocked == true ? "user is blocked" : "user is unblocked"
+                };
+            }
+
+            return new BlockUnblockResponse
+            {
+                message = "invalid user"
+            };
+        }
+
+
+
+
 
 
     }

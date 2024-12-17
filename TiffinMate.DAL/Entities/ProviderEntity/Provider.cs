@@ -16,6 +16,7 @@ namespace TiffinMate.DAL.Entities.ProviderEntity
         public string? certificate { get; set; }
         public string? password { get; set; }
         public string role { get; set; }
+        public bool is_blocked { get; set; }
 
         public string? username { get; set; }
         //public DateTime? updated_at { get; set; } = DateTime.UtcNow;

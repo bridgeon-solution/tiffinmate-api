@@ -67,6 +67,13 @@ namespace TiffinMate.DAL.Repositories.ProviderRepositories
         {
             return await _context.Providers.FirstOrDefaultAsync(u => u.refresh_token == refreshToken);
         }
+        public async Task<Provider> BlockUnblockUser(Guid id)
+
+        {
+            var provide = await _context.Providers.SingleOrDefaultAsync(u => u.id == id);
+            return provide;
+        }
+
 
 
 

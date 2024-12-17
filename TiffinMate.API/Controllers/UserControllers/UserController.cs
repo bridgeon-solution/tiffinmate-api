@@ -262,7 +262,7 @@ namespace TiffinMate.API.Controllers.UserControllers
             }
         }
 
-        [HttpGet("all_users")]
+        [HttpGet]
         public async Task<IActionResult> GetUsers()
         {
             try
@@ -279,7 +279,7 @@ namespace TiffinMate.API.Controllers.UserControllers
 
             }
         }
-        [HttpPut("block_unblock")]
+        [HttpPatch("block")]
         public async Task<IActionResult> BlockUnblockUser(Guid id)
         {
             try

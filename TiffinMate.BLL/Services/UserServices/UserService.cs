@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -22,17 +23,20 @@ namespace TiffinMate.BLL.Services.UserServices
         private readonly IUserRepository _userRepository;
         private readonly AppDbContext _appDbContext;
         private readonly ICloudinaryService _cloudinary;
-        public UserService(IAuthRepository authRepository, IUserRepository userRepository, AppDbContext appDbContext, ICloudinaryService cloudinary)
+        private readonly IMapper _mapper;
+        public UserService(IAuthRepository authRepository, IUserRepository userRepository, AppDbContext appDbContext, ICloudinaryService cloudinary,IMapper mapper)
 
         {
             _authRepository = authRepository;
             _userRepository = userRepository;
             _appDbContext = appDbContext;
             _cloudinary = cloudinary;
+            _mapper = mapper;
         }
         public async Task<List<User>> GetAllUsers()
         {
-            return await _userRepository.GetUsers();
+            var user= await _userRepository.GetUsers();
+            return user;
         }
         public async Task<BlockUnblockResponse> BlockUnblock(Guid id)
         {

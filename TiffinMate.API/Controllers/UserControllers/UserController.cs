@@ -250,7 +250,7 @@ namespace TiffinMate.API.Controllers.UserControllers
                     return NotFound(notFoundResponse);
                 }
 
-                var result = new ApiResponse<UserResponseDto>("success", "fetched Successfully", user, HttpStatusCode.OK, "");
+                var result = new ApiResponse<UserProfileDto>("success", "fetched Successfully", user, HttpStatusCode.OK, "");
                 return Ok(result);
 
             }
@@ -295,5 +295,6 @@ namespace TiffinMate.API.Controllers.UserControllers
 
             }
         }
+       
     }
 }

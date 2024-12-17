@@ -7,10 +7,14 @@ using System.Threading.Tasks;
 
 namespace TiffinMate.BLL.DTOs.UserDTOs
 {
-    public class UserResponseDto
+    public class UserProfileDto
     {
         public string name { get; set; }
         public string phone { get; set; }
         public string email { get; set; }
+        public string? address { get; set; }
+        public string? city { get; set; }
+        public string? image { get; set; }
+
     }
 }

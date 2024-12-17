@@ -36,8 +36,6 @@ namespace TiffinMate.BLL.Services.ProviderVerification
                 Console.WriteLine("Failed to send OTP email.");
                 return false;
             }
-
-
             try
             {
                 provider.password = otp;

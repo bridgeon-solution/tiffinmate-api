@@ -18,7 +18,7 @@ namespace TiffinMate.API.Controllers
             _verificationService = verificationService;
         }
 
-        [HttpPost("send-otp/{providerId}")]
+        [HttpPost("send-password/{providerId}")]
         public async Task<IActionResult> SendOtpEmail(Guid providerId)
         {
             if (providerId == Guid.Empty)
@@ -30,7 +30,6 @@ namespace TiffinMate.API.Controllers
                     HttpStatusCode.BadRequest,
                     "Provider ID is required."));
             }
-
             try
             {
                 var success = await _verificationService.SendPassword(providerId);

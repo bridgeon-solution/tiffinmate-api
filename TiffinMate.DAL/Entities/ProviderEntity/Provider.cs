@@ -19,11 +19,11 @@ namespace TiffinMate.DAL.Entities.ProviderEntity
 
         public string? username { get; set; }
         //public DateTime? updated_at { get; set; } = DateTime.UtcNow;
-        public bool is_certificate_verified { get; set; } = false;
+        public string verification_status { get; set; } = "pending";
         public string refresh_token { get; set; } = string.Empty;
-        public DateTime RefreshTokenExpiryDate { get; set; }
+        public DateTime refreshtoken_expiryDate { get; set; }
         public ProviderDetails ProviderDetails { get; set; }
-
+        public ICollection<Review> Review { get; set; }
         public ICollection<FoodItem> FoodItems { get; set; }
     }
 }

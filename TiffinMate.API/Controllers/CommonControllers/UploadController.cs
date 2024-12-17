@@ -18,7 +18,7 @@ namespace TiffinMate.API.Controllers.CommonControllers
             _userService = userService;          
         }
 
-        [HttpPost("{id:guid}")]
+        [HttpPost("image")]
         public async Task<IActionResult> UploadProfilePicture([FromForm]Guid id, IFormFile image)
         {
             try

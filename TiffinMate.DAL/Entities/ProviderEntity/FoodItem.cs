@@ -18,7 +18,6 @@ namespace TiffinMate.DAL.Entities.ProviderEntity
         public string description { get; set; }
         public bool is_veg { get; set; }
 
-        public bool is_available { get; set; }
         public string day { get; set; }
         public string image { get; set; }
         public Categories category { get; set; }

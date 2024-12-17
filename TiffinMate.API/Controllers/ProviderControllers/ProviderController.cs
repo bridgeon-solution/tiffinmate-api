@@ -8,6 +8,7 @@ using Sprache;
 using System.Net;
 using TiffinMate.API.ApiRespons;
 using TiffinMate.BLL.DTOs.ProviderDTOs;
+using TiffinMate.BLL.DTOs.UserDTOs;
 using TiffinMate.BLL.Interfaces.ProviderServiceInterafce;
 using TiffinMate.BLL.Services.ProviderServices;
 using TiffinMate.DAL.DbContexts;
@@ -103,13 +104,13 @@ namespace TiffinMate.API.Controllers.ControllerProvider
             }
         }
 
-        [HttpGet("providers")]
+        [HttpGet]
         public async Task<IActionResult> AllProviders()
         {
             try
             {
                 var response = await _providerService.GetProviders();
-                return Ok(new ApiResponse<List<Provider>>("success", "providers getted succesfuly", response, HttpStatusCode.OK, ""));
+                return Ok(new ApiResponse<List<ProviderResponseDTO>>("success", "providers getted succesfuly", response, HttpStatusCode.OK, ""));
             }
             catch (Exception ex) {
                 var response = new ApiResponse<string>("failed", "", ex.Message, HttpStatusCode.InternalServerError, "error occured");
@@ -118,6 +119,24 @@ namespace TiffinMate.API.Controllers.ControllerProvider
             
 
         }
+
+        [HttpPatch("block")]
+        public async Task<IActionResult> BlockUnblockUser(Guid id)
+        {
+            try
+            {
+                var response = await _providerService.BlockUnblock(id);
+                return Ok(new ApiResponse<BlockUnblockResponse>("success", "Vendor blocked/unblocked succesfuly", response, HttpStatusCode.OK, ""));
+
+            }
+            catch (Exception ex)
+            {
+                var response = new ApiResponse<string>("failed", "", ex.Message, HttpStatusCode.InternalServerError, "error occured");
+                return StatusCode((int)HttpStatusCode.InternalServerError, response);
+
+            }
+        }
+
 
     }
 }

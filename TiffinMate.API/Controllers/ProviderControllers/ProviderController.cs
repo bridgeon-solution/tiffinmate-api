@@ -143,7 +143,7 @@ namespace TiffinMate.API.Controllers.ControllerProvider
 
         }
 
-        [HttpGet("provider_review/{providerid}")]
+        [HttpGet("review/{providerid}")]
         public async Task<IActionResult> AllReviews (Guid providerid)
         {
             try
@@ -157,7 +157,7 @@ namespace TiffinMate.API.Controllers.ControllerProvider
                 return StatusCode((int)HttpStatusCode.InternalServerError, response);
             }
         }
-        [HttpPost("add-review")]
+        [HttpPost("review")]
         public async Task<IActionResult> AddReview([FromBody] ReviewDto reviewDto)
         {
             if (reviewDto == null)

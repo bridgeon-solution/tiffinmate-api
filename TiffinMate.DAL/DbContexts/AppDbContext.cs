@@ -116,6 +116,7 @@ namespace TiffinMate.DAL.DbContexts
             {
                 entity.HasKey(r => new { r.id });
 
+
                 entity.HasOne(r => r.User)
                       .WithMany(u => u.Review)
                       .HasForeignKey(r => r.UserId)

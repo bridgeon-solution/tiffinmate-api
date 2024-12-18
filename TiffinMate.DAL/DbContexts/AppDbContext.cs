@@ -114,7 +114,7 @@ namespace TiffinMate.DAL.DbContexts
             });
             modelBuilder.Entity<Review>(entity =>
             {
-                entity.HasKey(r => new { r.ProviderId, r.UserId });
+                entity.HasKey(r => new { r.id });
 
                 entity.HasOne(r => r.User)
                       .WithMany(u => u.Review)

@@ -30,6 +30,8 @@ using TiffinMate.BLL.Services.UserServices;
 using TiffinMate.DAL.Interfaces.UserInterfaces;
 using Microsoft.AspNetCore.Mvc;
 using Asp.Versioning;
+using TiffinMate.DAL.Interfaces.ReviewInterface;
+using TiffinMate.DAL.Repositories.ReviewRepository;
 
 namespace TiffinMate.API
 {
@@ -80,6 +82,9 @@ namespace TiffinMate.API
             builder.Services.AddScoped<IUserRepository, UserRepository>();
             builder.Services.AddScoped<ICloudinaryService, CloudinaryServices>();
             builder.Services.AddScoped<IProviderVerificationService, ProviderVerificationService>();
+            builder.Services.AddScoped<IReviewService, ReviewService>();
+
+            builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
             builder.Services.Configure<BrevoSettings>(options =>
             {
                 options.ApiKey = brevoApiKey;

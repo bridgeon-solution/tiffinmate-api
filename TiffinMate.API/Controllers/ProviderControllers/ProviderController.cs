@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Sprache;
+using System.Collections.Generic;
 using System.Net;
 using TiffinMate.API.ApiRespons;
 using TiffinMate.BLL.DTOs.ProviderDTOs;
@@ -16,6 +17,7 @@ using TiffinMate.DAL.DbContexts;
 using TiffinMate.DAL.Entities;
 using TiffinMate.DAL.Entities.ProviderEntity;
 using TiffinMate.DAL.Interfaces.ProviderInterface;
+using static Supabase.Gotrue.Constants;
 
 namespace TiffinMate.API.Controllers.ControllerProvider
 {
@@ -25,12 +27,13 @@ namespace TiffinMate.API.Controllers.ControllerProvider
     public class ProviderController : ControllerBase
     {
         private readonly IProviderService _providerService;
+        private readonly IReviewService _reviewService;
 
-        public ProviderController(IProviderService providerService)
+        public ProviderController(IProviderService providerService, IReviewService reviewService)
         {
 
             _providerService = providerService;
-
+            _reviewService = reviewService;
         }
 
         [HttpPost("register")]
@@ -118,7 +121,7 @@ namespace TiffinMate.API.Controllers.ControllerProvider
                 var response = new ApiResponse<string>("failed", "", ex.Message, HttpStatusCode.InternalServerError, "error occured");
                 return StatusCode((int)HttpStatusCode.InternalServerError, response);
             }
-            
+
 
         }
 
@@ -137,8 +140,72 @@ namespace TiffinMate.API.Controllers.ControllerProvider
                 return StatusCode((int)HttpStatusCode.InternalServerError, response);
 
             }
+
         }
 
+        [HttpGet("provider_review/{providerid}")]
+        public async Task<IActionResult> AllReviews (Guid providerid)
+        {
+            try
+            {
+                var response = await _reviewService.GetAllProviderReview(providerid);
+                return Ok(new ApiResponse<List< AllReview >> ("success", "providers getted succesfuly", response, HttpStatusCode.OK, ""));
+            }
+            catch(Exception ex)
+            {
+                var response = new ApiResponse<string>("failed", "", ex.Message, HttpStatusCode.InternalServerError, "error occured");
+                return StatusCode((int)HttpStatusCode.InternalServerError, response);
+            }
+        }
+        [HttpPost("add-review")]
+        public async Task<IActionResult> AddReview([FromBody] ReviewDto reviewDto)
+        {
+            if (reviewDto == null)
+            {
+                return BadRequest(new ApiResponse<string>("failure","Invalid Input",null,HttpStatusCode.BadRequest,"Review data is required."));
+            }
 
+            try
+            {
+                var result = await _reviewService.Reviews(reviewDto);
+
+                if (result)
+                {
+                    return Ok(new ApiResponse<string>("success","Review Added","Review added successfully.",HttpStatusCode.OK,""));
+                }
+                else
+                {
+                    return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse<string>("failure","Operation Failed",null,HttpStatusCode.InternalServerError,"Failed to add review."));
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse<string>( "failure", "Error Occurred", null, HttpStatusCode.InternalServerError,ex.Message));
+            }
+        }
+        [HttpGet("user/{userId}")]
+        public async Task<IActionResult> GetReviewsByUser(Guid userId)
+        {
+            if (userId == Guid.Empty)
+            {
+                return BadRequest(new ApiResponse<string>("failure","Invalid Input",null,HttpStatusCode.BadRequest,"User ID is required."));
+            }
+
+            try
+            {
+                var reviews = await _reviewService.GetAllReview(userId);
+
+                if (reviews == null || reviews.Count == 0)
+                {
+                    return NotFound(new ApiResponse<List<AllReview>>("failure","No Reviews Found",new List<AllReview>(),HttpStatusCode.NotFound,"No reviews found for the given user."));
+                }
+
+                return Ok(new ApiResponse<List<AllReview>>("success","Reviews Retrieved",reviews,HttpStatusCode.OK,""));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse<List<AllReview>>("failure","Error Occurred",null,HttpStatusCode.InternalServerError,ex.Message));
+            }
+        }
     }
 }

@@ -94,10 +94,7 @@ namespace TiffinMate.BLL.Services.ProviderServices
                     throw new Exception("Incorrect password.");
                 }
 
-                //if (pro.RefreshTokenExpiryDate < DateTime.UtcNow)
-                //{
-                //    throw new Exception("Refresh token expired");
-                //}
+
 
                 var tokenHelper = new TokenHelper();
 

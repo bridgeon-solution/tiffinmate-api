@@ -4,10 +4,12 @@ using System.Net;
 using TiffinMate.BLL.DTOs.ProviderDTOs;
 using TiffinMate.BLL.Interfaces.ProviderServiceInterafce;
 using TiffinMate.API.ApiRespons;
+using Asp.Versioning;
 
 namespace TiffinMate.API.Controllers.ProviderControllers
 {
-    [Route("api/[controller]")]
+    [Route("api/v{version:apiVersion}/[controller]")]
+    [ApiVersion("1.0")]
     [ApiController]
     public class RefreshController : ControllerBase
     {

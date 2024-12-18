@@ -72,7 +72,10 @@ namespace TiffinMate.BLL.Services.UserServices
             {
                 name = user.name,
                 phone = user.phone,
-                email = user.email
+                email = user.email,
+                address=user.address,
+                city=user.city,
+                image= user.image
             };
         }
 

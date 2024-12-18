@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TiffinMate.BLL.DTOs.ProviderDTOs;
 using TiffinMate.BLL.DTOs.UserDTOs;
 using TiffinMate.DAL.Entities;
 
@@ -16,5 +17,6 @@ namespace TiffinMate.BLL.Interfaces.UserInterfaces
         Task<BlockUnblockResponse> BlockUnblock(Guid id);
         Task<string> UploadImage(IFormFile image);
         Task<string> UpdateUser(Guid id, UserProfileDto reqDto);
+
     }
 }

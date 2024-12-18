@@ -16,7 +16,9 @@ namespace TiffinMate.BLL.DTOs.ProviderDTOs
        
 
         public string? username { get; set; }
-       
+        public bool is_blocked { get; set; }
+
+
         public string verification_status { get; set; } = "pending";
         
     }

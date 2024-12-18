@@ -28,6 +28,8 @@ using TiffinMate.BLL.Services.ProviderVerification;
 using TiffinMate.BLL.Interfaces.UserInterfaces;
 using TiffinMate.BLL.Services.UserServices;
 using TiffinMate.DAL.Interfaces.UserInterfaces;
+using Microsoft.AspNetCore.Mvc;
+using Asp.Versioning;
 
 namespace TiffinMate.API
 {
@@ -52,6 +54,13 @@ namespace TiffinMate.API
 
             // Add services to the container.
             builder.Services.AddControllers();
+
+            builder.Services.AddApiVersioning(options =>
+            {
+                options.AssumeDefaultVersionWhenUnspecified = true;
+                options.DefaultApiVersion = new ApiVersion(1, 0);
+                options.ReportApiVersions = true;                  
+            });
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();

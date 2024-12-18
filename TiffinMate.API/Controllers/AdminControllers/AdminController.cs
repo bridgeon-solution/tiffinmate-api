@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Asp.Versioning;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using TiffinMate.API.ApiRespons;
@@ -9,7 +10,8 @@ using Twilio.Rest.Trunking.V1;
 
 namespace TiffinMate.API.Controllers.AdminControllers
 {
-    [Route("api/[controller]")]
+    [Route("api/v{version:apiVersion}/[controller]")]
+    [ApiVersion("1.0")]
     [ApiController]
     public class AdminController : ControllerBase
     {

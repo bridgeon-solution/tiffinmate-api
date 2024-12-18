@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Asp.Versioning;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Sprache;
 using System.Net;
@@ -8,7 +9,8 @@ using TiffinMate.BLL.Interfaces.UserInterfaces;
 
 namespace TiffinMate.API.Controllers.CommonControllers
 {
-    [Route("api/[controller]")]
+    [Route("api/v{version:apiVersion}/[controller]")]
+    [ApiVersion("1.0")]
     [ApiController]
     public class UploadController : ControllerBase
     {

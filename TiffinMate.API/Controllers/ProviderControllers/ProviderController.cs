@@ -1,4 +1,5 @@
 ﻿using Amazon.S3;
+using Asp.Versioning;
 using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -17,7 +18,8 @@ using TiffinMate.DAL.Interfaces.ProviderInterface;
 
 namespace TiffinMate.API.Controllers.ControllerProvider
 {
-    [Route("api/[controller]")]
+    [Route("api/v{version:apiVersion}/[controller]")]
+    [ApiVersion("1.0")]
     [ApiController]
     public class ProviderController : ControllerBase
     {

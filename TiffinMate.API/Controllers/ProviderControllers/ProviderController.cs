@@ -143,7 +143,7 @@ namespace TiffinMate.API.Controllers.ControllerProvider
 
         }
 
-        [HttpGet("review/{providerid}")]
+        [HttpGet("{providerid}/reviews")]
         public async Task<IActionResult> AllReviews (Guid providerid)
         {
             try
@@ -183,7 +183,7 @@ namespace TiffinMate.API.Controllers.ControllerProvider
                 return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse<string>( "failure", "Error Occurred", null, HttpStatusCode.InternalServerError,ex.Message));
             }
         }
-        [HttpGet("user/{userId}")]
+        [HttpGet("{userId}/review")]
         public async Task<IActionResult> GetReviewsByUser(Guid userId)
         {
             if (userId == Guid.Empty)

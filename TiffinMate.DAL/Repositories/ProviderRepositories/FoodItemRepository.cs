@@ -30,7 +30,7 @@ namespace TiffinMate.DAL.Repositories.ProviderRepositories
         public async Task<FoodItem> GetByIdAsync(Guid id)
         {
             
-            return await _context.FoodItems.Include(f => f.category).FirstOrDefaultAsync(c => c.Id == id);
+            return await _context.FoodItems.Include(f => f.category).FirstOrDefaultAsync(c => c.id == id);
         }
 
         //additem
@@ -44,7 +44,7 @@ namespace TiffinMate.DAL.Repositories.ProviderRepositories
 
         public async Task<string> AddCategoryAsync(Categories category)
         {
-            var existingcategory=await _context.Categories.FirstOrDefaultAsync(c=>c.categoryname== category.categoryname);
+            var existingcategory=await _context.Categories.FirstOrDefaultAsync(c=>c.category_name== category.category_name);
             if (existingcategory != null) {
                 return "category with same name already exists.";
             }
@@ -58,12 +58,16 @@ namespace TiffinMate.DAL.Repositories.ProviderRepositories
             
              return await _context.FoodItems
                     .Include(f => f.category)
-                    .Where(f=>f.providerid==providerId)
+                    .Where(f=>f.provider_id==providerId)
                     .ToListAsync();
         
         }
 
+        public async Task<List<Categories>> GetAllCategory()
+        {
 
+            return await _context.Categories.ToListAsync();
+        }
 
 
     } 

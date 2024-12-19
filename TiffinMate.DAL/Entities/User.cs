@@ -27,6 +27,6 @@ namespace TiffinMate.DAL.Entities
         public string? city { get; set; }
         public string? image { get; set; }
         public bool is_blocked { get; set; }
-        public ICollection<Review> Review { get; set; }
+        public ICollection<Review> review { get; set; }
     }
 }

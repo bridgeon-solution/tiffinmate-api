@@ -10,13 +10,11 @@ namespace TiffinMate.BLL.DTOs.ProviderDTOs
     {
         public Guid categoryid { get; set; }
         public Guid providerid { get; set; }
-        public string categoryname { get; set; }
+        //public string categoryname { get; set; }
         public string foodname { get; set; }
         public decimal price { get; set; }
         public string description { get; set; }
         public bool is_veg { get; set; }
-
-        public bool is_available { get; set; }
         public string day { get; set; }
         //public string image { get; set; }
 

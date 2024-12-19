@@ -61,16 +61,19 @@ namespace TiffinMate.BLL.Services.ProviderServices
            
             var imageUrl = await _cloudinary.UploadDocumentAsync(image);
 
-           
-            var foodItem = _mapper.Map<FoodItem>(foodItemDto);
-            foodItem.image = imageUrl;
-            if (string.IsNullOrEmpty(foodItem.image))
+            if (string.IsNullOrEmpty(imageUrl))
             {
+                
                 return false;
             }
+
+            var foodItem = _mapper.Map<FoodItem>(foodItemDto);
+            foodItem.image = imageUrl; 
+
             await _foodItemRepository.AddItemAsync(foodItem);
-            return true; 
+            return true;
         }
+
 
         public async Task<string> AddCategories(CategoryDto category)
         {
@@ -86,14 +89,14 @@ namespace TiffinMate.BLL.Services.ProviderServices
             return _mapper.Map<List<FoodItemDto>>(result);
         }
 
-        public async Task<List<CategoryDto>> GetCategoryAsync()
+        public async Task<List<Categories>> GetCategoryAsync()
         {
             var result = await _foodItemRepository.GetAllCategory();
             if (result==null)
             {
                 return null;
             }
-            return _mapper.Map<List<CategoryDto>>(result);
+            return _mapper.Map<List<Categories>>(result);
             
             
         }

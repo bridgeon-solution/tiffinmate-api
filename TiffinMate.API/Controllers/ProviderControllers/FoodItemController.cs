@@ -106,7 +106,7 @@ namespace TiffinMate.API.Controllers.ProviderControllers
 
             }
 
-            var responce = new ApiResponse<List<CategoryDto>>("success", "categories retrieved successfully", result, HttpStatusCode.OK, "");
+            var responce = new ApiResponse<List<Categories>>("success", "categories retrieved successfully", result, HttpStatusCode.OK, "");
             return Ok(responce);
         }
 

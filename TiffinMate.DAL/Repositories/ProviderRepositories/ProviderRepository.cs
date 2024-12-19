@@ -77,7 +77,7 @@ namespace TiffinMate.DAL.Repositories.ProviderRepositories
         }
         public async Task<ProviderDetails> GetProviderDetailsById(Guid id)
         {
-            return await _context.ProvidersDetails.FirstOrDefaultAsync(p => p.ProviderId == id);
+            return await _context.ProvidersDetails.FirstOrDefaultAsync(p => p.provider_id == id);
         }
         public async Task<List<Provider>> GetProviders()
         {

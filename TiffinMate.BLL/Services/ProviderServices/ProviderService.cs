@@ -233,7 +233,7 @@ namespace TiffinMate.BLL.Services.ProviderServices
 
         //get all provider
 
-        
+
         public async Task<BlockUnblockResponse> BlockUnblock(Guid id)
         {
             var user = await _providerRepository.BlockUnblockUser(id);

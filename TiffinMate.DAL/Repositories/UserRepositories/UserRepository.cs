@@ -41,7 +41,11 @@ namespace TiffinMate.DAL.Repositories.UserRepositories
             await _context.SaveChangesAsync();
         }
 
-       
+        public async Task<List<User>> UserPagination()
+        {
+            return await _context.users.ToListAsync();
+
+        }
 
 
     }

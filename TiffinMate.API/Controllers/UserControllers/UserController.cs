@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Sprache;
 using System.Net;
 using TiffinMate.API.ApiRespons;
+using TiffinMate.BLL.DTOs.ProviderDTOs;
 using TiffinMate.BLL.DTOs.UserDTOs;
 using TiffinMate.BLL.Interfaces.AuthInterface;
 using TiffinMate.BLL.Interfaces.UserInterfaces;
@@ -268,7 +269,7 @@ namespace TiffinMate.API.Controllers.UserControllers
             try
             {
                 var result = await _userService.GetAllUsers();
-                return Ok(new ApiResponse<List<User>>("success", "users getted succesfuly", result, HttpStatusCode.OK, ""));
+                return Ok(new ApiResponse<List<UserResponseDTO>>("success", "users getted succesfuly", result, HttpStatusCode.OK, ""));
 
 
             }
@@ -286,6 +287,25 @@ namespace TiffinMate.API.Controllers.UserControllers
             {
                 var response = await _userService.BlockUnblock(id);
                 return Ok(new ApiResponse<BlockUnblockResponse>("success", "user blocked/unblocked succesfuly", response, HttpStatusCode.OK, ""));
+
+            }
+            catch (Exception ex)
+            {
+                var response = new ApiResponse<string>("failed", "", ex.Message, HttpStatusCode.InternalServerError, "error occured");
+                return StatusCode((int)HttpStatusCode.InternalServerError, response);
+
+            }
+        }
+
+        [HttpGet("pagination")]
+
+        public async Task<IActionResult> Pagination(int pageSize , int page , string search="", string filter = "")
+        {
+            try
+            {
+                var response = await _userService.UserPagination(page, pageSize,search,filter);
+                return Ok(new ApiResponse<List<UserResponseDTO>>("success", "provider getted", response, HttpStatusCode.OK, ""));
+
 
             }
             catch (Exception ex)

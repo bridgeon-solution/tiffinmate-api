@@ -136,7 +136,23 @@ namespace TiffinMate.API.Controllers.ControllerProvider
 
             }
         }
+        [HttpGet("pagination")]
 
-       
+        public async Task<IActionResult> Pagination(int pageSize, int page, string search = "", string filter = "",string verifystatus="")
+        {
+            try
+            {
+                var response = await _providerService.Providerpagination(page, pageSize,search,filter,verifystatus);
+                return Ok(new ApiResponse<List<ProviderResponseDTO>>("success", "provider getted", response, HttpStatusCode.OK, ""));
+
+
+            }
+            catch (Exception ex)
+            {
+                var response = new ApiResponse<string>("failed", "", ex.Message, HttpStatusCode.InternalServerError, "error occured");
+                return StatusCode((int)HttpStatusCode.InternalServerError, response);
+
+            }
+        }
     }
 }

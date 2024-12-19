@@ -20,5 +20,6 @@ namespace TiffinMate.DAL.Interfaces.ProviderInterface
         Task<bool> Remove(Guid id);
         Task<Provider> BlockUnblockUser(Guid id);
         Task<Provider> GetUserByRefreshTokenAsync(string refreshToken);
+        Task<List<Provider>> ProviderPagination();
     }
 }

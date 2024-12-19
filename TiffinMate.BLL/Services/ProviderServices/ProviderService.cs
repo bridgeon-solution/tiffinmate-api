@@ -18,6 +18,7 @@ using CloudinaryDotNet.Actions;
 using sib_api_v3_sdk.Client;
 using System.Net;
 using TiffinMate.BLL.DTOs.UserDTOs;
+using Supabase.Gotrue;
 
 namespace TiffinMate.BLL.Services.ProviderServices
 {
@@ -258,7 +259,41 @@ namespace TiffinMate.BLL.Services.ProviderServices
             };
         }
 
-       
+        public async Task<List<ProviderResponseDTO>> Providerpagination(int page, int pageSize, string search = null, string filter = null, string verifystatus = null)
+        {
+            var provider = await _providerRepository.ProviderPagination();
+
+            if (!string.IsNullOrEmpty(search))
+            {
+                provider = provider.Where(u => u.username.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                                               u.email.Contains(search, StringComparison.OrdinalIgnoreCase)).ToList();
+            }
+
+            if (!string.IsNullOrEmpty(filter))
+            {
+                if (filter.ToLower() == "true")
+                {
+                    provider = provider.Where(u => u.is_blocked == true).ToList();
+                }
+                else if (filter.ToLower() == "false")
+                {
+                    provider = provider.Where(u => u.is_blocked == false).ToList();
+                }
+            }
+
+            if (!string.IsNullOrEmpty(verifystatus))
+            {
+                provider = provider.Where(u => u.verification_status.Equals(verifystatus, StringComparison.OrdinalIgnoreCase)).ToList();
+            }
+
+            var providerPaged = provider
+               .OrderByDescending(u => u.created_at)
+               .Skip((page - 1) * pageSize)
+               .Take(pageSize);
+
+            
+            return _mapper.Map<List<ProviderResponseDTO>>(providerPaged);
+        }
 
 
     }

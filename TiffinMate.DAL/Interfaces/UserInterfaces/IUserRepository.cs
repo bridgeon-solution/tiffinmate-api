@@ -13,6 +13,7 @@ namespace TiffinMate.DAL.Interfaces.UserInterfaces
         Task<List<User>> GetUsers();
         Task<User> GetUserById(Guid id);
         Task UpdateUser(User user);
+        Task<List<User>> UserPagination();
 
 
 

@@ -74,6 +74,12 @@ namespace TiffinMate.DAL.Repositories.ProviderRepositories
             return provide;
         }
 
+        public async Task<List<Provider>> ProviderPagination()
+        {
+            return await _context.Providers.ToListAsync();
+
+        }
+
        
 
 

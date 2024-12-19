@@ -26,6 +26,7 @@ namespace TiffinMate.BLL.Mapper
             CreateMap<ProviderResponseDTO, Provider>().ReverseMap();
             CreateMap<UserResponseDTO, User>().ReverseMap();
             CreateMap<ProviderDetailResponse, ProviderDetails>().ReverseMap();
+            CreateMap<ProviderDetailedDTO, ProviderDetails>().ReverseMap();
 
         }
     }

@@ -18,8 +18,6 @@ namespace TiffinMate.DAL.Entities.ProviderEntity
         public string about { get; set; }
         public string image { get; set; }
         public int account_no { get; set; }
-        //public DateTime? created_at { get; set; } = DateTime.UtcNow;
-        //public DateTime? updated_at { get; set; } = DateTime.UtcNow;
-        public Provider provider { get; set; }
+        public Provider Provider { get; set; }
     }
 }

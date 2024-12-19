@@ -34,6 +34,10 @@ namespace TiffinMate.DAL.Repositories.ProviderRepositories
         {
             return await _context.Set<Provider>().FirstOrDefaultAsync(p => p.email == email && p.password == password);
         }
+        public async Task<List<Provider>> GetProviderByCategory(string? verificationStatus)
+        {
+            return await _context.Providers.Where(x => x.verification_status == verificationStatus).ToListAsync();
+        }
         public async Task<Provider> GetProviderById(Guid id)
         {
             return await _context.Set<Provider>().FirstOrDefaultAsync(p => p.id == id);
@@ -44,9 +48,7 @@ namespace TiffinMate.DAL.Repositories.ProviderRepositories
 
         }
         public async Task SaveChangesAsync()
-
         {
-
             await _context.SaveChangesAsync();
         }
         public async Task<bool> ExistsAsync(Guid providerId)
@@ -65,20 +67,23 @@ namespace TiffinMate.DAL.Repositories.ProviderRepositories
             return await _context.Providers.FirstOrDefaultAsync(u => u.refresh_token == refreshToken);
         }
         public async Task<Provider> BlockUnblockUser(Guid id)
-
         {
             var provide = await _context.Providers.SingleOrDefaultAsync(u => u.id == id);
             return provide;
         }
-
+        public async Task<List<ProviderDetails>> GetProvidersWithDetail()
+        {
+            return await _context.ProvidersDetails.ToListAsync();
+        }
+        public async Task<ProviderDetails> GetProviderDetailsById(Guid id)
+        {
+            return await _context.ProvidersDetails.FirstOrDefaultAsync(p => p.ProviderId == id);
+        }
         public async Task<List<Provider>> GetProviders()
         {
             return await _context.Providers.ToListAsync();
 
         }
-
-       
-
 
 
 

@@ -19,6 +19,9 @@ namespace TiffinMate.DAL.Interfaces.ProviderInterface
         Task<bool> Remove(Guid id);
         Task<Provider> BlockUnblockUser(Guid id);
         Task<Provider> GetUserByRefreshTokenAsync(string refreshToken);
+        Task<List<Provider>> GetProviderByCategory(string? verificationStatus);
+        Task<List<ProviderDetails>> GetProvidersWithDetail();
+        Task<ProviderDetails> GetProviderDetailsById(Guid id);
         Task<List<Provider>> GetProviders();
     }
 }

@@ -11,9 +11,11 @@ namespace TiffinMate.BLL.Interfaces.ProviderServiceInterafce
         Task<ProviderLoginResponse> AddLogin(ProviderLoginDTO providerdto);
         Task<bool> AddProviderDetails(ProviderDetailsDTO providerDetailsdto, IFormFile logo, IFormFile image);
         Task<ProviderLoginResponse> GetRefreshToken(string refreshToken);
+
         Task<BlockUnblockResponse> BlockUnblock(Guid id);
+        Task<List<ProviderDetailResponse>> GetProvidersWithDetail();
+        Task<ProviderDetailedDTO> GetProviderDetailsById(Guid id);
         Task<List<ProviderResponseDTO>> GetProviders(int page, int pageSize, string search = null, string filter = null, string verifystatus = null);
-        
 
     }
 }

@@ -27,6 +27,8 @@ namespace TiffinMate.DAL.DbContexts
         public DbSet<User> users { get; set; }
         public DbSet<Review> Reviews { get; set; }
 
+        public DbSet<Menu> menus { get; set; }
+
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -131,6 +133,25 @@ namespace TiffinMate.DAL.DbContexts
 
                 entity.Property(r => r.review)
                       .IsRequired();
+            });
+
+            modelBuilder.Entity<Menu>(entity =>
+            {
+                entity.HasMany(m => m.foodItems)
+                .WithOne(f => f.menu)
+                .HasForeignKey(f => f.menu_id);
+                
+
+            });
+            modelBuilder.Entity<Menu>(entity =>
+            {
+                entity.HasOne(m => m.Provider)
+                .WithMany(p => p.Menus)
+                .HasForeignKey(f => f.provider_id);
+
+                entity.Property(m=>m.is_available)
+                .HasDefaultValue(true);
+
             });
 
 

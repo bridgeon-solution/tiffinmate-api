@@ -26,5 +26,6 @@ namespace TiffinMate.DAL.Entities.ProviderEntity
         public ProviderDetails ProviderDetails { get; set; }
         public ICollection<Review> Review { get; set; }
         public ICollection<FoodItem> FoodItems { get; set; }
+        public ICollection<Menu> Menus { get; set; }
     }
 }

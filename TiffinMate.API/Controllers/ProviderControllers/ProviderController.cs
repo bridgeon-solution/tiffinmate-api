@@ -109,21 +109,7 @@ namespace TiffinMate.API.Controllers.ControllerProvider
             }
         }
 
-        [HttpGet]
-        public async Task<IActionResult> AllProviders()
-        {
-            try
-            {
-                var response = await _providerService.GetProviders();
-                return Ok(new ApiResponse<List<ProviderResponseDTO>>("success", "providers getted succesfuly", response, HttpStatusCode.OK, ""));
-            }
-            catch (Exception ex) {
-                var response = new ApiResponse<string>("failed", "", ex.Message, HttpStatusCode.InternalServerError, "error occured");
-                return StatusCode((int)HttpStatusCode.InternalServerError, response);
-            }
-
-
-        }
+       
 
         [HttpPatch("block")]
         public async Task<IActionResult> BlockUnblockUser(Guid id)
@@ -144,14 +130,14 @@ namespace TiffinMate.API.Controllers.ControllerProvider
         }
 
         [HttpGet("{providerid}/reviews")]
-        public async Task<IActionResult> AllReviews (Guid providerid)
+        public async Task<IActionResult> AllReviews(Guid providerid)
         {
             try
             {
                 var response = await _reviewService.GetAllProviderReview(providerid);
-                return Ok(new ApiResponse<List< AllReview >> ("success", "providers getted succesfuly", response, HttpStatusCode.OK, ""));
+                return Ok(new ApiResponse<List<AllReview>>("success", "providers getted succesfuly", response, HttpStatusCode.OK, ""));
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 var response = new ApiResponse<string>("failed", "", ex.Message, HttpStatusCode.InternalServerError, "error occured");
                 return StatusCode((int)HttpStatusCode.InternalServerError, response);
@@ -162,7 +148,7 @@ namespace TiffinMate.API.Controllers.ControllerProvider
         {
             if (reviewDto == null)
             {
-                return BadRequest(new ApiResponse<string>("failure","Invalid Input",null,HttpStatusCode.BadRequest,"Review data is required."));
+                return BadRequest(new ApiResponse<string>("failure", "Invalid Input", null, HttpStatusCode.BadRequest, "Review data is required."));
             }
 
             try
@@ -171,16 +157,16 @@ namespace TiffinMate.API.Controllers.ControllerProvider
 
                 if (result)
                 {
-                    return Ok(new ApiResponse<string>("success","Review Added","Review added successfully.",HttpStatusCode.OK,""));
+                    return Ok(new ApiResponse<string>("success", "Review Added", "Review added successfully.", HttpStatusCode.OK, ""));
                 }
                 else
                 {
-                    return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse<string>("failure","Operation Failed",null,HttpStatusCode.InternalServerError,"Failed to add review."));
+                    return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse<string>("failure", "Operation Failed", null, HttpStatusCode.InternalServerError, "Failed to add review."));
                 }
             }
             catch (Exception ex)
             {
-                return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse<string>( "failure", "Error Occurred", null, HttpStatusCode.InternalServerError,ex.Message));
+                return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse<string>("failure", "Error Occurred", null, HttpStatusCode.InternalServerError, ex.Message));
             }
         }
         [HttpGet("{userId}/review")]
@@ -188,7 +174,7 @@ namespace TiffinMate.API.Controllers.ControllerProvider
         {
             if (userId == Guid.Empty)
             {
-                return BadRequest(new ApiResponse<string>("failure","Invalid Input",null,HttpStatusCode.BadRequest,"User ID is required."));
+                return BadRequest(new ApiResponse<string>("failure", "Invalid Input", null, HttpStatusCode.BadRequest, "User ID is required."));
             }
 
             try
@@ -197,14 +183,30 @@ namespace TiffinMate.API.Controllers.ControllerProvider
 
                 if (reviews == null || reviews.Count == 0)
                 {
-                    return NotFound(new ApiResponse<List<AllReview>>("failure","No Reviews Found",new List<AllReview>(),HttpStatusCode.NotFound,"No reviews found for the given user."));
+                    return NotFound(new ApiResponse<List<AllReview>>("failure", "No Reviews Found", new List<AllReview>(), HttpStatusCode.NotFound, "No reviews found for the given user."));
                 }
 
-                return Ok(new ApiResponse<List<AllReview>>("success","Reviews Retrieved",reviews,HttpStatusCode.OK,""));
+                return Ok(new ApiResponse<List<AllReview>>("success", "Reviews Retrieved", reviews, HttpStatusCode.OK, ""));
             }
             catch (Exception ex)
             {
-                return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse<List<AllReview>>("failure","Error Occurred",null,HttpStatusCode.InternalServerError,ex.Message));
+                return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse<List<AllReview>>("failure", "Error Occurred", null, HttpStatusCode.InternalServerError, ex.Message));
+            }
+        }
+        [HttpGet]
+
+        public async Task<IActionResult> GetProviders(int pageSize, int page, string search = "", string filter = "", string verifystatus = "")
+        {
+            try
+            {
+                var response = await _providerService.GetProviders(page, pageSize, search, filter, verifystatus);
+                return Ok(new ApiResponse<List<ProviderResponseDTO>>("success", "provider getted", response, HttpStatusCode.OK, ""));
+            }
+
+            catch (Exception ex)
+            {
+                var response = new ApiResponse<string>("failed", "", ex.Message, HttpStatusCode.InternalServerError, "error occured");
+                return StatusCode((int)HttpStatusCode.InternalServerError, response);
             }
         }
     }

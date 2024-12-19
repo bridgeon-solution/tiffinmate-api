@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Sprache;
 using System.Net;
 using TiffinMate.API.ApiRespons;
+using TiffinMate.BLL.DTOs.ProviderDTOs;
 using TiffinMate.BLL.DTOs.UserDTOs;
 using TiffinMate.BLL.Interfaces.AuthInterface;
 using TiffinMate.BLL.Interfaces.UserInterfaces;
@@ -264,23 +265,7 @@ namespace TiffinMate.API.Controllers.UserControllers
             }
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetUsers()
-        {
-            try
-            {
-                var result = await _userService.GetAllUsers();
-                return Ok(new ApiResponse<List<User>>("success", "users getted succesfuly", result, HttpStatusCode.OK, ""));
-
-
-            }
-            catch (Exception ex)
-            {
-                var response = new ApiResponse<string>("failed", "", ex.Message, HttpStatusCode.InternalServerError, "error occured");
-                return StatusCode((int)HttpStatusCode.InternalServerError, response);
-
-            }
-        }
+        
         [HttpPatch("block")]
         public async Task<IActionResult> BlockUnblockUser(Guid id)
         {
@@ -297,6 +282,25 @@ namespace TiffinMate.API.Controllers.UserControllers
 
             }
         }
-       
+
+        [HttpGet]
+
+        public async Task<IActionResult> GetUsers(int pageSize , int page , string search="", string filter = "")
+        {
+            try
+            {
+                var response = await _userService.GetUsers(page, pageSize,search,filter);
+                return Ok(new ApiResponse<List<UserResponseDTO>>("success", "provider getted", response, HttpStatusCode.OK, ""));
+
+
+            }
+            catch (Exception ex)
+            {
+                var response = new ApiResponse<string>("failed", "", ex.Message, HttpStatusCode.InternalServerError, "error occured");
+                return StatusCode((int)HttpStatusCode.InternalServerError, response);
+
+            }
+        }
+
     }
 }

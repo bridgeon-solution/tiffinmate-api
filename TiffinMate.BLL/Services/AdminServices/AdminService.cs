@@ -50,7 +50,7 @@ namespace TiffinMate.BLL.Services.AdminService
             return new LoginResponseDTO
             {
                 id = user.id,
-                name = user.username,
+                name = user.user_name,
                 token = token,
                 message="success"
             };
@@ -67,7 +67,7 @@ namespace TiffinMate.BLL.Services.AdminService
             var claims = new[]
             {
                 new Claim (ClaimTypes.NameIdentifier, user.id.ToString()),
-                new Claim (ClaimTypes.Name,user.username),
+                new Claim (ClaimTypes.Name,user.user_name),
                 new Claim (ClaimTypes.Role, user.role),
                 new Claim(ClaimTypes.Email, user.email)
             };

@@ -38,7 +38,7 @@ namespace TiffinMate.BLL.Services.ProviderServices
             var foodItemsDto = result.Select(e =>
             {
                 var dto = _mapper.Map<FoodItemDto>(e);
-                dto.categoryname = e.category?.categoryname;
+                dto.categoryname = e.category?.category_name;
                 return dto;
             }).ToList();
             return foodItemsDto;

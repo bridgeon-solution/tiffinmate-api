@@ -26,7 +26,7 @@ namespace TiffinMate.API.Controllers.ProviderControllers
         }
 
 
-        [HttpPost("FoodItem")]
+        [HttpPost("fooditem")]
         public async Task<IActionResult> AddItem([FromForm] FoodItemDto foodItemDto, IFormFile image)
         {
             var response = await _foodItemService.AddFoodItemAsync(foodItemDto, image);
@@ -39,7 +39,7 @@ namespace TiffinMate.API.Controllers.ProviderControllers
         }
 
 
-        [HttpPost("Categery")]
+        [HttpPost("categery")]
         public async Task<IActionResult> AddCategory([FromBody] CategoryDto category)
         {
             var response= await _foodItemService.AddCategories(category);
@@ -52,7 +52,7 @@ namespace TiffinMate.API.Controllers.ProviderControllers
         }
 
 
-        [HttpGet("FoodItem")]
+        [HttpGet("fooditem")]
         public async Task<IActionResult> GetFoodItems()
         {
             var result=await _foodItemService.GetFoodItemsAsync();
@@ -68,7 +68,7 @@ namespace TiffinMate.API.Controllers.ProviderControllers
         }
 
 
-        [HttpGet("ById")]
+        [HttpGet("{id}")]
         public async Task<IActionResult> GetFoodItem(Guid id)
         {
             var result = await _foodItemService.GetFoodItemAsync(id);
@@ -81,7 +81,7 @@ namespace TiffinMate.API.Controllers.ProviderControllers
             return Ok(response);
         }
 
-        [HttpGet("ByProvider")]
+        [HttpGet("{providerid}")]
         public async Task<IActionResult> GetByProvider(Guid id)
         {
             var result = await _foodItemService.GetByProviderAsync(id);

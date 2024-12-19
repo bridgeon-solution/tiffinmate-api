@@ -21,7 +21,7 @@ namespace TiffinMate.DAL.Entities.ProviderEntity
         public string description { get; set; }
         [Required]
         public bool is_available { get; set; }
-        public List<FoodItem> foodItems { get; set; }
-        public Provider Provider { get; set; }
+        public List<FoodItem> food_items { get; set; }
+        public Provider provider { get; set; }
     }
 }

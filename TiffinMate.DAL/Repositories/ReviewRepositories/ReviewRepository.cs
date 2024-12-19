@@ -22,25 +22,25 @@ namespace TiffinMate.DAL.Repositories.ReviewRepository
         public async Task<List<Review>> GetReviewofuser(Guid providerid, Guid userid)
         {
             return await _context.Reviews
-         .Where(r => r.ProviderId == providerid && r.UserId == userid)
-         .Include(r => r.User)
-         .Include(r => r.Provider)
+         .Where(r => r.provider_id == providerid && r.user_id == userid)
+         .Include(r => r.user)
+         .Include(r => r.provider)
          .ToListAsync();
         }
         public async Task<List<Review>> GetUserReview(Guid userid)
         {
             return await _context.Reviews
-         .Where(r => r.UserId == userid)
-         .Include(r => r.User)
-         .Include(r => r.Provider)
+         .Where(r => r.user_id == userid)
+         .Include(r => r.user)
+         .Include(r => r.provider)
          .ToListAsync();
         }
         public async Task<List<Review>> GetProviderReview(Guid providerId)
         {
             return await _context.Reviews
-         .Where(r => r.ProviderId == providerId)
-         .Include(r => r.User)
-         .Include(r => r.Provider)
+         .Where(r => r.provider_id == providerId)
+         .Include(r => r.user)
+         .Include(r => r.provider)
          .ToListAsync();
         }
         public async Task<bool> UpdateProvider(Review review)

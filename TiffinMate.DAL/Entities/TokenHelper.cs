@@ -30,7 +30,7 @@ namespace TiffinMate.DAL.Entities
             var claims = new[]
             {
                 new Claim(ClaimTypes.NameIdentifier, provider.id.ToString()),
-                new Claim(ClaimTypes.Name, provider.username),
+                new Claim(ClaimTypes.Name, provider.user_name),
                 new Claim(ClaimTypes.Role, provider.role),
                 new Claim(ClaimTypes.Email, provider.email)
             };

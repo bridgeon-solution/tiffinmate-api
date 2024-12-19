@@ -11,9 +11,9 @@ namespace TiffinMate.DAL.Entities.ProviderEntity
     public class FoodItem : AuditableEntity
     {
        
-        public Guid Id { get; set; }
+        public Guid id { get; set; }
         [Required]
-        public string foodname { get; set; }
+        public string food_name { get; set; }
         [Required]
         public decimal price { get; set; }
         public string description { get; set; }
@@ -27,10 +27,10 @@ namespace TiffinMate.DAL.Entities.ProviderEntity
        
         public Categories category { get; set; }
         [Required]
-        public Guid categoryid { get; set; }
+        public Guid category_id { get; set; }
 
         [Required]
-        public Guid providerid { get; set; }
+        public Guid provider_id { get; set; }
 
         public Provider provider { get; set; }
         public Menu menu { get; set; }

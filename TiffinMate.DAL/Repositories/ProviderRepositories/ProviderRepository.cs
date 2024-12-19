@@ -51,7 +51,7 @@ namespace TiffinMate.DAL.Repositories.ProviderRepositories
         }
         public async Task<bool> ExistsAsync(Guid providerId)
         {
-            return await _context.ProvidersDetails.AnyAsync(p => p.ProviderId == providerId);
+            return await _context.ProvidersDetails.AnyAsync(p => p.provider_id == providerId);
         }
         public async Task<bool> Remove(Guid id)
         {

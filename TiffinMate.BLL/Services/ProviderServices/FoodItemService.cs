@@ -23,7 +23,6 @@ namespace TiffinMate.BLL.Services.ProviderServices
         private readonly ICloudinaryService _cloudinary;
         private readonly IConfiguration _config;
        
-
         public FoodItemService(IFoodItemRepository foodItemRepository,IMapper mapper, ICloudinaryService cloudinary, IConfiguration config)
         {
             _foodItemRepository = foodItemRepository;
@@ -36,7 +35,13 @@ namespace TiffinMate.BLL.Services.ProviderServices
         public async Task<List<FoodItemDto>> GetFoodItemsAsync()
         {
             var result=await _foodItemRepository.GetAllAsync();
-             return _mapper.Map<List<FoodItemDto>>(result);
+            var foodItemsDto = result.Select(e =>
+            {
+                var dto = _mapper.Map<FoodItemDto>(e);
+                dto.categoryname = e.category?.categoryname;
+                return dto;
+            }).ToList();
+            return foodItemsDto;
         }
 
 
@@ -47,9 +52,6 @@ namespace TiffinMate.BLL.Services.ProviderServices
             return _mapper.Map<FoodItemDto>(result);
 
         }
-
-
-
         public async Task<bool> AddFoodItemAsync(FoodItemDto foodItemDto, IFormFile image)
         {
             if (foodItemDto == null)

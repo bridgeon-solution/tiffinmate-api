@@ -6,17 +6,20 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Sprache;
+using Supabase.Gotrue;
 using System.Collections.Generic;
 using System.Net;
 using TiffinMate.API.ApiRespons;
 using TiffinMate.BLL.DTOs.ProviderDTOs;
 using TiffinMate.BLL.DTOs.UserDTOs;
 using TiffinMate.BLL.Interfaces.ProviderServiceInterafce;
+using TiffinMate.BLL.Interfaces.ProviderVerification;
 using TiffinMate.BLL.Services.ProviderServices;
 using TiffinMate.DAL.DbContexts;
 using TiffinMate.DAL.Entities;
 using TiffinMate.DAL.Entities.ProviderEntity;
 using TiffinMate.DAL.Interfaces.ProviderInterface;
+using Twilio.Annotations;
 using static Supabase.Gotrue.Constants;
 
 namespace TiffinMate.API.Controllers.ControllerProvider
@@ -28,12 +31,14 @@ namespace TiffinMate.API.Controllers.ControllerProvider
     {
         private readonly IProviderService _providerService;
         private readonly IReviewService _reviewService;
+        private readonly IProviderVerificationService _verificationService;
 
-        public ProviderController(IProviderService providerService, IReviewService reviewService)
+        public ProviderController(IProviderService providerService, IReviewService reviewService, IProviderVerificationService verificationService)
         {
 
             _providerService = providerService;
             _reviewService = reviewService;
+            _verificationService=verificationService;
         }
 
         [HttpPost("register")]
@@ -188,7 +193,7 @@ namespace TiffinMate.API.Controllers.ControllerProvider
         {
             if (userId == Guid.Empty)
             {
-                return BadRequest(new ApiResponse<string>("failure","Invalid Input",null,HttpStatusCode.BadRequest,"User ID is required."));
+                return BadRequest(new ApiResponse<string>("failure", "Invalid Input", null, HttpStatusCode.BadRequest, "User ID is required."));
             }
 
             try
@@ -197,15 +202,142 @@ namespace TiffinMate.API.Controllers.ControllerProvider
 
                 if (reviews == null || reviews.Count == 0)
                 {
-                    return NotFound(new ApiResponse<List<AllReview>>("failure","No Reviews Found",new List<AllReview>(),HttpStatusCode.NotFound,"No reviews found for the given user."));
+                    return NotFound(new ApiResponse<List<AllReview>>("failure", "No Reviews Found", new List<AllReview>(), HttpStatusCode.NotFound, "No reviews found for the given user."));
                 }
 
-                return Ok(new ApiResponse<List<AllReview>>("success","Reviews Retrieved",reviews,HttpStatusCode.OK,""));
+                return Ok(new ApiResponse<List<AllReview>>("success", "Reviews Retrieved", reviews, HttpStatusCode.OK, ""));
             }
             catch (Exception ex)
             {
-                return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse<List<AllReview>>("failure","Error Occurred",null,HttpStatusCode.InternalServerError,ex.Message));
+                return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse<List<AllReview>>("failure", "Error Occurred", null, HttpStatusCode.InternalServerError, ex.Message));
             }
         }
+        [HttpGet("{providerid}")]
+        public async Task<IActionResult> GetProviderById(Guid providerid)
+        {
+            if (providerid == Guid.Empty)
+            {
+                return BadRequest(new ApiResponse<string>("failure", "Invalid Input", null, HttpStatusCode.BadRequest, "User ID is required."));
+            }
+
+            var provider = await _providerService.ProviderById(providerid);
+            if (provider == null)
+            {
+                return NotFound(new ApiResponse<ProviderByIdDto>("failure", "No Provider Found", null, HttpStatusCode.NotFound, "No provider found for the given ID."));
+            }
+
+            return Ok(new ApiResponse<ProviderByIdDto>("success", "Provider Retrieved", provider, HttpStatusCode.OK, ""));
+        }
+        [HttpPost("forgot-passowrd")]
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordDto forgotPasswordDto)
+        {
+            try
+            {
+                var response = await _verificationService.SendResetOtp(forgotPasswordDto);
+                if (response == "Not Found")
+                {
+                    return NotFound(new ApiResponse<string>("failure", "Failed", null, HttpStatusCode.NotFound, "user not found"));
+                }
+                if (response == "failed")
+                {
+
+                    return BadRequest(new ApiResponse<string>("failure", "Failed", null, HttpStatusCode.BadRequest, "failed"));
+                }
+
+                var result = new ApiResponse<string>("success", "otp sended Successfully", response, HttpStatusCode.OK, "");
+                return Ok(result);
+
+            }
+            catch (Exception ex)
+            {
+                var response = new ApiResponse<string>("failed", "", ex.Message, HttpStatusCode.InternalServerError, "error occured");
+                return StatusCode((int)HttpStatusCode.InternalServerError, response);
+
+            }
+
+        }
+        [HttpPost("verify-email-otp")]
+        public async Task<IActionResult> VerifyEmailOtp(VerifyEmailOtpDto verifyEmailOtp)
+        {
+            try
+            {
+                var response = _verificationService.VerifyEmailOtp(verifyEmailOtp);
+                if (!response)
+                {
+                    return BadRequest(new ApiResponse<string>("failure", "verification failed", null, HttpStatusCode.BadRequest, "otp verification failed"));
+                }
+
+                var result = new ApiResponse<bool>("success", "verification Successfull", response, HttpStatusCode.OK, "");
+                return Ok(result);
+
+            }
+            catch (Exception ex)
+            {
+                var response = new ApiResponse<string>("failed", "", ex.Message, HttpStatusCode.InternalServerError, "error occured");
+                return StatusCode((int)HttpStatusCode.InternalServerError, response);
+
+            }
+
+
+
+        }
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto resetPasswordDto)
+        {
+            try
+            {
+                var response = await _verificationService.ResetPassword(resetPasswordDto);
+                if (response == "User Not Found")
+                {
+                    return NotFound(new ApiResponse<string>("failure", "Failed", null, HttpStatusCode.NotFound, "user not found"));
+                }
+                if (response == "updation failed")
+                {
+
+                    return BadRequest(new ApiResponse<string>("failure", "Failed", null, HttpStatusCode.BadRequest, "failed"));
+                }
+
+                var result = new ApiResponse<string>("success", "password updated Successfully", response, HttpStatusCode.OK, "");
+                return Ok(result);
+
+            }
+            catch (Exception ex)
+            {
+                var response = new ApiResponse<string>("failed", "", ex.Message, HttpStatusCode.InternalServerError, "error occured");
+                return StatusCode((int)HttpStatusCode.InternalServerError, response);
+
+            }
+
+        }
+        [HttpPost("resend-mail-otp")]
+        public async Task<IActionResult> ResendMailOtp(ForgotPasswordDto forgotPasswordDto)
+        {
+            try
+            {
+                var response = await _verificationService.SendResetOtp(forgotPasswordDto);
+                if (response == "Not Found")
+                {
+                    return NotFound(new ApiResponse<string>("failure", "Failed", null, HttpStatusCode.NotFound, "user not found"));
+                }
+                if (response == "failed")
+                {
+
+                    return BadRequest(new ApiResponse<string>("failure", "Failed", null, HttpStatusCode.BadRequest, "failed"));
+                }
+
+                var result = new ApiResponse<string>("success", "otp sended Successfully", response, HttpStatusCode.OK, "");
+                return Ok(result);
+
+            }
+            catch (Exception ex)
+            {
+                var response = new ApiResponse<string>("failed", "", ex.Message, HttpStatusCode.InternalServerError, "error occured");
+                return StatusCode((int)HttpStatusCode.InternalServerError, response);
+
+            }
+
+        }
+
     }
 }
+

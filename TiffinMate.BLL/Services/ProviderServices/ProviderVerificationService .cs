@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
+using TiffinMate.BLL.DTOs.ProviderDTOs;
+using TiffinMate.BLL.DTOs.UserDTOs;
 using TiffinMate.BLL.Interfaces.ProviderVerification;
 using TiffinMate.DAL.Entities.ProviderEntity;
 using TiffinMate.DAL.Interfaces.ProviderInterface;
@@ -10,7 +12,8 @@ namespace TiffinMate.BLL.Services.ProviderVerification
     {
         private readonly IProviderBrevoMailService _mailService;
         private readonly IProviderRepository _providerRepository;
-
+        private static Dictionary<string, ProviderLoginDTO> _otpStore = new Dictionary<string, ProviderLoginDTO>();
+        private static Dictionary<string, string> _emailOtpStore = new Dictionary<string, string>();
         public ProviderVerificationService(IProviderBrevoMailService mailService, IProviderRepository providerRepository)
         {
             _mailService = mailService;
@@ -38,7 +41,8 @@ namespace TiffinMate.BLL.Services.ProviderVerification
             }
             try
             {
-                provider.password = otp;
+                string hashPassword = BCrypt.Net.BCrypt.HashPassword(otp);
+                provider.password = hashPassword;
                 provider.updated_at = DateTime.UtcNow;
                 _providerRepository.Update(provider);
                await _providerRepository.SaveChangesAsync();
@@ -82,8 +86,62 @@ namespace TiffinMate.BLL.Services.ProviderVerification
             }
 
         }
+        public async Task<string> SendResetOtp(ForgotPasswordDto forgotPasswordDto)
+        {
+            var user = _providerRepository.GetUserByEmail(forgotPasswordDto.email);
+            if (user == null)
+            {
+                return "User Not Found";
+            }
+            string otp = GenerateOtp();
+            var res = await _mailService.SendOtpForgetPassword(forgotPasswordDto.email, otp);
+            if (res)
+            {
+                _emailOtpStore[forgotPasswordDto.email] = otp;
+                return "otp sended";
+            }
+            else
+            {
+                return "failed";
+            }
 
+        }
+        public bool VerifyEmailOtp(VerifyEmailOtpDto verifyEmailOtp)
+        {
+            var storedOtp = _emailOtpStore[verifyEmailOtp.email];
+            if (storedOtp == verifyEmailOtp.otp)
+            {
+                _emailOtpStore.Remove(verifyEmailOtp.email);
+                return true;
 
+            }
+            else
+            {
+                return false;
+            }
+        }
+        public async Task<string> ResetPassword(ResetPasswordDto resetPasswordDto)
+        {
+            var provider = await _providerRepository.GetUserByEmail(resetPasswordDto.email);
+            if (provider == null)
+            {
+                return "User Not Found";
+            }
+            else
+            {
+                string hashedPassword = BCrypt.Net.BCrypt.HashPassword(resetPasswordDto.password);
+                bool passwordUpdated = await _providerRepository.UpdatePassword(provider, hashedPassword);
+
+                if (passwordUpdated)
+                {
+                    return "Password updated";
+                }
+                else
+                {
+                    return "updation failed";
+                }
+            }
+        }
         private string GenerateOtp()
         {
             Random random = new Random();

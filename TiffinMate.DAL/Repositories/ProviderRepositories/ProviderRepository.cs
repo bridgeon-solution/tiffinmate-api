@@ -73,9 +73,28 @@ namespace TiffinMate.DAL.Repositories.ProviderRepositories
             var provide = await _context.Providers.SingleOrDefaultAsync(u => u.id == id);
             return provide;
         }
+        public async Task<List<Provider>> GetAProviderById(Guid id)
+        {
+            return await _context.Set<Provider>().Where(r => r.id == id)
+         .Include(r => r.ProviderDetails)
+         .Include(r=>r.Review)
+         .ToListAsync();
+        }
+
+        public async Task<Provider> GetUserByEmail(string email)
+        {
+            return await _context.Providers.FirstOrDefaultAsync(e => e.email == email);
+
+        }
+        public async Task<bool> UpdatePassword(Provider provider, string password)
+        {
+            provider.password = password;
+            provider.updated_at = DateTime.UtcNow;
 
 
-
+            await _context.SaveChangesAsync();
+            return true;
+        }
 
     }
 }

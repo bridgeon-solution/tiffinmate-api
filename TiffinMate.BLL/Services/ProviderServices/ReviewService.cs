@@ -72,7 +72,8 @@ namespace TiffinMate.BLL.Services.ProviderServices
                     review = review.review,
                     username = review.User?.name,
                     providername = review.Provider?.username,
-                    image=review.User.image
+                    image=review.User.image,
+                    created_at=review.created_at
 
                 }).ToList();
 
@@ -102,7 +103,8 @@ namespace TiffinMate.BLL.Services.ProviderServices
                     review = review.review,
                     username = review.User?.name,
                     providername = review.Provider?.username,
-                     image = review.User.image
+                     image = review.User.image,
+                     created_at=review.created_at
                 }).ToList();
 
                 return reviewDtos;

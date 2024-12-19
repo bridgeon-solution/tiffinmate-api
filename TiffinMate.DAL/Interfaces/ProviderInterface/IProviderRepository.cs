@@ -12,7 +12,7 @@ namespace TiffinMate.DAL.Interfaces.ProviderInterface
         Task<Provider> AddProviderAsync(Provider provider);
         Task<string> AddProviderDetailsAsync(ProviderDetails proDetails);
         Task<Provider> Login(string email, string password);
-        Task<Provider> GetProviderById(Guid id);
+        Task<List<Provider>> GetAProviderById(Guid id);
         void Update(Provider provider);
         Task SaveChangesAsync();
         Task<List<Provider>> GetProviders();
@@ -20,5 +20,9 @@ namespace TiffinMate.DAL.Interfaces.ProviderInterface
         Task<bool> Remove(Guid id);
         Task<Provider> BlockUnblockUser(Guid id);
         Task<Provider> GetUserByRefreshTokenAsync(string refreshToken);
+        Task<Provider> GetProviderById(Guid id);
+
+        Task<Provider> GetUserByEmail(string email);
+        Task<bool> UpdatePassword(Provider provider, string password);
     }
 }

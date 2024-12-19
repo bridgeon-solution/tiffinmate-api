@@ -258,7 +258,27 @@ namespace TiffinMate.BLL.Services.ProviderServices
             };
         }
 
-
+   public async Task <ProviderByIdDto> ProviderById(Guid providerId)
+        {
+            var provider = await _providerRepository.GetAProviderById(providerId);
+            if (provider == null)
+            {
+                throw new Exception("No provider available");
+            }
+            var result = provider.Select(providers => new ProviderByIdDto
+            {
+                username = providers.username,
+                email = providers.email,
+                address = providers.ProviderDetails.address,
+                phone_no = providers.ProviderDetails.phone_no,
+                verification_status = providers.verification_status,
+                image = providers.ProviderDetails.logo,
+                created_at = providers.created_at,
+                certificate = providers.certificate,
+               
+            }).FirstOrDefault();
+            return result;
+        }
 
 
 

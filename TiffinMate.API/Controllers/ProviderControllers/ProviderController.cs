@@ -109,22 +109,7 @@ namespace TiffinMate.API.Controllers.ControllerProvider
             }
         }
 
-        [HttpGet]
-        public async Task<IActionResult> AllProviders()
-        {
-            try
-            {
-                var response = await _providerService.GetProviders();
-                return Ok(new ApiResponse<List<ProviderResponseDTO>>("success", "providers getted succesfuly", response, HttpStatusCode.OK, ""));
-            }
-            catch (Exception ex)
-            {
-                var response = new ApiResponse<string>("failed", "", ex.Message, HttpStatusCode.InternalServerError, "error occured");
-                return StatusCode((int)HttpStatusCode.InternalServerError, response);
-            }
-
-
-        }
+       
 
         [HttpPatch("block")]
         public async Task<IActionResult> BlockUnblockUser(Guid id)
@@ -208,13 +193,13 @@ namespace TiffinMate.API.Controllers.ControllerProvider
                 return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse<List<AllReview>>("failure", "Error Occurred", null, HttpStatusCode.InternalServerError, ex.Message));
             }
         }
-        [HttpGet("pagination")]
+        [HttpGet]
 
-        public async Task<IActionResult> Pagination(int pageSize, int page, string search = "", string filter = "", string verifystatus = "")
+        public async Task<IActionResult> GetProviders(int pageSize, int page, string search = "", string filter = "", string verifystatus = "")
         {
             try
             {
-                var response = await _providerService.Providerpagination(page, pageSize, search, filter, verifystatus);
+                var response = await _providerService.GetProviders(page, pageSize, search, filter, verifystatus);
                 return Ok(new ApiResponse<List<ProviderResponseDTO>>("success", "provider getted", response, HttpStatusCode.OK, ""));
             }
 

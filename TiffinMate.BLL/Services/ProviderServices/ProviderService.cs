@@ -233,11 +233,6 @@ namespace TiffinMate.BLL.Services.ProviderServices
 
         //get all provider
 
-        public async Task<List<ProviderResponseDTO>> GetProviders()
-        {
-            var provider = await _providerRepository.GetProviders();
-            return _mapper.Map<List<ProviderResponseDTO>>(provider);
-        }
 
         public async Task<BlockUnblockResponse> BlockUnblock(Guid id)
         {
@@ -259,9 +254,9 @@ namespace TiffinMate.BLL.Services.ProviderServices
             };
         }
 
-        public async Task<List<ProviderResponseDTO>> Providerpagination(int page, int pageSize, string search = null, string filter = null, string verifystatus = null)
+        public async Task<List<ProviderResponseDTO>> GetProviders(int page, int pageSize, string search = null, string filter = null, string verifystatus = null)
         {
-            var provider = await _providerRepository.ProviderPagination();
+            var provider = await _providerRepository.GetProviders();
 
             if (!string.IsNullOrEmpty(search))
             {

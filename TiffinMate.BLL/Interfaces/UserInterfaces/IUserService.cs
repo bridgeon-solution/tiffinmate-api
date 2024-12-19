@@ -13,11 +13,10 @@ namespace TiffinMate.BLL.Interfaces.UserInterfaces
     public interface IUserService
     {
         Task<UserProfileDto> GetUserById(Guid id);
-        Task<List<UserResponseDTO>> GetAllUsers();
         Task<BlockUnblockResponse> BlockUnblock(Guid id);
         Task<string> UploadImage(IFormFile image);
         Task<string> UpdateUser(Guid id, UserProfileDto reqDto);
-        Task<List<UserResponseDTO>> UserPagination(int page, int pageSize, string search=null, string filter=null);
+        Task<List<UserResponseDTO>> GetUsers(int page, int pageSize, string search=null, string filter=null);
 
     }
 }

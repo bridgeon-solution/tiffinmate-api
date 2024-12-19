@@ -34,18 +34,7 @@ namespace TiffinMate.BLL.Services.UserServices
             _cloudinary = cloudinary;
             _mapper = mapper;
         }
-        public async Task<List<UserResponseDTO>> GetAllUsers()
-        {
-            var user= await _userRepository.GetUsers();
-            return user.Select(u=>new UserResponseDTO
-            {
-                id=u.id,
-                name=u.name,
-                email=u.email,
-                subscription_status=u.subscription_status,
-                is_blocked=u.is_blocked
-            }).ToList();
-        }
+        
         public async Task<BlockUnblockResponse> BlockUnblock(Guid id)
         {
             var user = await _userRepository.BlockUnblockUser(id);
@@ -121,9 +110,9 @@ namespace TiffinMate.BLL.Services.UserServices
             await _userRepository.UpdateUser(user);
             return "Updated successfully";
         }
-        public async Task<List<UserResponseDTO>> UserPagination(int page, int pageSize, string search=null, string filter=null)
+        public async Task<List<UserResponseDTO>> GetUsers(int page, int pageSize, string search=null, string filter=null)
         {
-            var users = await _userRepository.UserPagination();
+            var users = await _userRepository.GetUsers();
 
             if (!string.IsNullOrEmpty(search))
             {

@@ -265,23 +265,7 @@ namespace TiffinMate.API.Controllers.UserControllers
             }
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetUsers()
-        {
-            try
-            {
-                var result = await _userService.GetAllUsers();
-                return Ok(new ApiResponse<List<UserResponseDTO>>("success", "users getted succesfuly", result, HttpStatusCode.OK, ""));
-
-
-            }
-            catch (Exception ex)
-            {
-                var response = new ApiResponse<string>("failed", "", ex.Message, HttpStatusCode.InternalServerError, "error occured");
-                return StatusCode((int)HttpStatusCode.InternalServerError, response);
-
-            }
-        }
+        
         [HttpPatch("block")]
         public async Task<IActionResult> BlockUnblockUser(Guid id)
         {
@@ -299,13 +283,13 @@ namespace TiffinMate.API.Controllers.UserControllers
             }
         }
 
-        [HttpGet("pagination")]
+        [HttpGet]
 
-        public async Task<IActionResult> Pagination(int pageSize , int page , string search="", string filter = "")
+        public async Task<IActionResult> GetUsers(int pageSize , int page , string search="", string filter = "")
         {
             try
             {
-                var response = await _userService.UserPagination(page, pageSize,search,filter);
+                var response = await _userService.GetUsers(page, pageSize,search,filter);
                 return Ok(new ApiResponse<List<UserResponseDTO>>("success", "provider getted", response, HttpStatusCode.OK, ""));
 
 

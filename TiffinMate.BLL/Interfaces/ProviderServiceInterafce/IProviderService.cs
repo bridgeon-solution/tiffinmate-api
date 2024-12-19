@@ -10,10 +10,9 @@ namespace TiffinMate.BLL.Interfaces.ProviderServiceInterafce
         Task<bool> AddProvider(ProviderDTO product, IFormFile certificateFile);
         Task<ProviderLoginResponse> AddLogin(ProviderLoginDTO providerdto);
         Task<bool> AddProviderDetails(ProviderDetailsDTO providerDetailsdto, IFormFile logo, IFormFile image);
-        Task<List<ProviderResponseDTO>> GetProviders();
         Task<ProviderLoginResponse> GetRefreshToken(string refreshToken);
         Task<BlockUnblockResponse> BlockUnblock(Guid id);
-        Task<List<ProviderResponseDTO>> Providerpagination(int page, int pageSize, string search = null, string filter = null, string verifystatus = null);
+        Task<List<ProviderResponseDTO>> GetProviders(int page, int pageSize, string search = null, string filter = null, string verifystatus = null);
         
 
     }

@@ -70,7 +70,8 @@ namespace TiffinMate.BLL.Services.ProviderVerification
             try
             {
                 provider.updated_at = DateTime.UtcNow;
-                await _providerRepository.Remove(providerId);
+                provider.is_delete = true;
+                 _providerRepository.Update(provider);
                 await _providerRepository.SaveChangesAsync();
 
                 return true;

@@ -28,6 +28,10 @@ using TiffinMate.BLL.Services.ProviderVerification;
 using TiffinMate.BLL.Interfaces.UserInterfaces;
 using TiffinMate.BLL.Services.UserServices;
 using TiffinMate.DAL.Interfaces.UserInterfaces;
+using Microsoft.AspNetCore.Mvc;
+using Asp.Versioning;
+using TiffinMate.DAL.Interfaces.ReviewInterface;
+using TiffinMate.DAL.Repositories.ReviewRepository;
 
 namespace TiffinMate.API
 {
@@ -52,6 +56,13 @@ namespace TiffinMate.API
             Console.WriteLine($"Brevo API Key: {brevoApiKey}");
             // Add services to the container.
             builder.Services.AddControllers();
+
+            builder.Services.AddApiVersioning(options =>
+            {
+                options.AssumeDefaultVersionWhenUnspecified = true;
+                options.DefaultApiVersion = new ApiVersion(1, 0);
+                options.ReportApiVersions = true;                  
+            });
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
@@ -71,6 +82,9 @@ namespace TiffinMate.API
             builder.Services.AddScoped<IUserRepository, UserRepository>();
             builder.Services.AddScoped<ICloudinaryService, CloudinaryServices>();
             builder.Services.AddScoped<IProviderVerificationService, ProviderVerificationService>();
+            builder.Services.AddScoped<IReviewService, ReviewService>();
+
+            builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
             builder.Services.Configure<BrevoSettings>(options =>
             {
                 options.ApiKey = brevoApiKey;

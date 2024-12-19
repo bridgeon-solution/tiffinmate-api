@@ -59,10 +59,7 @@ namespace TiffinMate.DAL.Repositories.ProviderRepositories
             _context.Providers.Remove(remove);
             return true;
         }
-        public async Task<List<Provider>> GetProviders()
-        {
-            return await _context.Providers.ToListAsync();
-        }
+       
         public async Task<Provider> GetUserByRefreshTokenAsync(string refreshToken)
         {
             return await _context.Providers.FirstOrDefaultAsync(u => u.refresh_token == refreshToken);
@@ -73,6 +70,14 @@ namespace TiffinMate.DAL.Repositories.ProviderRepositories
             var provide = await _context.Providers.SingleOrDefaultAsync(u => u.id == id);
             return provide;
         }
+
+        public async Task<List<Provider>> GetProviders()
+        {
+            return await _context.Providers.ToListAsync();
+
+        }
+
+       
 
 
 

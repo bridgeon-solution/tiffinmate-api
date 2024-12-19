@@ -24,7 +24,6 @@ namespace TiffinMate.BLL.Mapper
             CreateMap<FoodItem,FoodItemDto>().ReverseMap();
             CreateMap<Categories,CategoryDto>().ReverseMap();
             CreateMap<ProviderResponseDTO,Provider>().ReverseMap();
-            CreateMap<UserResponseDTO,User>().ReverseMap();
             
         }
     }

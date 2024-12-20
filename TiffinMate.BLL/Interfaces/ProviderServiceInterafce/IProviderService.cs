@@ -14,6 +14,7 @@ namespace TiffinMate.BLL.Interfaces.ProviderServiceInterafce
         Task<ProviderLoginResponse> GetRefreshToken(string refreshToken);
         Task<BlockUnblockResponse> BlockUnblock(Guid id);
         Task<ProviderByIdDto> ProviderById(Guid providerId);
+        Task<List<ProviderResponseDTO>> GetProviders(int page, int pageSize, string search = null, string filter = null, string verifystatus = null);
 
     }
 }

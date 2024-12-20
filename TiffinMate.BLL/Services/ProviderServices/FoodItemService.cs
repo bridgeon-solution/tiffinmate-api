@@ -23,7 +23,6 @@ namespace TiffinMate.BLL.Services.ProviderServices
         private readonly ICloudinaryService _cloudinary;
         private readonly IConfiguration _config;
        
-
         public FoodItemService(IFoodItemRepository foodItemRepository,IMapper mapper, ICloudinaryService cloudinary, IConfiguration config)
         {
             _foodItemRepository = foodItemRepository;
@@ -36,7 +35,13 @@ namespace TiffinMate.BLL.Services.ProviderServices
         public async Task<List<FoodItemDto>> GetFoodItemsAsync()
         {
             var result=await _foodItemRepository.GetAllAsync();
-             return _mapper.Map<List<FoodItemDto>>(result);
+            var foodItemsDto = result.Select(e =>
+            {
+                var dto = _mapper.Map<FoodItemDto>(e);
+                dto.categoryname = e.category?.category_name;
+                return dto;
+            }).ToList();
+            return foodItemsDto;
         }
 
 
@@ -47,9 +52,6 @@ namespace TiffinMate.BLL.Services.ProviderServices
             return _mapper.Map<FoodItemDto>(result);
 
         }
-
-
-
         public async Task<bool> AddFoodItemAsync(FoodItemDto foodItemDto, IFormFile image)
         {
             if (foodItemDto == null)
@@ -61,16 +63,19 @@ namespace TiffinMate.BLL.Services.ProviderServices
            
             var imageUrl = await _cloudinary.UploadDocumentAsync(image);
 
-           
-            var foodItem = _mapper.Map<FoodItem>(foodItemDto);
-            foodItem.image = imageUrl;
-            if (string.IsNullOrEmpty(foodItem.image))
+            if (string.IsNullOrEmpty(imageUrl))
             {
+                
                 return false;
             }
+
+            var foodItem = _mapper.Map<FoodItem>(foodItemDto);
+            foodItem.image = imageUrl; 
+
             await _foodItemRepository.AddItemAsync(foodItem);
-            return true; 
+            return true;
         }
+
 
         public async Task<string> AddCategories(CategoryDto category)
         {
@@ -84,6 +89,18 @@ namespace TiffinMate.BLL.Services.ProviderServices
         {
             var result = await _foodItemRepository.GetByProviderAsync(id);
             return _mapper.Map<List<FoodItemDto>>(result);
+        }
+
+        public async Task<List<Categories>> GetCategoryAsync()
+        {
+            var result = await _foodItemRepository.GetAllCategory();
+            if (result==null)
+            {
+                return null;
+            }
+            return _mapper.Map<List<Categories>>(result);
+            
+            
         }
 
     }

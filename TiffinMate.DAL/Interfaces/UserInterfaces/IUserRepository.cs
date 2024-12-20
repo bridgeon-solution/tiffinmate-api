@@ -10,9 +10,10 @@ namespace TiffinMate.DAL.Interfaces.UserInterfaces
     public interface IUserRepository
     {
         Task<User> BlockUnblockUser(Guid id);
-        Task<List<User>> GetUsers();
         Task<User> GetUserById(Guid id);
         Task UpdateUser(User user);
+        Task<List<User>> GetUsers();
+
 
 
     }

@@ -41,8 +41,8 @@ namespace TiffinMate.BLL.Services.ProviderServices
             }
             var review = new Review
             {
-                ProviderId = reviewDto.ProviderId,
-                UserId = reviewDto.UserId,
+                provider_id = reviewDto.ProviderId,
+                user_id = reviewDto.UserId,
                 review = reviewDto.review
             };
             await _reviewRepository.UpdateProvider(review);
@@ -72,8 +72,8 @@ namespace TiffinMate.BLL.Services.ProviderServices
                     review = review.review,
                     username = review.User?.name,
                     providername = review.Provider?.username,
-                    image=review.User.image,
-                    created_at=review.created_at
+                    image = review.User.image,
+                    created_at = review.created_at
 
                 }).ToList();
 
@@ -97,14 +97,14 @@ namespace TiffinMate.BLL.Services.ProviderServices
 
                 var reviewDtos = reviews.Select(review => new AllReview
                 {
-                    id= Guid.NewGuid(),
+                    id = Guid.NewGuid(),
                     ProviderId = review.ProviderId,
                     UserId = review.UserId,
                     review = review.review,
                     username = review.User?.name,
                     providername = review.Provider?.username,
-                     image = review.User.image,
-                     created_at=review.created_at
+                    image = review.User.image,
+                    created_at = review.created_at
                 }).ToList();
 
                 return reviewDtos;

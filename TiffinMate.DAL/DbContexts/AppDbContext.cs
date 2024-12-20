@@ -27,6 +27,8 @@ namespace TiffinMate.DAL.DbContexts
         public DbSet<User> users { get; set; }
         public DbSet<Review> Reviews { get; set; }
 
+        public DbSet<Menu> menus { get; set; }
+
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -58,9 +60,9 @@ namespace TiffinMate.DAL.DbContexts
                 entity.Property(p => p.verification_status)
                       .HasDefaultValue(false);
 
-                entity.HasOne(p => p.ProviderDetails)
-                      .WithOne(pd => pd.Provider)
-                      .HasForeignKey<ProviderDetails>(pd => pd.ProviderId)
+                entity.HasOne(p => p.provider_details)
+                      .WithOne(pd => pd.provider)
+                      .HasForeignKey<ProviderDetails>(pd => pd.provider_id)
                       .OnDelete(DeleteBehavior.Cascade);
                 entity.Property(e => e.role).HasDefaultValue("provider");
                
@@ -88,28 +90,28 @@ namespace TiffinMate.DAL.DbContexts
                       .IsRequired()
                       .HasDefaultValueSql("gen_random_uuid()");
 
-                entity.Property(pd => pd.ProviderId)
+                entity.Property(pd => pd.provider_id)
                       .IsRequired();
 
-                entity.HasOne(pd => pd.Provider)
-                      .WithOne(p => p.ProviderDetails)
-                      .HasForeignKey<ProviderDetails>(pd => pd.ProviderId)
+                entity.HasOne(pd => pd.provider)
+                      .WithOne(p => p.provider_details)
+                      .HasForeignKey<ProviderDetails>(pd => pd.provider_id)
                       .OnDelete(DeleteBehavior.Cascade);
             });
 
             modelBuilder.Entity<FoodItem>(entity =>
             {
                 entity.HasOne(e => e.category)
-                .WithMany(c => c.foodItems)
-                .HasForeignKey(d => d.categoryid);
+                .WithMany(c => c.food_items)
+                .HasForeignKey(d => d.category_id);
 
             });
 
             modelBuilder.Entity<FoodItem>(entity =>
             {
                 entity.HasOne(f => f.provider)
-                .WithMany(c => c.FoodItems)
-                .HasForeignKey(d => d.providerid)
+                .WithMany(c => c.food_items)
+                .HasForeignKey(d => d.provider_id)
                 .OnDelete(DeleteBehavior.Cascade);
             });
             modelBuilder.Entity<Review>(entity =>
@@ -117,20 +119,39 @@ namespace TiffinMate.DAL.DbContexts
                 entity.HasKey(r => new { r.id });
 
 
-                entity.HasOne(r => r.User)
-                      .WithMany(u => u.Review)
-                      .HasForeignKey(r => r.UserId)
+                entity.HasOne(r => r.user)
+                      .WithMany(u => u.review)
+                      .HasForeignKey(r => r.user_id)
                       .OnDelete(DeleteBehavior.Cascade);
 
 
-                entity.HasOne(r => r.Provider)
-                      .WithMany(p => p.Review)
-                      .HasForeignKey(r => r.ProviderId)
+                entity.HasOne(r => r.provider)
+                      .WithMany(p => p.review)
+                      .HasForeignKey(r => r.provider_id)
                       .OnDelete(DeleteBehavior.Cascade);
 
 
                 entity.Property(r => r.review)
                       .IsRequired();
+            });
+
+            modelBuilder.Entity<Menu>(entity =>
+            {
+                entity.HasMany(m => m.food_items)
+                .WithOne(f => f.menu)
+                .HasForeignKey(f => f.menu_id);
+                
+
+            });
+            modelBuilder.Entity<Menu>(entity =>
+            {
+                entity.HasOne(m => m.provider)
+                .WithMany(p => p.menus)
+                .HasForeignKey(f => f.provider_id);
+
+                entity.Property(m=>m.is_available)
+                .HasDefaultValue(true);
+
             });
 
 

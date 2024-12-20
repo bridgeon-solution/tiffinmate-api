@@ -44,6 +44,7 @@ namespace TiffinMate.BLL.Services.ProviderVerification
                 string hashPassword = BCrypt.Net.BCrypt.HashPassword(otp);
                 provider.password = hashPassword;
                 provider.updated_at = DateTime.UtcNow;
+                provider.verification_status = "approved";
                 _providerRepository.Update(provider);
                await _providerRepository.SaveChangesAsync();
                 Console.WriteLine($"Password updated for provider {providerId}");

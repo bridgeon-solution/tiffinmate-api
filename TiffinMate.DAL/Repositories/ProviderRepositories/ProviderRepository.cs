@@ -51,7 +51,7 @@ namespace TiffinMate.DAL.Repositories.ProviderRepositories
         }
         public async Task<bool> ExistsAsync(Guid providerId)
         {
-            return await _context.ProvidersDetails.AnyAsync(p => p.ProviderId == providerId);
+            return await _context.ProvidersDetails.AnyAsync(p => p.provider_id == providerId);
         }
         public async Task<bool> Remove(Guid id)
         {
@@ -59,10 +59,7 @@ namespace TiffinMate.DAL.Repositories.ProviderRepositories
             _context.Providers.Remove(remove);
             return true;
         }
-        public async Task<List<Provider>> GetProviders()
-        {
-            return await _context.Providers.ToListAsync();
-        }
+       
         public async Task<Provider> GetUserByRefreshTokenAsync(string refreshToken)
         {
             return await _context.Providers.FirstOrDefaultAsync(u => u.refresh_token == refreshToken);
@@ -90,6 +87,14 @@ namespace TiffinMate.DAL.Repositories.ProviderRepositories
         {
             provider.password = password;
             provider.updated_at = DateTime.UtcNow;
+
+        public async Task<List<Provider>> GetProviders()
+        {
+            return await _context.Providers.ToListAsync();
+
+        }
+
+       
 
 
             await _context.SaveChangesAsync();

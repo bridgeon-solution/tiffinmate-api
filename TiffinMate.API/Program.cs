@@ -83,6 +83,7 @@ namespace TiffinMate.API
             builder.Services.AddScoped<ICloudinaryService, CloudinaryServices>();
             builder.Services.AddScoped<IProviderVerificationService, ProviderVerificationService>();
             builder.Services.AddScoped<IReviewService, ReviewService>();
+            
 
             builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
             builder.Services.Configure<BrevoSettings>(options =>

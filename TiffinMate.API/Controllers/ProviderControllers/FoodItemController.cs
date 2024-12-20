@@ -63,7 +63,7 @@ namespace TiffinMate.API.Controllers.ProviderControllers
 
            }
 
-            var responce = new ApiResponse<List<FoodItemDto>>("success", "Food items retrieved successfully",result, HttpStatusCode.OK,"");
+            var responce = new ApiResponse<List<FoodItemResponceDto>>("success", "Food items retrieved successfully",result, HttpStatusCode.OK,"");
             return Ok(responce);
         }
 
@@ -112,6 +112,33 @@ namespace TiffinMate.API.Controllers.ProviderControllers
             return Ok(responce);
         }
 
+        [HttpGet("menu")]
+        public async Task<IActionResult> Getmenu()
+        {
+            var result = await _foodItemService.GetMenuAsync();
+            if (result == null || !result.Any())
+            {
+                return NotFound(new ApiResponse<string>("failure", "No menu found", null, HttpStatusCode.NotFound, "No menu found"
+            ));
+
+            }
+
+            var responce = new ApiResponse<List<MenuDto>>("success", "menu retrieved successfully", result, HttpStatusCode.OK, "");
+            return Ok(responce);
+        }
+
+
+        [HttpPost("menu")]
+        public async Task<IActionResult> AddMenu([FromForm] MenuDto menu, IFormFile image)
+        {
+            var response = await _foodItemService.AddMenuAsync(menu, image);
+            if (!response)
+            {
+                return BadRequest(new ApiResponse<string>("failure", "Addition failed", null, HttpStatusCode.BadRequest, "Image is not uploaded"));
+            }
+            var result = new ApiResponse<bool>("success", "Addition Successful", response, HttpStatusCode.OK, "");
+            return Ok(result);
+        }
 
 
     }

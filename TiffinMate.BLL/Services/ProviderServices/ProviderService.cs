@@ -95,7 +95,7 @@ namespace TiffinMate.BLL.Services.ProviderServices
                     throw new Exception("Incorrect password.");
                 }
 
-               
+
 
                 var tokenHelper = new TokenHelper();
 
@@ -286,10 +286,36 @@ namespace TiffinMate.BLL.Services.ProviderServices
                .Skip((page - 1) * pageSize)
                .Take(pageSize);
 
-            
+
             return _mapper.Map<List<ProviderResponseDTO>>(providerPaged);
         }
 
+
+        public async Task<ProviderDetailedDTO> GetProviderDetailsById(Guid id)
+        {
+            try
+            {
+                var res = await _providerRepository.GetProviderDetailsById(id);
+                return _mapper.Map<ProviderDetailedDTO>(res);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<List<ProviderDetailResponse>> GetProvidersWithDetail()
+        {
+            try
+            {
+                var res = await _providerRepository.GetProvidersWithDetail();
+                return _mapper.Map<List<ProviderDetailResponse>>(res);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
 
     }
 }

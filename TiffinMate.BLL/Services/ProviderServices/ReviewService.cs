@@ -83,11 +83,11 @@ namespace TiffinMate.BLL.Services.ProviderServices
                 throw new Exception($"An error occurred while fetching reviews: {ex.Message}");
             }
         }
-        public async Task<List<AllReview>> GetAllProviderReview(Guid ProviderId)
+        public async Task<List<AllReview>> GetAllProviderReview(Guid providerid)
         {
             try
             {
-                var reviews = await _reviewRepository.GetProviderReview(ProviderId);
+                var reviews = await _reviewRepository.GetProviderReview(providerid);
 
                 if (reviews == null || !reviews.Any())
                 {

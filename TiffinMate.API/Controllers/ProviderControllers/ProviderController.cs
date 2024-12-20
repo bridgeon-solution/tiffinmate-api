@@ -84,7 +84,7 @@ namespace TiffinMate.API.Controllers.ControllerProvider
             }
         }
 
-        [HttpPost("providerdetails")]
+        [HttpPost("details")]
         public async Task<IActionResult> ProviderDetails([FromForm] ProviderDetailsDTO providerDetailsDTO, IFormFile logo, IFormFile image)
         {
 
@@ -110,6 +110,7 @@ namespace TiffinMate.API.Controllers.ControllerProvider
         }
 
        
+
 
         [HttpPatch("block")]
         public async Task<IActionResult> BlockUnblockUser(Guid id)
@@ -207,6 +208,33 @@ namespace TiffinMate.API.Controllers.ControllerProvider
             {
                 var response = new ApiResponse<string>("failed", "", ex.Message, HttpStatusCode.InternalServerError, "error occured");
                 return StatusCode((int)HttpStatusCode.InternalServerError, response);
+            }
+        }
+
+        [HttpGet("details")]
+
+        public async Task<IActionResult> GetProvidersWithDetail()
+        {
+            try
+            {
+                var res = await _providerService.GetProvidersWithDetail();
+                return Ok(new ApiResponse<List<ProviderDetailResponse>>("success","Providers fetched successfully",res,HttpStatusCode.OK,null));
+            }catch(Exception ex)
+            {
+                return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse<string>("failure", "Error Occurred", null, HttpStatusCode.InternalServerError, ex.Message));
+            }
+        }
+        [HttpGet("{id:Guid}/details")]  
+        public async Task<IActionResult> GetProviderDetails(Guid id)
+        {
+            try
+            {
+                var res = await _providerService.GetProviderDetailsById(id);
+                return Ok(new ApiResponse<ProviderDetailedDTO>("success", "Provider fetched successfully", res, HttpStatusCode.OK, null));
+            }
+            catch(Exception ex)
+            {
+                return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse<string>("failure", "Error Occurred", null, HttpStatusCode.InternalServerError, ex.Message));
             }
         }
     }

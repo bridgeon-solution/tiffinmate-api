@@ -71,7 +71,7 @@ namespace TiffinMate.BLL.Services.ProviderServices
                     UserId = review.user_id,
                     review = review.review,
                     username = review.user?.name,
-                    providername = review.provider?.username,
+                    providername = review.provider?.user_name,
                     image=review.user.image
 
                 }).ToList();
@@ -101,7 +101,7 @@ namespace TiffinMate.BLL.Services.ProviderServices
                     UserId = review.user_id,
                     review = review.review,
                     username = review.user?.name,
-                    providername = review.Provider?.username,
+                    providername = review.provider?.user_name,
                      image = review.user.image
                 }).ToList();
 

@@ -30,4 +30,4 @@ jobs:
       - name: Delete Old Container
         run: docker rm -f tiffinmate-api
       - name: Run New Docker Container
-        run: docker run -d -p 8080:8080 --name tiffinmate-api sabithmk7/tiffinmate-api-prod:latest
+        run: docker run -d -p 8080:8080 -e JWT_KEY="${{ secrets.JWT_KEY }}" -e JWT_REFRESH_KEY="${{ secrets.JWT_REFRESH_KEY }}" -e DEFAULT_CONNECTION="${{ secrets.DEFAULT_CONNECTION }}" -e HOST_URL="${{ secrets.HOST_URL }}" -e HOST_API="${{ secrets.HOST_API }}" -e TWILIO_SID="${{ secrets.TWILIO_SID }}" -e TWILIO_TOKEN="${{ secrets.TWILIO_TOKEN }}" -e TWILIO_VERIFY_SID="${{ secrets.TWILIO_VERIFY_SID }}" -e BREVO_API_KEY="${{ secrets.BREVO_API_KEY }}" -e BREVO_API_URL="${{ secrets.BREVO_API_URL }}" -e BREVO_FROM_EMAIL="${{ secrets.BREVO_FROM_EMAIL }}" -e CLOUDINARY_CLOUD_NAME="${{ secrets.CLOUDINARY_CLOUD_NAME }}" -e CLOUDINARY_API_KEY="${{ secrets.CLOUDINARY_API_KEY }}" -e CLOUDINARY_API_SECRET="${{ secrets.CLOUDINARY_API_SECRET }}" --name tiffinmate-api sabithmk7/tiffinmate-api-prod:latest

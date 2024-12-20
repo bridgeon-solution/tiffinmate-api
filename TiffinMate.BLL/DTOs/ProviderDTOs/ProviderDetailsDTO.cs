@@ -8,7 +8,7 @@ namespace TiffinMate.BLL.DTOs.ProviderDTOs
 {
    public class ProviderDetailsDTO
     {
-        public Guid ProviderId { get; set; }
+        public Guid provider_id { get; set; }
         public string resturent_name { get; set; }
         public string address { get; set; }
         public int phone_no { get; set; }

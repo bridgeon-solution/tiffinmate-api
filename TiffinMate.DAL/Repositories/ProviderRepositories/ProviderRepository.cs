@@ -28,11 +28,11 @@ namespace TiffinMate.DAL.Repositories.ProviderRepositories
         {
             _context.ProvidersDetails.Add(proDetails);
             await _context.SaveChangesAsync();
-            return "added";
+            return "ok";
         }
-        public async Task<Provider> Login(string email, string password)
+        public async Task<Provider> Login(string email)
         {
-            return await _context.Set<Provider>().FirstOrDefaultAsync(p => p.email == email && p.password == password);
+            return await _context.Set<Provider>().FirstOrDefaultAsync(p => p.email == email);
         }
         public async Task<List<Provider>> GetProviderByCategory(string? verificationStatus)
         {
@@ -71,6 +71,34 @@ namespace TiffinMate.DAL.Repositories.ProviderRepositories
             var provide = await _context.Providers.SingleOrDefaultAsync(u => u.id == id);
             return provide;
         }
+        public async Task<List<Provider>> GetAProviderById(Guid id)
+        {
+            return await _context.Set<Provider>().Where(r => r.id == id)
+         .Include(r => r.provider_details)
+         .Include(r => r.review)
+         .ToListAsync();
+        }
+
+        public async Task<Provider> GetUserByEmail(string email)
+        {
+            return await _context.Providers.FirstOrDefaultAsync(e => e.email == email);
+
+        }
+        public async Task<bool> UpdatePassword(Provider provider, string password)
+        {
+            provider.password = password;
+            provider.updated_at = DateTime.UtcNow;
+            _context.Providers.Update(provider);
+            await _context.SaveChangesAsync();
+            return true;
+
+        }
+
+        public async Task<List<Provider>> GetProviders()
+        {
+            return await _context.Providers.ToListAsync();
+
+        }
         public async Task<List<ProviderDetails>> GetProvidersWithDetail()
         {
             return await _context.ProvidersDetails.ToListAsync();
@@ -79,13 +107,12 @@ namespace TiffinMate.DAL.Repositories.ProviderRepositories
         {
             return await _context.ProvidersDetails.FirstOrDefaultAsync(p => p.provider_id == id);
         }
-        public async Task<List<Provider>> GetProviders()
+        public async Task<ProviderDetails> GetProviderDetailsByProviderIdAsync(Guid providerId)
         {
-            return await _context.Providers.ToListAsync();
-
+            return await _context.ProvidersDetails.FirstOrDefaultAsync(pd => pd.provider_id == providerId);
         }
-
-
 
     }
 }
+
+

@@ -113,22 +113,7 @@ namespace TiffinMate.API.Controllers.ControllerProvider
 
             }
         }
-        [HttpGet]
-        public async Task<IActionResult> AllProviders()
-        {
-            try
-            {
-                var response = await _providerService.GetProviders();
-                return Ok(new ApiResponse<List<ProviderResponseDTO>>("success", "providers getted succesfuly", response, HttpStatusCode.OK, ""));
-            }
-            catch (Exception ex)
-            {
-                var response = new ApiResponse<string>("failed", "", ex.Message, HttpStatusCode.InternalServerError, "error occured");
-                return StatusCode((int)HttpStatusCode.InternalServerError, response);
-            }
-
-
-        }
+       
 
 
 

@@ -67,12 +67,12 @@ namespace TiffinMate.BLL.Services.ProviderServices
                 var reviewDtos = reviews.Select(review => new AllReview
                 {
                     id = Guid.NewGuid(),
-                    ProviderId = review.ProviderId,
-                    UserId = review.UserId,
+                    ProviderId = review.provider_id,
+                    UserId = review.user_id,
                     review = review.review,
-                    username = review.User?.name,
-                    providername = review.Provider?.username,
-                    image = review.User.image,
+                    username = review.user?.name,
+                    providername = review.provider?.user_name,
+                    image = review.user.image,
                     created_at = review.created_at
 
                 }).ToList();
@@ -98,12 +98,12 @@ namespace TiffinMate.BLL.Services.ProviderServices
                 var reviewDtos = reviews.Select(review => new AllReview
                 {
                     id = Guid.NewGuid(),
-                    ProviderId = review.ProviderId,
-                    UserId = review.UserId,
+                    ProviderId = review.provider_id,
+                    UserId = review.user_id,
                     review = review.review,
-                    username = review.User?.name,
-                    providername = review.Provider?.username,
-                    image = review.User.image,
+                    username = review.user?.name,
+                    providername = review.provider?.user_name,
+                    image = review.user.image,
                     created_at = review.created_at
                 }).ToList();
 

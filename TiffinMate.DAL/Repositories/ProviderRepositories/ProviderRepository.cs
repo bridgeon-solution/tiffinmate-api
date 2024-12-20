@@ -27,8 +27,8 @@ namespace TiffinMate.DAL.Repositories.ProviderRepositories
         public async Task <string>AddProviderDetailsAsync(ProviderDetails proDetails)
         {
             _context.ProvidersDetails.Add(proDetails);
-            await _context.SaveChangesAsync();
-            return "added";
+            //await _context.SaveChangesAsync();
+            return "ok";
         }
         public async Task<Provider> Login(string email, string password)
         {
@@ -73,8 +73,8 @@ namespace TiffinMate.DAL.Repositories.ProviderRepositories
         public async Task<List<Provider>> GetAProviderById(Guid id)
         {
             return await _context.Set<Provider>().Where(r => r.id == id)
-         .Include(r => r.ProviderDetails)
-         .Include(r=>r.Review)
+         .Include(r => r.provider_details)
+         .Include(r=>r.review)
          .ToListAsync();
         }
 
@@ -87,6 +87,11 @@ namespace TiffinMate.DAL.Repositories.ProviderRepositories
         {
             provider.password = password;
             provider.updated_at = DateTime.UtcNow;
+            _context.Providers.Update(provider);
+            await _context.SaveChangesAsync();
+            return true;
+
+        }
 
         public async Task<List<Provider>> GetProviders()
         {
@@ -97,9 +102,8 @@ namespace TiffinMate.DAL.Repositories.ProviderRepositories
        
 
 
-            await _context.SaveChangesAsync();
-            return true;
-        }
+           
+      
 
     }
 }

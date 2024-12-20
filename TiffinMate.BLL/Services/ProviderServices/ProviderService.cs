@@ -298,12 +298,12 @@ namespace TiffinMate.BLL.Services.ProviderServices
             }
             var result = provider.Select(providers => new ProviderByIdDto
             {
-                username = providers.username,
+                username = providers.user_name,
                 email = providers.email,
-                address = providers.ProviderDetails.address,
-                phone_no = providers.ProviderDetails.phone_no,
+                address = providers.provider_details.address,
+                phone_no = providers.provider_details.phone_no,
                 verification_status = providers.verification_status,
-                image = providers.ProviderDetails.logo,
+                image = providers.provider_details.logo,
                 created_at = providers.created_at,
                 certificate = providers.certificate,
 

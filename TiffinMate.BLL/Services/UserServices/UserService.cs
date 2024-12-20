@@ -75,7 +75,9 @@ namespace TiffinMate.BLL.Services.UserServices
                 email = user.email,
                 address=user.address,
                 city=user.city,
-                image= user.image
+                image= user.image,
+                is_blocked=user.is_blocked,
+                subscription_status=user.subscription_status
             };
         }
 

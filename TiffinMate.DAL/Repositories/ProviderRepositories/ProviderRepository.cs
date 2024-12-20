@@ -27,12 +27,16 @@ namespace TiffinMate.DAL.Repositories.ProviderRepositories
         public async Task <string>AddProviderDetailsAsync(ProviderDetails proDetails)
         {
             _context.ProvidersDetails.Add(proDetails);
-            //await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
             return "ok";
         }
-        public async Task<Provider> Login(string email, string password)
+        public async Task<Provider> Login(string email)
         {
-            return await _context.Set<Provider>().FirstOrDefaultAsync(p => p.email == email && p.password == password);
+            return await _context.Set<Provider>().FirstOrDefaultAsync(p => p.email == email);
+        }
+        public async Task<List<Provider>> GetProviderByCategory(string? verificationStatus)
+        {
+            return await _context.Providers.Where(x => x.verification_status == verificationStatus).ToListAsync();
         }
         public async Task<Provider> GetProviderById(Guid id)
         {
@@ -44,9 +48,7 @@ namespace TiffinMate.DAL.Repositories.ProviderRepositories
 
         }
         public async Task SaveChangesAsync()
-
         {
-
             await _context.SaveChangesAsync();
         }
         public async Task<bool> ExistsAsync(Guid providerId)
@@ -65,7 +67,6 @@ namespace TiffinMate.DAL.Repositories.ProviderRepositories
             return await _context.Providers.FirstOrDefaultAsync(u => u.refresh_token == refreshToken);
         }
         public async Task<Provider> BlockUnblockUser(Guid id)
-
         {
             var provide = await _context.Providers.SingleOrDefaultAsync(u => u.id == id);
             return provide;
@@ -74,7 +75,7 @@ namespace TiffinMate.DAL.Repositories.ProviderRepositories
         {
             return await _context.Set<Provider>().Where(r => r.id == id)
          .Include(r => r.provider_details)
-         .Include(r=>r.review)
+         .Include(r => r.review)
          .ToListAsync();
         }
 
@@ -98,12 +99,20 @@ namespace TiffinMate.DAL.Repositories.ProviderRepositories
             return await _context.Providers.ToListAsync();
 
         }
-
-       
-
-
-           
-      
+        public async Task<List<ProviderDetails>> GetProvidersWithDetail()
+        {
+            return await _context.ProvidersDetails.ToListAsync();
+        }
+        public async Task<ProviderDetails> GetProviderDetailsById(Guid id)
+        {
+            return await _context.ProvidersDetails.FirstOrDefaultAsync(p => p.provider_id == id);
+        }
+        public async Task<ProviderDetails> GetProviderDetailsByProviderIdAsync(Guid providerId)
+        {
+            return await _context.ProvidersDetails.FirstOrDefaultAsync(pd => pd.provider_id == providerId);
+        }
 
     }
 }
+
+

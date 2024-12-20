@@ -89,31 +89,33 @@ namespace TiffinMate.API.Controllers.ControllerProvider
             }
         }
 
-        [HttpPost("providerdetails")]
+        [HttpPost("details")]
         public async Task<IActionResult> ProviderDetails([FromForm] ProviderDetailsDTO providerDetailsDTO, IFormFile logo, IFormFile image)
         {
-
-
             try
             {
                 var response = await _providerService.AddProviderDetails(providerDetailsDTO, logo, image);
                 if (!response)
                 {
-                    return BadRequest(new ApiResponse<string>("failure", " failed", null, HttpStatusCode.BadRequest, "logo or image is not uploaded"));
+                    return BadRequest(new ApiResponse<string>("failure", "Upload failed", null, HttpStatusCode.BadRequest, "Logo or image is not uploaded"));
                 }
 
-                var result = new ApiResponse<bool>("success", " Successfull", response, HttpStatusCode.OK, "");
+                var result = new ApiResponse<bool>("success", "Successfully added details", response, HttpStatusCode.OK, "");
                 return Ok(result);
-
             }
             catch (Exception ex)
             {
-                var response = new ApiResponse<string>("failed", "", ex.Message, HttpStatusCode.InternalServerError, "error occured");
-                return StatusCode((int)HttpStatusCode.InternalServerError, response);
+                if (ex.Message.Contains("Provider details already exist"))
+                {
+                    return Conflict(new ApiResponse<string>("failure", "Conflict", null, HttpStatusCode.Conflict, ex.Message));
+                }
 
+                var response = new ApiResponse<string>("failed", "", ex.Message, HttpStatusCode.InternalServerError, "Error occurred");
+                return StatusCode((int)HttpStatusCode.InternalServerError, response);
             }
         }
-       
+
+
 
 
 
@@ -325,8 +327,33 @@ namespace TiffinMate.API.Controllers.ControllerProvider
             }
 
         }
+        [HttpGet("details")]
 
-
+        public async Task<IActionResult> GetProvidersWithDetail()
+        {
+            try
+            {
+                var res = await _providerService.GetProvidersWithDetail();
+                return Ok(new ApiResponse<List<ProviderDetailResponse>>("success", "Providers fetched successfully", res, HttpStatusCode.OK, null));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse<string>("failure", "Error Occurred", null, HttpStatusCode.InternalServerError, ex.Message));
+            }
+        }
+        [HttpGet("{id:Guid}/details")]
+        public async Task<IActionResult> GetProviderDetails(Guid id)
+        {
+            try
+            {
+                var res = await _providerService.GetProviderDetailsById(id);
+                return Ok(new ApiResponse<ProviderDetailedDTO>("success", "Provider fetched successfully", res, HttpStatusCode.OK, null));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse<string>("failure", "Error Occurred", null, HttpStatusCode.InternalServerError, ex.Message));
+            }
+        }
     }
 }
 

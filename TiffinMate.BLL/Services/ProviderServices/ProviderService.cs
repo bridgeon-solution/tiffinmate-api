@@ -218,7 +218,7 @@ namespace TiffinMate.BLL.Services.ProviderServices
             var claims = new[]
             {
                 new Claim (ClaimTypes.NameIdentifier, user.id.ToString()),
-                new Claim (ClaimTypes.Name,user.username),
+                new Claim (ClaimTypes.Name,user.user_name),
                 new Claim (ClaimTypes.Role, user.role),
                 new Claim(ClaimTypes.Email, user.email)
             };
@@ -260,7 +260,7 @@ namespace TiffinMate.BLL.Services.ProviderServices
 
             if (!string.IsNullOrEmpty(search))
             {
-                provider = provider.Where(u => u.username.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                provider = provider.Where(u => u.user_name.Contains(search, StringComparison.OrdinalIgnoreCase) ||
                                                u.email.Contains(search, StringComparison.OrdinalIgnoreCase)).ToList();
             }
 

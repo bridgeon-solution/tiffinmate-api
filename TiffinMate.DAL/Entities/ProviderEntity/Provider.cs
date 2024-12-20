@@ -18,7 +18,7 @@ namespace TiffinMate.DAL.Entities.ProviderEntity
         public string role { get; set; }
         public bool is_blocked { get; set; }
 
-        public string? username { get; set; }
+        public string? user_name { get; set; }
         //public DateTime? updated_at { get; set; } = DateTime.UtcNow;
         public string verification_status { get; set; } = "pending";
         public string refresh_token { get; set; } = string.Empty;

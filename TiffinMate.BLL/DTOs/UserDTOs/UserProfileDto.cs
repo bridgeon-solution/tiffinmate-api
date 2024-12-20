@@ -15,6 +15,9 @@ namespace TiffinMate.BLL.DTOs.UserDTOs
         public string? address { get; set; }
         public string? city { get; set; }
         public string? image { get; set; }
+        public bool is_blocked { get; set; }
+        public bool subscription_status { get; set; }
+
 
     }
 }

@@ -10,10 +10,10 @@ namespace TiffinMate.DAL.Entities
     public class Review:AuditableEntity
     {
         public Guid id { get; set; }
-        public Guid ProviderId { get; set; }
-        public Guid UserId { get; set; }
+        public Guid provider_id { get; set; }
+        public Guid user_id { get; set; }
         public string review { get; set; }
-        public Provider Provider { get; set; }
-        public User User { get; set; }
+        public Provider provider { get; set; }
+        public User user { get; set; }
     }
 }

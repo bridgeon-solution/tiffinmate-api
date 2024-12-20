@@ -23,8 +23,9 @@ namespace TiffinMate.DAL.Entities.ProviderEntity
         public string verification_status { get; set; } = "pending";
         public string refresh_token { get; set; } = string.Empty;
         public DateTime refreshtoken_expiryDate { get; set; }
-        public ProviderDetails ProviderDetails { get; set; }
-        public ICollection<Review> Review { get; set; }
-        public ICollection<FoodItem> FoodItems { get; set; }
+        public ProviderDetails provider_details { get; set; }
+        public ICollection<Review> review { get; set; }
+        public ICollection<FoodItem> food_items { get; set; }
+        public ICollection<Menu> menus { get; set; }
     }
 }

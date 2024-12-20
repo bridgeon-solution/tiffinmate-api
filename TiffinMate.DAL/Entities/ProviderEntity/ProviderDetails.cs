@@ -9,7 +9,7 @@ namespace TiffinMate.DAL.Entities.ProviderEntity
     public class ProviderDetails:AuditableEntity
     {
         public Guid id { get; set; }
-        public Guid ProviderId { get; set; }
+        public Guid provider_id { get; set; }
         public string resturent_name { get; set; }
         public string address { get; set; }
         public int phone_no { get; set; }
@@ -20,6 +20,6 @@ namespace TiffinMate.DAL.Entities.ProviderEntity
         public int account_no { get; set; }
         //public DateTime? created_at { get; set; } = DateTime.UtcNow;
         //public DateTime? updated_at { get; set; } = DateTime.UtcNow;
-        public Provider Provider { get; set; }
+        public Provider provider { get; set; }
     }
 }

@@ -41,8 +41,8 @@ namespace TiffinMate.BLL.Services.ProviderServices
             }
             var review = new Review
             {
-                ProviderId = reviewDto.ProviderId,
-                UserId = reviewDto.UserId,
+                provider_id = reviewDto.ProviderId,
+                user_id = reviewDto.UserId,
                 review = reviewDto.review
             };
             await _reviewRepository.UpdateProvider(review);
@@ -67,12 +67,12 @@ namespace TiffinMate.BLL.Services.ProviderServices
                 var reviewDtos = reviews.Select(review => new AllReview
                 {
                     id = Guid.NewGuid(),
-                    ProviderId = review.ProviderId,
-                    UserId = review.UserId,
+                    ProviderId = review.provider_id,
+                    UserId = review.user_id,
                     review = review.review,
-                    username = review.User?.name,
-                    providername = review.Provider?.user_name,
-                    image=review.User.image
+                    username = review.user?.name,
+                    providername = review.provider?.username,
+                    image=review.user.image
 
                 }).ToList();
 
@@ -97,12 +97,12 @@ namespace TiffinMate.BLL.Services.ProviderServices
                 var reviewDtos = reviews.Select(review => new AllReview
                 {
                     id= Guid.NewGuid(),
-                    ProviderId = review.ProviderId,
-                    UserId = review.UserId,
+                    ProviderId = review.provider_id,
+                    UserId = review.user_id,
                     review = review.review,
-                    username = review.User?.name,
-                    providername = review.Provider?.user_name,
-                     image = review.User.image
+                    username = review.user?.name,
+                    providername = review.Provider?.username,
+                     image = review.user.image
                 }).ToList();
 
                 return reviewDtos;

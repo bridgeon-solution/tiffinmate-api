@@ -16,7 +16,7 @@ namespace TiffinMate.DAL.Entities
         [EmailAddress]
         public string password { get; set; }
         
-        public string username { get; set; }
+        public string user_name { get; set; }
         public string role { get; set; }
 
         public DateTime created_at { get; set; }

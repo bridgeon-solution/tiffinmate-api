@@ -125,12 +125,12 @@ namespace TiffinMate.BLL.Services.UserServices
             {
                 if (filter == "true")
                 {
-                    bool isBlocked = filter.ToLower() == "true";
+                    
                     users = users.Where(u => u.is_blocked == true).ToList();
                 }
                 if (filter == "false")
                 {
-                    bool isBlocked = filter.ToLower() == "false"; 
+                   
                     users = users.Where(u => u.is_blocked == false).ToList();
                 }  
 

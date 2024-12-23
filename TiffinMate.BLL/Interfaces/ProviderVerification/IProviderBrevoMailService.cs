@@ -10,5 +10,6 @@ namespace TiffinMate.BLL.Interfaces.ProviderVerification
     {
         Task<bool> SendOtpEmailAsync(string to, string otp);
         Task<bool> Rejectmail(string to);
+        Task<bool> SendOtpForgetPassword(string to, string otp);
     }
 }

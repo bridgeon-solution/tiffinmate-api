@@ -61,7 +61,7 @@ namespace TiffinMate.DAL.DbContexts
                       .HasDefaultValue(false);
 
                 entity.HasOne(p => p.provider_details)
-                      .WithOne(pd => pd.provider)
+                      .WithOne(pd => pd.Provider)
                       .HasForeignKey<ProviderDetails>(pd => pd.provider_id)
                       .OnDelete(DeleteBehavior.Cascade);
                 entity.Property(e => e.role).HasDefaultValue("provider");
@@ -93,7 +93,7 @@ namespace TiffinMate.DAL.DbContexts
                 entity.Property(pd => pd.provider_id)
                       .IsRequired();
 
-                entity.HasOne(pd => pd.provider)
+                entity.HasOne(pd => pd.Provider)
                       .WithOne(p => p.provider_details)
                       .HasForeignKey<ProviderDetails>(pd => pd.provider_id)
                       .OnDelete(DeleteBehavior.Cascade);

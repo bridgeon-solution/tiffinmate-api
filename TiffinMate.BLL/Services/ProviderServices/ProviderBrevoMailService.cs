@@ -17,7 +17,7 @@ namespace TiffinMate.BLL.Services.ProviderVerification
         public ProviderBrevoMailService(IOptions<BrevoSettings> brevoSettings, ILogger<ProviderBrevoMailService> logger)
         {
             _brevoSettings = brevoSettings.Value;
-            _logger= logger;
+            _logger = logger;
         }
 
         public async Task<bool> SendOtpEmailAsync(string to, string otp)
@@ -96,6 +96,43 @@ namespace TiffinMate.BLL.Services.ProviderVerification
             {
                 _logger.LogError(ex, "An error occurred while sending OTP email to {Recipient}", to);
                 Console.WriteLine($"Error sending email: {ex.Message}");
+                return false;
+            }
+        }
+
+        public async Task<bool> SendOtpForgetPassword(string to, string otp)
+        {
+            var emailData = new
+            {
+                sender = new { email = _brevoSettings.FromEmail },
+                to = new[] { new { email = to } },
+                subject = "reset password",
+                textContent = $"Hello,\n\nYour reset password otp is: {otp}\n\nThis otp is valid for 10 minutes.\n\nThank you,\nTiffinMate "
+            };
+
+            try
+            {
+                using (var client = new HttpClient())
+                {
+                    client.DefaultRequestHeaders.Add("api-key", _brevoSettings.ApiKey);
+                    var jsonData = JsonSerializer.Serialize(emailData);
+                    var content = new StringContent(jsonData, Encoding.UTF8, "application/json");
+
+                    var response = await client.PostAsync(_brevoSettings.ApiUrl, content);
+                    var responseBody = await response.Content.ReadAsStringAsync();
+
+                    if (!response.IsSuccessStatusCode)
+                    {
+
+                        return false;
+                    }
+
+                    return true;
+                }
+            }
+            catch (Exception ex)
+            {
+
                 return false;
             }
         }

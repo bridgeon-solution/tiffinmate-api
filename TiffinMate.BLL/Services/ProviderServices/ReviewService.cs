@@ -72,7 +72,8 @@ namespace TiffinMate.BLL.Services.ProviderServices
                     review = review.review,
                     username = review.user?.name,
                     providername = review.provider?.user_name,
-                    image=review.user.image
+                    image = review.user.image,
+                    created_at = review.created_at
 
                 }).ToList();
 
@@ -83,11 +84,11 @@ namespace TiffinMate.BLL.Services.ProviderServices
                 throw new Exception($"An error occurred while fetching reviews: {ex.Message}");
             }
         }
-        public async Task<List<AllReview>> GetAllProviderReview(Guid ProviderId)
+        public async Task<List<AllReview>> GetAllProviderReview(Guid providerid)
         {
             try
             {
-                var reviews = await _reviewRepository.GetProviderReview(ProviderId);
+                var reviews = await _reviewRepository.GetProviderReview(providerid);
 
                 if (reviews == null || !reviews.Any())
                 {
@@ -96,13 +97,14 @@ namespace TiffinMate.BLL.Services.ProviderServices
 
                 var reviewDtos = reviews.Select(review => new AllReview
                 {
-                    id= Guid.NewGuid(),
+                    id = Guid.NewGuid(),
                     ProviderId = review.provider_id,
                     UserId = review.user_id,
                     review = review.review,
                     username = review.user?.name,
                     providername = review.provider?.user_name,
-                     image = review.user.image
+                    image = review.user.image,
+                    created_at = review.created_at
                 }).ToList();
 
                 return reviewDtos;

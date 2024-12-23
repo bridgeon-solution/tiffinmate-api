@@ -171,7 +171,7 @@ namespace TiffinMate.BLL.Services.UserService
         }
         public async Task<string> ResetPassword(ResetPasswordDto resetPasswordDto)
         {
-            var user = await _authRepository.GetUserByEmail(resetPasswordDto. email);
+            var user = await _authRepository.GetUserByEmail(resetPasswordDto.email);
             if (user == null)
             {
                 return "User Not Found";

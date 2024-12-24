@@ -16,7 +16,7 @@ namespace TiffinMate.BLL.Interfaces.UserInterfaces
         Task<BlockUnblockResponse> BlockUnblock(Guid id);
         Task<string> UploadImage(IFormFile image);
         Task<string> UpdateUser(Guid id, UserProfileDto reqDto);
-        Task<List<UserResponseDTO>> GetUsers(int page, int pageSize, string search=null, string filter=null);
+        Task<UserResultDTO> GetUsers(int page, int pageSize, string search=null, string filter=null);
 
     }
 }

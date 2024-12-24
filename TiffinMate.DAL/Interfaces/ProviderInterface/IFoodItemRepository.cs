@@ -17,5 +17,6 @@ namespace TiffinMate.DAL.Interfaces.ProviderInterface
         Task<List<Categories>> GetAllCategory();
         Task<List<Menu>> GetAllMenuAsync();
         Task<string> AddMenuAsync(Menu menus);
+        Task<List<Menu>> GetMenuByProviderAsync(Guid providerId);
     }
 }

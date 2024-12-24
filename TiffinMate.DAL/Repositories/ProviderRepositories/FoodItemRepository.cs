@@ -88,7 +88,15 @@ namespace TiffinMate.DAL.Repositories.ProviderRepositories
             return "menu added";
         }
 
-        
+        public async Task<List<Menu>> GetMenuByProviderAsync(Guid providerId)
+        {
+
+            return await _context.menus
+                   .Where(f => f.provider_id == providerId)
+                   .ToListAsync();
+
+        }
+
 
 
     } 

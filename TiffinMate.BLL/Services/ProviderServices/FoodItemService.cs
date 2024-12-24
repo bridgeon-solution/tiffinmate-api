@@ -117,6 +117,12 @@ namespace TiffinMate.BLL.Services.ProviderServices
 
         }
 
+        public async Task<List<MenuDto>> ByProvider(Guid id)
+        {
+            var result = await _foodItemRepository.GetMenuByProviderAsync(id);
+            return _mapper.Map<List<MenuDto>>(result);
+        }
+
         public async Task<bool> AddMenuAsync(MenuDto menu, IFormFile image)
         {
             if (menu == null)

@@ -23,6 +23,8 @@ namespace TiffinMate.BLL.Interfaces.ProviderServiceInterafce
 
         Task<bool> AddMenuAsync(MenuDto menu, IFormFile image);
 
+        Task<List<MenuDto>> ByProvider(Guid id);
+
 
 
     }

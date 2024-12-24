@@ -10,9 +10,7 @@ namespace TiffinMate.BLL.DTOs.ProviderDTOs
     {
         public Guid category_id { get; set; }
         public Guid provider_id { get; set; }
-
         public Guid menu_id { get; set; }
-        public string category_name { get; set; }
         public string food_name { get; set; }
         public decimal price { get; set; }
         public string description { get; set; }
@@ -20,7 +18,7 @@ namespace TiffinMate.BLL.DTOs.ProviderDTOs
        
 
 
-        //public string image { get; set; }
+        
 
     }
 }

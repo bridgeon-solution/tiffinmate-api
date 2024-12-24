@@ -127,6 +127,22 @@ namespace TiffinMate.API.Controllers.ProviderControllers
             return Ok(responce);
         }
 
+        [HttpGet("menu/{id:guid}")]
+        public async Task<IActionResult> GetByProviderMenu(Guid id)
+        {
+            var result = await _foodItemService.ByProvider(id);
+            if (result == null || !result.Any())
+            {
+                return NotFound(new ApiResponse<string>("failure", "No menu found for the given provider. ", null, HttpStatusCode.NotFound, "No menu found for the given provider."
+            ));
+
+            }
+
+            var responce = new ApiResponse<List<MenuDto>>("success", "menu retrieved successfully", result, HttpStatusCode.OK, "");
+            return Ok(responce);
+
+        }
+
 
         [HttpPost("menu")]
         public async Task<IActionResult> AddMenu([FromForm] MenuDto menu, IFormFile image)

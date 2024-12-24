@@ -9,8 +9,8 @@ namespace TiffinMate.BLL.DTOs.ProviderDTOs
 {
     public class MenuDto
     {
-        //public Guid id { get; set; }
-      
+        public Guid id { get; set; }
+       
         public Guid provider_id { get; set; }
         
         public string name { get; set; }

@@ -18,6 +18,8 @@ namespace TiffinMate.BLL.DTOs.UserDTOs
         public bool is_blocked { get; set; }
         public bool subscription_status { get; set; }
 
+        public DateTime? created_at { get; set; }
+
 
     }
 }

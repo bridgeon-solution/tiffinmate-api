@@ -21,13 +21,15 @@ namespace TiffinMate.BLL.Mapper
             CreateMap<User, RegisterUserDto>().ReverseMap();
             CreateMap<User, ProviderLoginResponse>().ReverseMap();
             CreateMap<ProviderDetails, ProviderDetailsDTO>().ReverseMap();
-            CreateMap<FoodItem, FoodItemDto>().ReverseMap();
-            CreateMap<Categories, CategoryDto>().ReverseMap();
-            CreateMap<ProviderResponseDTO, Provider>().ReverseMap();
             CreateMap<UserResponseDTO, User>().ReverseMap();
             CreateMap<ProviderDetailResponse, ProviderDetails>().ReverseMap();
             CreateMap<ProviderDetailedDTO, ProviderDetails>().ReverseMap();
-
+            CreateMap<MenuDto, Menu>().ReverseMap();
+            CreateMap<FoodItem, FoodItemResponceDto>().ReverseMap();
+            CreateMap<FoodItem,FoodItemDto>().ReverseMap();
+            CreateMap<Categories,CategoryDto>().ReverseMap();
+            CreateMap<ProviderResponseDTO,Provider>().ReverseMap();
+            
         }
     }
 }

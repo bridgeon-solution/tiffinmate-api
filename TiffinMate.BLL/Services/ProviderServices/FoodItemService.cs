@@ -32,13 +32,15 @@ namespace TiffinMate.BLL.Services.ProviderServices
            
         }
 
-        public async Task<List<FoodItemDto>> GetFoodItemsAsync()
+        public async Task<List<FoodItemResponceDto>> GetFoodItemsAsync()
         {
             var result=await _foodItemRepository.GetAllAsync();
             var foodItemsDto = result.Select(e =>
             {
-                var dto = _mapper.Map<FoodItemDto>(e);
-                dto.categoryname = e.category?.category_name;
+                var dto = _mapper.Map<FoodItemResponceDto>(e);
+                dto.category_name = e.category?.category_name;
+                dto.menu_name = e.menu?.name;
+                dto.menu_id = e.menu.id;
                 return dto;
             }).ToList();
             return foodItemsDto;
@@ -102,6 +104,52 @@ namespace TiffinMate.BLL.Services.ProviderServices
             
             
         }
+
+        public async Task<List<MenuDto>> GetMenuAsync()
+        {
+            var result = await _foodItemRepository.GetAllMenuAsync();
+            if (result == null)
+            {
+                return null;
+            }
+            return _mapper.Map<List<MenuDto>>(result);
+
+
+        }
+
+        public async Task<List<MenuDto>> ByProvider(Guid id)
+        {
+            var result = await _foodItemRepository.GetMenuByProviderAsync(id);
+            return _mapper.Map<List<MenuDto>>(result);
+        }
+
+        public async Task<bool> AddMenuAsync(MenuDto menu, IFormFile image)
+        {
+            if (menu == null)
+                throw new ArgumentNullException(nameof(menu));
+
+            if (image == null)
+                throw new ArgumentNullException(nameof(image));
+
+
+            var imageUrl = await _cloudinary.UploadDocumentAsync(image);
+
+            if (string.IsNullOrEmpty(imageUrl))
+            {
+
+                return false;
+            }
+
+            var menuitem = _mapper.Map<Menu>(menu);
+            menuitem.image = imageUrl;
+
+            await _foodItemRepository.AddMenuAsync(menuitem);
+            return true;
+        }
+
+
+
+
 
     }
 }

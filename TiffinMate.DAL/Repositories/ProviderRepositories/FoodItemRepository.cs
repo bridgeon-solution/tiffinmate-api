@@ -22,8 +22,8 @@ namespace TiffinMate.DAL.Repositories.ProviderRepositories
         //getall
         public async Task<List<FoodItem>> GetAllAsync()
         {
-           
-            return await _context.FoodItems.Include(f => f.category).ToListAsync();
+
+            return await _context.FoodItems.Include(f => f.category).Include(f => f.menu).ToListAsync();
         }
 
         //getbyid
@@ -68,6 +68,35 @@ namespace TiffinMate.DAL.Repositories.ProviderRepositories
 
             return await _context.Categories.ToListAsync();
         }
+
+
+        public async Task<List<Menu>> GetAllMenuAsync()
+        {
+
+            return await _context.menus.ToListAsync();
+        }
+
+        public async Task<string> AddMenuAsync(Menu menus)
+        {
+            var existingcategory = await _context.menus.FirstOrDefaultAsync(c => c.name == menus.name);
+            if (existingcategory != null)
+            {
+                return "menu with same name already exists.";
+            }
+            await _context.menus.AddAsync(menus);
+            await _context.SaveChangesAsync();
+            return "menu added";
+        }
+
+        public async Task<List<Menu>> GetMenuByProviderAsync(Guid providerId)
+        {
+
+            return await _context.menus
+                   .Where(f => f.provider_id == providerId)
+                   .ToListAsync();
+
+        }
+
 
 
     } 

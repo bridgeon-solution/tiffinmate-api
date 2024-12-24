@@ -81,7 +81,7 @@ namespace TiffinMate.API.Controllers.ProviderControllers
             return Ok(response);
         }
 
-        [HttpGet("{providerid}")]
+        [HttpGet("providerid")]
         public async Task<IActionResult> GetByProvider(Guid id)
         {
             var result = await _foodItemService.GetByProviderAsync(id);
@@ -145,7 +145,7 @@ namespace TiffinMate.API.Controllers.ProviderControllers
 
 
         [HttpPost("menu")]
-        public async Task<IActionResult> AddMenu([FromForm] MenuDto menu, IFormFile image)
+        public async Task<IActionResult> AddMenu([FromForm] MenuRequestDto menu, IFormFile image)
         {
             var response = await _foodItemService.AddMenuAsync(menu, image);
             if (!response)

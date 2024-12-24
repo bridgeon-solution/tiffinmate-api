@@ -86,7 +86,7 @@ namespace TiffinMate.BLL.Services.ProviderServices
             return "Added successfully";
 
         }
-
+        //foodbyprovider
         public async Task<List<FoodItemDto>> GetByProviderAsync(Guid id)
         {
             var result = await _foodItemRepository.GetByProviderAsync(id);
@@ -123,7 +123,7 @@ namespace TiffinMate.BLL.Services.ProviderServices
             return _mapper.Map<List<MenuDto>>(result);
         }
 
-        public async Task<bool> AddMenuAsync(MenuDto menu, IFormFile image)
+        public async Task<bool> AddMenuAsync(MenuRequestDto menu, IFormFile image)
         {
             if (menu == null)
                 throw new ArgumentNullException(nameof(menu));

@@ -8,7 +8,7 @@ namespace TiffinMate.BLL.DTOs.ProviderDTOs
 {
     public class ProviderDTO
     {
-        public string username { get; set; }
+        public string user_name { get; set; }
         public string email { get; set; }
        
     }

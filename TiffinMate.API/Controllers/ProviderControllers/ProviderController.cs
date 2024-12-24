@@ -1,6 +1,8 @@
 ﻿using Amazon.S3;
+using Amazon.S3.Model;
 using Asp.Versioning;
 using AutoMapper;
+using CloudinaryDotNet;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -353,6 +355,21 @@ namespace TiffinMate.API.Controllers.ControllerProvider
             {
                 return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse<string>("failure", "Error Occurred", null, HttpStatusCode.InternalServerError, ex.Message));
             }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetProviders(int page, int pageSize, string search = null, string filter = null, string verifystatus = null)
+        {
+            try
+            {
+                var res = await _providerService.GetProviders(page,pageSize,search,filter,verifystatus);
+                return Ok(new ApiResponse<ProviderResultDTO>("success", "Provider fetched successfully", res, HttpStatusCode.OK, null));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse<string>("failure", "Error Occurred", null, HttpStatusCode.InternalServerError, ex.Message));
+            }
+
         }
     }
 }

@@ -1,22 +1,27 @@
 ﻿using Amazon.S3;
+using Amazon.S3.Model;
 using Asp.Versioning;
 using AutoMapper;
+using CloudinaryDotNet;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Sprache;
+using Supabase.Gotrue;
 using System.Collections.Generic;
 using System.Net;
 using TiffinMate.API.ApiRespons;
 using TiffinMate.BLL.DTOs.ProviderDTOs;
 using TiffinMate.BLL.DTOs.UserDTOs;
 using TiffinMate.BLL.Interfaces.ProviderServiceInterafce;
+using TiffinMate.BLL.Interfaces.ProviderVerification;
 using TiffinMate.BLL.Services.ProviderServices;
 using TiffinMate.DAL.DbContexts;
 using TiffinMate.DAL.Entities;
 using TiffinMate.DAL.Entities.ProviderEntity;
 using TiffinMate.DAL.Interfaces.ProviderInterface;
+using Twilio.Annotations;
 using static Supabase.Gotrue.Constants;
 
 namespace TiffinMate.API.Controllers.ControllerProvider
@@ -28,12 +33,14 @@ namespace TiffinMate.API.Controllers.ControllerProvider
     {
         private readonly IProviderService _providerService;
         private readonly IReviewService _reviewService;
+        private readonly IProviderVerificationService _verificationService;
 
-        public ProviderController(IProviderService providerService, IReviewService reviewService)
+        public ProviderController(IProviderService providerService, IReviewService reviewService, IProviderVerificationService verificationService)
         {
 
             _providerService = providerService;
             _reviewService = reviewService;
+            _verificationService = verificationService;
         }
 
         [HttpPost("register")]
@@ -84,32 +91,35 @@ namespace TiffinMate.API.Controllers.ControllerProvider
             }
         }
 
-        [HttpPost("providerdetails")]
+        [HttpPost("details")]
         public async Task<IActionResult> ProviderDetails([FromForm] ProviderDetailsDTO providerDetailsDTO, IFormFile logo, IFormFile image)
         {
-
-
             try
             {
                 var response = await _providerService.AddProviderDetails(providerDetailsDTO, logo, image);
                 if (!response)
                 {
-                    return BadRequest(new ApiResponse<string>("failure", " failed", null, HttpStatusCode.BadRequest, "logo or image is not uploaded"));
+                    return BadRequest(new ApiResponse<string>("failure", "Upload failed", null, HttpStatusCode.BadRequest, "Logo or image is not uploaded"));
                 }
 
-                var result = new ApiResponse<bool>("success", " Successfull", response, HttpStatusCode.OK, "");
+                var result = new ApiResponse<bool>("success", "Successfully added details", response, HttpStatusCode.OK, "");
                 return Ok(result);
-
             }
             catch (Exception ex)
             {
-                var response = new ApiResponse<string>("failed", "", ex.Message, HttpStatusCode.InternalServerError, "error occured");
-                return StatusCode((int)HttpStatusCode.InternalServerError, response);
+                if (ex.Message.Contains("Provider details already exist"))
+                {
+                    return Conflict(new ApiResponse<string>("failure", "Conflict", null, HttpStatusCode.Conflict, ex.Message));
+                }
 
+                var response = new ApiResponse<string>("failed", "", ex.Message, HttpStatusCode.InternalServerError, "Error occurred");
+                return StatusCode((int)HttpStatusCode.InternalServerError, response);
             }
         }
 
-       
+
+
+
 
         [HttpPatch("block")]
         public async Task<IActionResult> BlockUnblockUser(Guid id)
@@ -193,21 +203,174 @@ namespace TiffinMate.API.Controllers.ControllerProvider
                 return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse<List<AllReview>>("failure", "Error Occurred", null, HttpStatusCode.InternalServerError, ex.Message));
             }
         }
-        [HttpGet]
 
-        public async Task<IActionResult> GetProviders(int pageSize, int page, string search = "", string filter = "", string verifystatus = "")
+        [HttpGet("{providerid}")]
+        public async Task<IActionResult> GetProviderById(Guid providerid)
+        {
+            if (providerid == Guid.Empty)
+            {
+                return BadRequest(new ApiResponse<string>("failure", "Invalid Input", null, HttpStatusCode.BadRequest, "User ID is required."));
+            }
+
+            var provider = await _providerService.ProviderById(providerid);
+            if (provider == null)
+            {
+                return NotFound(new ApiResponse<ProviderByIdDto>("failure", "No Provider Found", null, HttpStatusCode.NotFound, "No provider found for the given ID."));
+            }
+
+            return Ok(new ApiResponse<ProviderByIdDto>("success", "Provider Retrieved", provider, HttpStatusCode.OK, ""));
+        }
+        [HttpPost("forgot-passowrd")]
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordDto forgotPasswordDto)
         {
             try
             {
-                var response = await _providerService.GetProviders(page, pageSize, search, filter, verifystatus);
-                return Ok(new ApiResponse<List<ProviderResponseDTO>>("success", "provider getted", response, HttpStatusCode.OK, ""));
-            }
+                var response = await _verificationService.SendResetOtp(forgotPasswordDto);
+                if (response == "Not Found")
+                {
+                    return NotFound(new ApiResponse<string>("failure", "Failed", null, HttpStatusCode.NotFound, "user not found"));
+                }
+                if (response == "failed")
+                {
 
+                    return BadRequest(new ApiResponse<string>("failure", "Failed", null, HttpStatusCode.BadRequest, "failed"));
+                }
+
+                var result = new ApiResponse<string>("success", "otp sended Successfully", response, HttpStatusCode.OK, "");
+                return Ok(result);
+
+            }
             catch (Exception ex)
             {
                 var response = new ApiResponse<string>("failed", "", ex.Message, HttpStatusCode.InternalServerError, "error occured");
                 return StatusCode((int)HttpStatusCode.InternalServerError, response);
+
             }
+
+        }
+        [HttpPost("verify-email-otp")]
+        public async Task<IActionResult> VerifyEmailOtp(VerifyEmailOtpDto verifyEmailOtp)
+        {
+            try
+            {
+                var response = _verificationService.VerifyEmailOtp(verifyEmailOtp);
+                if (!response)
+                {
+                    return BadRequest(new ApiResponse<string>("failure", "verification failed", null, HttpStatusCode.BadRequest, "otp verification failed"));
+                }
+
+                var result = new ApiResponse<bool>("success", "verification Successfull", response, HttpStatusCode.OK, "");
+                return Ok(result);
+
+            }
+            catch (Exception ex)
+            {
+                var response = new ApiResponse<string>("failed", "", ex.Message, HttpStatusCode.InternalServerError, "error occured");
+                return StatusCode((int)HttpStatusCode.InternalServerError, response);
+
+            }
+
+
+
+        }
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto resetPasswordDto)
+        {
+            try
+            {
+                var response = await _verificationService.ResetPassword(resetPasswordDto);
+                if (response == "User Not Found")
+                {
+                    return NotFound(new ApiResponse<string>("failure", "Failed", null, HttpStatusCode.NotFound, "user not found"));
+                }
+                if (response == "updation failed")
+                {
+
+                    return BadRequest(new ApiResponse<string>("failure", "Failed", null, HttpStatusCode.BadRequest, "failed"));
+                }
+
+                var result = new ApiResponse<string>("success", "password updated Successfully", response, HttpStatusCode.OK, "");
+                return Ok(result);
+
+            }
+            catch (Exception ex)
+            {
+                var response = new ApiResponse<string>("failed", "", ex.Message, HttpStatusCode.InternalServerError, "error occured");
+                return StatusCode((int)HttpStatusCode.InternalServerError, response);
+
+            }
+
+        }
+        [HttpPost("resend-mail-otp")]
+        public async Task<IActionResult> ResendMailOtp(ForgotPasswordDto forgotPasswordDto)
+        {
+            try
+            {
+                var response = await _verificationService.SendResetOtp(forgotPasswordDto);
+                if (response == "Not Found")
+                {
+                    return NotFound(new ApiResponse<string>("failure", "Failed", null, HttpStatusCode.NotFound, "user not found"));
+                }
+                if (response == "failed")
+                {
+
+                    return BadRequest(new ApiResponse<string>("failure", "Failed", null, HttpStatusCode.BadRequest, "failed"));
+                }
+
+                var result = new ApiResponse<string>("success", "otp sended Successfully", response, HttpStatusCode.OK, "");
+                return Ok(result);
+
+            }
+            catch (Exception ex)
+            {
+                var response = new ApiResponse<string>("failed", "", ex.Message, HttpStatusCode.InternalServerError, "error occured");
+                return StatusCode((int)HttpStatusCode.InternalServerError, response);
+
+            }
+
+        }
+        [HttpGet("details")]
+
+        public async Task<IActionResult> GetProvidersWithDetail()
+        {
+            try
+            {
+                var res = await _providerService.GetProvidersWithDetail();
+                return Ok(new ApiResponse<List<ProviderDetailResponse>>("success", "Providers fetched successfully", res, HttpStatusCode.OK, null));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse<string>("failure", "Error Occurred", null, HttpStatusCode.InternalServerError, ex.Message));
+            }
+        }
+        [HttpGet("{id:Guid}/details")]
+        public async Task<IActionResult> GetProviderDetails(Guid id)
+        {
+            try
+            {
+                var res = await _providerService.GetProviderDetailsById(id);
+                return Ok(new ApiResponse<ProviderDetailedDTO>("success", "Provider fetched successfully", res, HttpStatusCode.OK, null));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse<string>("failure", "Error Occurred", null, HttpStatusCode.InternalServerError, ex.Message));
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetProviders(int page, int pageSize, string search = null, string filter = null, string verifystatus = null)
+        {
+            try
+            {
+                var res = await _providerService.GetProviders(page,pageSize,search,filter,verifystatus);
+                return Ok(new ApiResponse<ProviderResultDTO>("success", "Provider fetched successfully", res, HttpStatusCode.OK, null));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse<string>("failure", "Error Occurred", null, HttpStatusCode.InternalServerError, ex.Message));
+            }
+
         }
     }
 }
+

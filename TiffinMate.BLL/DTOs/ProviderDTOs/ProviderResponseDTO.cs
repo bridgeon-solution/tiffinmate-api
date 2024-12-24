@@ -16,7 +16,7 @@ namespace TiffinMate.BLL.DTOs.ProviderDTOs
         public string? certificate { get; set; }
        
 
-        public string? username { get; set; }
+        public string? user_name { get; set; }
         public bool is_blocked { get; set; }
 
 

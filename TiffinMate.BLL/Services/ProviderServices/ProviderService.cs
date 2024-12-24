@@ -19,6 +19,7 @@ using sib_api_v3_sdk.Client;
 using System.Net;
 using TiffinMate.BLL.DTOs.UserDTOs;
 using Supabase.Gotrue;
+using BCrypt.Net;
 
 namespace TiffinMate.BLL.Services.ProviderServices
 {
@@ -78,25 +79,18 @@ namespace TiffinMate.BLL.Services.ProviderServices
                     throw new Exception("Email or password cannot be null or empty.");
                 }
 
-                var pro = await _providerRepository.Login(providerdto.email, providerdto.password);
+                var pro = await _providerRepository.Login(providerdto.email);
 
                 if (pro == null)
                 {
-                    throw new Exception("Invalid provider.");
+                    throw new Exception("Provider not found.");
                 }
+                bool isValid = BCrypt.Net.BCrypt.Verify(providerdto.password, pro.password);
 
-                if (pro.password == null || providerdto.password == null)
+                if (!isValid)
                 {
-                    throw new Exception("Password cannot be null.");
+                    throw new Exception("Invalid password.");
                 }
-
-                if (pro.password != providerdto.password)
-                {
-                    throw new Exception("Incorrect password.");
-                }
-
-               
-
                 var tokenHelper = new TokenHelper();
 
                 var newRefreshToken = tokenHelper.GenerateRefreshToken(pro);
@@ -121,14 +115,15 @@ namespace TiffinMate.BLL.Services.ProviderServices
                     token = token,
                     refresh_token = newRefreshToken
                 };
-            }
-            catch (Exception ex)
-            {
 
+            }
+            catch(Exception ex)
+            {
                 Console.WriteLine($"Error during login: {ex.Message}");
                 Console.WriteLine($"Query Parameters - Email: {providerdto.email}, Password: {providerdto.password}");
 
-                throw new Exception("An error occurred: " + ex.Message);
+                throw new Exception("An error occurred: " + ex.Message);              
+
             }
         }
 
@@ -137,28 +132,20 @@ namespace TiffinMate.BLL.Services.ProviderServices
         {
             try
             {
-
                 if (logo == null || image == null)
                 {
                     return false;
                 }
 
+                // Check if provider details already exist
+                var existingDetails = await _providerRepository.GetProviderDetailsByProviderIdAsync(providerDetailsdto.provider_id);
+                if (existingDetails != null)
+                {
+                    throw new Exception("Provider details already exist.");
+                }
+
                 var logUrl = await _cloudinary.UploadDocumentAsync(logo);
                 var imageUrl = await _cloudinary.UploadDocumentAsync(image);
-
-                //var providerDetails = new ProviderDetails
-                //{
-
-                //    resturent_name = providerDetailsdto.resturent_name,
-                //    address = providerDetailsdto.address,
-                //    phone_no = providerDetailsdto.phone_no,
-                //    location = providerDetailsdto.location,
-                //    logo = logUrl,
-                //    image = imageUrl,
-                //    about = providerDetailsdto.about,
-                //    account_no = providerDetailsdto.account_no
-                //};
-
 
                 var prddetails = _mapper.Map<ProviderDetails>(providerDetailsdto);
 
@@ -254,42 +241,104 @@ namespace TiffinMate.BLL.Services.ProviderServices
             };
         }
 
-        public async Task<List<ProviderResponseDTO>> GetProviders(int page, int pageSize, string search = null, string filter = null, string verifystatus = null)
+        public async Task<ProviderResultDTO> GetProviders(int page, int pageSize, string search = null, string filter = null, string verifystatus = null)
         {
-            var provider = await _providerRepository.GetProviders();
+            var providerList = await _providerRepository.GetProviders();
+            if (providerList == null)
+            {
+                throw new InvalidOperationException("No providers found.");
+            }
+            var providers = providerList.AsQueryable();
 
             if (!string.IsNullOrEmpty(search))
             {
-                provider = provider.Where(u => u.user_name.Contains(search, StringComparison.OrdinalIgnoreCase) ||
-                                               u.email.Contains(search, StringComparison.OrdinalIgnoreCase)).ToList();
+                providers = providers.Where(u =>
+                    (u.user_name != null && u.user_name.Contains(search, StringComparison.OrdinalIgnoreCase)) ||
+                    (u.email != null && u.email.Contains(search, StringComparison.OrdinalIgnoreCase)));
             }
 
             if (!string.IsNullOrEmpty(filter))
             {
                 if (filter.ToLower() == "true")
                 {
-                    provider = provider.Where(u => u.is_blocked == true).ToList();
+                    providers = providers.Where(u => u.is_blocked);
                 }
                 else if (filter.ToLower() == "false")
                 {
-                    provider = provider.Where(u => u.is_blocked == false).ToList();
+                    providers = providers.Where(u => !u.is_blocked);
                 }
             }
 
             if (!string.IsNullOrEmpty(verifystatus))
             {
-                provider = provider.Where(u => u.verification_status.Equals(verifystatus, StringComparison.OrdinalIgnoreCase)).ToList();
+                providers = providers.Where(u =>
+                    u.verification_status != null &&
+                    u.verification_status.Equals(verifystatus, StringComparison.OrdinalIgnoreCase));
             }
 
-            var providerPaged = provider
-               .OrderByDescending(u => u.created_at)
-               .Skip((page - 1) * pageSize)
-               .Take(pageSize);
+            var totalCount = providers.Count();
 
-            
-            return _mapper.Map<List<ProviderResponseDTO>>(providerPaged);
+            var pagedProviders = providers
+                .OrderByDescending(u => u.created_at)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            return new ProviderResultDTO
+            {
+                TotalCount = totalCount,
+                Providers = _mapper.Map<List<ProviderResponseDTO>>(pagedProviders)
+            };
         }
 
+
+        public async Task<ProviderByIdDto> ProviderById(Guid providerId)
+        {
+            var provider = await _providerRepository.GetAProviderById(providerId);
+            if (provider == null)
+            {
+                throw new Exception("No provider available");
+            }
+            var result = provider.Select(providers => new ProviderByIdDto
+            {
+                username = providers.user_name,
+                email = providers.email,
+                address = providers.provider_details.address, 
+                phone_no = providers.provider_details.phone_no,
+                verification_status = providers.verification_status,
+                image = providers.provider_details.logo,
+                created_at = providers.created_at,
+                certificate = providers.certificate,
+
+            }).FirstOrDefault();
+            return result;
+        }
+
+        public async Task<ProviderDetailedDTO> GetProviderDetailsById(Guid id)
+        {
+            try
+            {
+                var res = await _providerRepository.GetProviderDetailsById(id);
+                return _mapper.Map<ProviderDetailedDTO>(res);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+
+        public async Task<List<ProviderDetailResponse>> GetProvidersWithDetail()
+        {
+            try
+            {
+                var res = await _providerRepository.GetProvidersWithDetail();
+                return _mapper.Map<List<ProviderDetailResponse>>(res);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
 
     }
 }

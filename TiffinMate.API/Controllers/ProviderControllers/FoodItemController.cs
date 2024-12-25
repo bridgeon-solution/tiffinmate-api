@@ -156,32 +156,7 @@ namespace TiffinMate.API.Controllers.ProviderControllers
             return Ok(result);
         }
 
-        [HttpGet("provider")]
-        public async Task <IActionResult> GetFoodItemByProvider(Guid id) { 
-            var result=await _foodItemService.GetByProvider(id);
-
-            try
-            {
-                if (result == null || !result.Any())
-                {
-                    return Ok(new ApiResponse<string>("failure", "No Fooditem found for the given provider. ", null, HttpStatusCode.NotFound, "No menu found for the given provider."
-                ));
-
-                }
-
-                var responce = new ApiResponse<List<FoodItemResponceDto>>("success", "Food retrieved successfully", result, HttpStatusCode.OK, "");
-                return Ok(responce);
-
-            }
-            catch (Exception ex) {
-
-                var response = new ApiResponse<string>("failed", "", ex.Message, HttpStatusCode.InternalServerError, "error occured");
-                return StatusCode((int)HttpStatusCode.InternalServerError, response);
-
-            }
-
-        
-        }
+      
 
 
     }

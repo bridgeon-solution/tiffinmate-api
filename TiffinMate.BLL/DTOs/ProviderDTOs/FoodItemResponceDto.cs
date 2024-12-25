@@ -18,5 +18,6 @@ namespace TiffinMate.BLL.DTOs.ProviderDTOs
         public decimal price { get; set; }
         public string description { get; set; }
         public string day { get; set; }
+       
     }
 }

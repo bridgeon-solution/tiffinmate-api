@@ -58,6 +58,7 @@ namespace TiffinMate.DAL.Repositories.ProviderRepositories
             
              return await _context.FoodItems
                     .Include(f => f.category)
+                    .Include(c=>c.menu)
                     .Where(f=>f.provider_id==providerId)
                     .ToListAsync();
         

@@ -81,7 +81,7 @@ namespace TiffinMate.API.Controllers.ProviderControllers
             return Ok(response);
         }
 
-        [HttpGet("providerid")]
+        [HttpGet("providerid/{id}")]
         public async Task<IActionResult> GetByProvider(Guid id)
         {
             var result = await _foodItemService.GetByProviderAsync(id);
@@ -92,7 +92,7 @@ namespace TiffinMate.API.Controllers.ProviderControllers
 
             }
 
-            var responce = new ApiResponse<List<FoodItemDto>>("success", "Food items retrieved successfully", result, HttpStatusCode.OK, "");
+            var responce = new ApiResponse<List<FoodItemResponceDto>>("success", "Food items retrieved successfully", result, HttpStatusCode.OK, "");
             return Ok(responce);
 
         }

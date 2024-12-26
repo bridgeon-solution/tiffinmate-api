@@ -32,6 +32,11 @@ using Microsoft.AspNetCore.Mvc;
 using Asp.Versioning;
 using TiffinMate.DAL.Interfaces.ReviewInterface;
 using TiffinMate.DAL.Repositories.ReviewRepository;
+using TiffinMate.DAL.Interfaces.NotificationInterfaces;
+using TiffinMate.DAL.Repositories.NotificationRepository;
+using TiffinMate.BLL.Interfaces.NotificationInterface;
+using TiffinMate.BLL.Services.NotificationSevice.cs;
+using Microsoft.AspNetCore.WebSockets;
 
 namespace TiffinMate.API
 {
@@ -83,6 +88,9 @@ namespace TiffinMate.API
             builder.Services.AddScoped<ICloudinaryService, CloudinaryServices>();
             builder.Services.AddScoped<IProviderVerificationService, ProviderVerificationService>();
             builder.Services.AddScoped<IReviewService, ReviewService>();
+            builder.Services.AddScoped<INotificationRepository,NotificationRepository>();
+            builder.Services.AddScoped<INotificationService,NotificationService>();
+
             
 
             builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
@@ -153,8 +161,16 @@ namespace TiffinMate.API
                 return new OtpService(accountSid, authToken, verifySid);
             });
 
+
+            builder.Services.AddWebSockets(options =>
+            {
+                options.KeepAliveInterval = TimeSpan.FromSeconds(120);
+            });
+
             var app = builder.Build();
-           
+
+            app.UseWebSockets();
+
             if (env == "Development")
             {
                 app.UseSwagger();

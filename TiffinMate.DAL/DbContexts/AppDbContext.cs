@@ -28,6 +28,8 @@ namespace TiffinMate.DAL.DbContexts
         public DbSet<Review> Reviews { get; set; }
 
         public DbSet<Menu> menus { get; set; }
+        public DbSet<Notification> notifications { get; set; }
+
 
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
         protected override void OnModelCreating(ModelBuilder modelBuilder)

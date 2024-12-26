@@ -92,7 +92,7 @@ namespace TiffinMate.BLL.Services.ProviderServices
 
                 if (reviews == null || !reviews.Any())
                 {
-                    throw new ArgumentException("No reviews found for the given provider .");
+                    return [];
                 }
 
                 var reviewDtos = reviews.Select(review => new AllReview

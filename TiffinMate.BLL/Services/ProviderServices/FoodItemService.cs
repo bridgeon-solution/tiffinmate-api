@@ -13,6 +13,7 @@ using TiffinMate.DAL.DbContexts;
 using TiffinMate.DAL.Entities.ProviderEntity;
 using TiffinMate.DAL.Interfaces.ProviderInterface;
 using Twilio.Rest.Trunking.V1;
+using static Supabase.Gotrue.Constants;
 
 namespace TiffinMate.BLL.Services.ProviderServices
 {
@@ -87,11 +88,21 @@ namespace TiffinMate.BLL.Services.ProviderServices
 
         }
         //foodbyprovider
-        public async Task<List<FoodItemDto>> GetByProviderAsync(Guid id)
+        public async Task<List<FoodItemResponceDto>> GetByProviderAsync(Guid id)
         {
             var result = await _foodItemRepository.GetByProviderAsync(id);
-            return _mapper.Map<List<FoodItemDto>>(result);
+            var foodItemsDto = result.Select(e =>
+            {
+                var dto = _mapper.Map<FoodItemResponceDto>(e);
+                dto.category_name = e.category?.category_name;
+                dto.menu_name = e.menu?.name;
+                //dto.menu_id = e.menu.id;
+                return dto;
+            }).ToList();
+            return foodItemsDto;
+            
         }
+
 
         public async Task<List<Categories>> GetCategoryAsync()
         {
@@ -146,15 +157,16 @@ namespace TiffinMate.BLL.Services.ProviderServices
             await _foodItemRepository.AddMenuAsync(menuitem);
             return true;
         }
-        public async Task<decimal> CalculateTotalAsync(PlanRequest request)
+        public async Task<decimal> CalculateTotal(PlanRequest request)
         {
             if (string.IsNullOrEmpty(request.date) || request.categories == null || !request.categories.Any())
                 throw new ArgumentException("Invalid input data.");
 
-            var dayOfWeek = DateTime.Parse(request.date).DayOfWeek.ToString();
-            return await _foodItemRepository.GetTotalAmountAsync(request.categories, dayOfWeek);
+            var day = DateTime.Parse(request.date).DayOfWeek.ToString();
+            return await _foodItemRepository.GetTotalAmount(request.categories, day);
         }
 
+       
 
 
 

@@ -82,18 +82,18 @@ namespace TiffinMate.API.Controllers.ProviderControllers
             return Ok(response);
         }
 
-        [HttpGet("providerid")]
+        [HttpGet("providerid/{id}")]
         public async Task<IActionResult> GetByProvider(Guid id)
         {
             var result = await _foodItemService.GetByProviderAsync(id);
             if (result == null || !result.Any())
             {
-                return NotFound(new ApiResponse<string>("failure", "No food items found for the given provider. ", null, HttpStatusCode.NotFound, "No food items found for the given provider."
+                return Ok(new ApiResponse<string>("failure", "No food items found for the given provider. ", null, HttpStatusCode.NotFound, "No food items found for the given provider."
             ));
 
             }
 
-            var responce = new ApiResponse<List<FoodItemDto>>("success", "Food items retrieved successfully", result, HttpStatusCode.OK, "");
+            var responce = new ApiResponse<List<FoodItemResponceDto>>("success", "Food items retrieved successfully", result, HttpStatusCode.OK, "");
             return Ok(responce);
 
         }
@@ -156,21 +156,23 @@ namespace TiffinMate.API.Controllers.ProviderControllers
             var result = new ApiResponse<bool>("success", "Addition Successful", response, HttpStatusCode.OK, "");
             return Ok(result);
         }
-
-        [HttpPost("calculate-total")]
+        [HttpPost("total-amount")]
         public async Task<IActionResult> CalculateTotal([FromBody] PlanRequest request)
         {
             try
             {
-                var totalAmount = await _foodItemService.CalculateTotalAsync(request);
-                return Ok(new { TotalAmount = totalAmount });
+                var totalAmount = await _foodItemService.CalculateTotal(request);
+                return Ok(new ApiResponse<decimal>("success", "total calculated succesfully", totalAmount, HttpStatusCode.OK, ""));
+
             }
-           
             catch (Exception ex)
             {
-                return StatusCode(500, "An unexpected error occurred.");
+                var response = new ApiResponse<string>("failed", "", ex.Message, HttpStatusCode.InternalServerError, "error occured");
+                return StatusCode((int)HttpStatusCode.InternalServerError, response);
             }
         }
+
+
     }
 
 }

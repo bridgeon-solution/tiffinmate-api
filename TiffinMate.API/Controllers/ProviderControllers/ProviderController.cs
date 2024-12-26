@@ -215,7 +215,7 @@ namespace TiffinMate.API.Controllers.ControllerProvider
             var provider = await _providerService.ProviderById(providerid);
             if (provider == null)
             {
-                return NotFound(new ApiResponse<ProviderByIdDto>("failure", "No Provider Found", null, HttpStatusCode.NotFound, "No provider found for the given ID."));
+                return Ok(new ApiResponse<ProviderByIdDto>("failure", "No Provider Found", null, HttpStatusCode.NotFound, "No provider found for the given ID."));
             }
 
             return Ok(new ApiResponse<ProviderByIdDto>("success", "Provider Retrieved", provider, HttpStatusCode.OK, ""));

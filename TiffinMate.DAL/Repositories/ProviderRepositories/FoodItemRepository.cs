@@ -96,6 +96,12 @@ namespace TiffinMate.DAL.Repositories.ProviderRepositories
                    .ToListAsync();
 
         }
+        public async Task<decimal> GetTotalAmountAsync(List<Guid> categoryIds, string dayOfWeek)
+        {
+            return await _context.FoodItems
+                .Where(item => categoryIds.Contains(item.category_id) && item.day == dayOfWeek)
+                .SumAsync(item => item.price);
+        }
 
 
 

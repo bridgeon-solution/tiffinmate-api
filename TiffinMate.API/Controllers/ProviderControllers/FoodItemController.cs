@@ -1,6 +1,7 @@
 ﻿using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Net;
 using System.Xml.Linq;
 using TiffinMate.API.ApiRespons;
@@ -156,6 +157,20 @@ namespace TiffinMate.API.Controllers.ProviderControllers
             return Ok(result);
         }
 
-
+        [HttpPost("calculate-total")]
+        public async Task<IActionResult> CalculateTotal([FromBody] PlanRequest request)
+        {
+            try
+            {
+                var totalAmount = await _foodItemService.CalculateTotalAsync(request);
+                return Ok(new { TotalAmount = totalAmount });
+            }
+           
+            catch (Exception ex)
+            {
+                return StatusCode(500, "An unexpected error occurred.");
+            }
+        }
     }
+
 }

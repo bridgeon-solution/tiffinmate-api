@@ -14,7 +14,7 @@ namespace TiffinMate.API.Controllers
             _notificationService = notificationService;
         }
 
-        [HttpPost("create")]
+        [HttpPost]
         public async Task<IActionResult> CreateNotification(string title, string message)
         {
             await _notificationService.CreateAndSendNotificationAsync(title, message);

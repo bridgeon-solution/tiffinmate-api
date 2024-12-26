@@ -1,43 +1,37 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.WebSockets;
 using System.Text;
-using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 
-namespace TiffinMate.BLL.Services.NotificationSevice.cs
+public static class WebSocketManager
 {
-    public static class WebSocketManager
+    private static readonly ConcurrentDictionary<string, WebSocket> _sockets = new();
+
+    // Add a WebSocket to the collection
+    public static void AddSocket(string id, WebSocket socket)
     {
-        private static ConcurrentDictionary<string, WebSocket> _sockets = new ConcurrentDictionary<string, WebSocket>();
+        _sockets.TryAdd(id, socket);
+    }
 
-        // Add a WebSocket connection
-        public static void AddSocket(string id, WebSocket socket)
+    // Remove a WebSocket from the collection
+    public static void RemoveSocket(string id)
+    {
+        _sockets.TryRemove(id, out var _);
+    }
+
+    // Broadcast a message to all connected clients
+    public static async Task BroadcastMessage(string title, string message)
+    {
+        var fullMessage = $"{title}: {message}";
+        var messageBytes = Encoding.UTF8.GetBytes(fullMessage);
+
+        foreach (var socket in _sockets.Values)
         {
-            _sockets.TryAdd(id, socket);
-        }
-
-        // Remove a WebSocket connection
-        public static void RemoveSocket(string id)
-        {
-            _sockets.TryRemove(id, out var socket);
-        }
-
-        // Broadcast a message to all WebSocket clients
-        public static async Task BroadcastMessage(string title, string message)
-        {
-            var notification = new { Title = title, Message = message };
-            var json = JsonSerializer.Serialize(notification);
-
-            foreach (var socket in _sockets.Values)
+            if (socket.State == WebSocketState.Open)
             {
-                if (socket.State == WebSocketState.Open)
-                {
-                    var buffer = Encoding.UTF8.GetBytes(json);
-                    await socket.SendAsync(new ArraySegment<byte>(buffer), WebSocketMessageType.Text, true, CancellationToken.None);
-                }
+                await socket.SendAsync(new ArraySegment<byte>(messageBytes), WebSocketMessageType.Text, true, CancellationToken.None);
             }
         }
     }

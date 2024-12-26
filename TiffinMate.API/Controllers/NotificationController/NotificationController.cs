@@ -1,32 +1,24 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using TiffinMate.BLL.DTOs.NotificationDTOs;
+﻿using Microsoft.AspNetCore.Mvc;
 using TiffinMate.BLL.Interfaces.NotificationInterface;
-using TiffinMate.BLL.Services.NotificationSevice.cs;
 
-namespace TiffinMate.API.Controllers.NotificationController
+namespace TiffinMate.API.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
     public class NotificationController : ControllerBase
     {
-        public readonly NotificationService _notificationService;
-        public NotificationController(NotificationService notificationService)
+        private readonly INotificationService _notificationService;
+
+        public NotificationController(INotificationService notificationService)
         {
             _notificationService = notificationService;
         }
-        [HttpPost]
-        public async Task<IActionResult> CreateNotification([FromBody] NotificationRequestDTO requestDTO)
+
+        [HttpPost("create")]
+        public async Task<IActionResult> CreateNotification(string title, string message)
         {
-            if (requestDTO == null || string.IsNullOrEmpty(requestDTO.Title) || string.IsNullOrEmpty(requestDTO.Message))
-            {
-                return BadRequest("Invalid notification data.");
-            }
-
-            // Call the NotificationService to create and send the notification
-            await _notificationService.CreateAndSendNotificationAsync(requestDTO.Title, requestDTO.Message);
-
-            return Ok(new { message = "Notification sent successfully." });
+            await _notificationService.CreateAndSendNotificationAsync(title, message);
+            return Ok("Notification sent.");
         }
     }
 }

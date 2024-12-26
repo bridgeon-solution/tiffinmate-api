@@ -6,12 +6,11 @@ using System.Threading.Tasks;
 
 namespace TiffinMate.DAL.Entities.ProviderEntity
 {
-    public class Notification
+    public class Notification:AuditableEntity
     {
-        public int Id { get; set; }
-        public string Title { get; set; }
-        public string Message { get; set; }
-        public bool IsRead { get; set; } = false;
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public int id { get; set; }
+        public string title { get; set; }
+        public string message { get; set; }
+        public bool isread { get; set; } = false;
     }
 }

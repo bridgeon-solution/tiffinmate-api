@@ -34,9 +34,10 @@ using TiffinMate.DAL.Interfaces.ReviewInterface;
 using TiffinMate.DAL.Repositories.ReviewRepository;
 using TiffinMate.DAL.Interfaces.NotificationInterfaces;
 using TiffinMate.DAL.Repositories.NotificationRepository;
+using System.Net.WebSockets;
 using TiffinMate.BLL.Interfaces.NotificationInterface;
-using TiffinMate.BLL.Services.NotificationSevice.cs;
-using Microsoft.AspNetCore.WebSockets;
+
+using TiffinMate.BLL.Services.NotificationService;
 
 namespace TiffinMate.API
 {
@@ -88,12 +89,13 @@ namespace TiffinMate.API
             builder.Services.AddScoped<ICloudinaryService, CloudinaryServices>();
             builder.Services.AddScoped<IProviderVerificationService, ProviderVerificationService>();
             builder.Services.AddScoped<IReviewService, ReviewService>();
-            builder.Services.AddScoped<INotificationRepository,NotificationRepository>();
-            builder.Services.AddScoped<INotificationService,NotificationService>();
-
-            
-
             builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
+            builder.Services.AddScoped<INotificationRepository,NotificationRepository>();
+            builder.Services.AddScoped<INotificationService, NotificationService>();
+           
+
+      
+
             builder.Services.Configure<BrevoSettings>(options =>
             {
                 options.ApiKey = brevoApiKey;
@@ -161,15 +163,50 @@ namespace TiffinMate.API
                 return new OtpService(accountSid, authToken, verifySid);
             });
 
-
-            builder.Services.AddWebSockets(options =>
-            {
-                options.KeepAliveInterval = TimeSpan.FromSeconds(120);
-            });
-
             var app = builder.Build();
 
-            app.UseWebSockets();
+          
+
+            app.UseWebSockets(new WebSocketOptions
+            {
+                KeepAliveInterval = TimeSpan.FromMinutes(2)
+            });
+
+            app.UseWebSockets(new WebSocketOptions
+            {
+                KeepAliveInterval = TimeSpan.FromMinutes(2)
+            });
+
+            app.Map("/ws", async context =>
+            {
+                if (context.WebSockets.IsWebSocketRequest)
+                {
+                    var socket = await context.WebSockets.AcceptWebSocketAsync();
+                    var socketId = Guid.NewGuid().ToString();
+                    WebSocketManager.AddSocket(socketId, socket);
+
+                    try
+                    {
+                        var buffer = new byte[1024 * 4];
+                        WebSocketReceiveResult result;
+                        do
+                        {
+                            result = await socket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+                        } while (!result.CloseStatus.HasValue);
+
+                        WebSocketManager.RemoveSocket(socketId);
+                        await socket.CloseAsync(result.CloseStatus.Value, result.CloseStatusDescription, CancellationToken.None);
+                    }
+                    catch (Exception ex)
+                    {
+                        WebSocketManager.RemoveSocket(socketId);
+                    }
+                }
+                else
+                {
+                    context.Response.StatusCode = 400;
+                }
+            });
 
             if (env == "Development")
             {

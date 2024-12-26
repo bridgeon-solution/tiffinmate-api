@@ -87,7 +87,7 @@ namespace TiffinMate.API.Controllers.ProviderControllers
             var result = await _foodItemService.GetByProviderAsync(id);
             if (result == null || !result.Any())
             {
-                return NotFound(new ApiResponse<string>("failure", "No food items found for the given provider. ", null, HttpStatusCode.NotFound, "No food items found for the given provider."
+                return Ok(new ApiResponse<string>("failure", "No food items found for the given provider. ", null, HttpStatusCode.NotFound, "No food items found for the given provider."
             ));
 
             }
@@ -155,6 +155,8 @@ namespace TiffinMate.API.Controllers.ProviderControllers
             var result = new ApiResponse<bool>("success", "Addition Successful", response, HttpStatusCode.OK, "");
             return Ok(result);
         }
+
+      
 
 
     }

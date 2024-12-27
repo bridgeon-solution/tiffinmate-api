@@ -157,6 +157,10 @@ namespace TiffinMate.DAL.DbContexts
                 entity.Property(m=>m.is_available)
                 .HasDefaultValue(true);
 
+                entity.Property(m => m.monthly_plan_amount)
+                .HasPrecision(18, 2)
+                .HasDefaultValue(0);
+
             });
 
             modelBuilder.Entity<Order>(entity =>

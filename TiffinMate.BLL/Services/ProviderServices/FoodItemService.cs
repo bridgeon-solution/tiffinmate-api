@@ -157,6 +157,14 @@ namespace TiffinMate.BLL.Services.ProviderServices
             await _foodItemRepository.AddMenuAsync(menuitem);
             return true;
         }
+        public async Task<decimal> CalculateTotal(PlanRequest request)
+        {
+            if (string.IsNullOrEmpty(request.date) || request.categories == null || !request.categories.Any())
+                throw new ArgumentException("Invalid input data.");
+
+            var day = DateTime.Parse(request.date).DayOfWeek.ToString();
+            return await _foodItemRepository.GetTotalAmount(request.categories, day);
+        }
 
        
 

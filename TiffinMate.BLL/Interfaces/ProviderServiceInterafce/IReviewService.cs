@@ -13,5 +13,6 @@ namespace TiffinMate.BLL.Interfaces.ProviderServiceInterafce
         Task<bool> Reviews(ReviewDto review);
         Task<List<AllReview>> GetAllReview(Guid userId);
         Task<List<AllReview>> GetAllProviderReview(Guid ProviderId);
+        Task<PaginationReview> ReviewsList(Guid ProviderId, int page, int pageSize, string search = null, string filter = null);
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Asp.Versioning;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Net;
 using System.Xml.Linq;
 using TiffinMate.API.ApiRespons;
@@ -155,9 +156,23 @@ namespace TiffinMate.API.Controllers.ProviderControllers
             var result = new ApiResponse<bool>("success", "Addition Successful", response, HttpStatusCode.OK, "");
             return Ok(result);
         }
+        [HttpPost("total-amount")]
+        public async Task<IActionResult> CalculateTotal([FromBody] PlanRequest request)
+        {
+            try
+            {
+                var totalAmount = await _foodItemService.CalculateTotal(request);
+                return Ok(new ApiResponse<decimal>("success", "total calculated succesfully", totalAmount, HttpStatusCode.OK, ""));
 
-      
+            }
+            catch (Exception ex)
+            {
+                var response = new ApiResponse<string>("failed", "", ex.Message, HttpStatusCode.InternalServerError, "error occured");
+                return StatusCode((int)HttpStatusCode.InternalServerError, response);
+            }
+        }
 
 
     }
+
 }

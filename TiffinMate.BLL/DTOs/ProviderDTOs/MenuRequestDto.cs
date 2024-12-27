@@ -13,6 +13,7 @@ namespace TiffinMate.BLL.DTOs.ProviderDTOs
         public string name { get; set; }
 
         public string description { get; set; }
+        public decimal monthly_plan_amount { get; set; }
 
         public bool is_available { get; set; }
     }

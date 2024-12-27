@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TiffinMate.DAL.Entities;
+using TiffinMate.DAL.Entities.OrderEntity;
 using TiffinMate.DAL.Entities.ProviderEntity;
 using User = TiffinMate.DAL.Entities.User;
 
@@ -29,6 +30,8 @@ namespace TiffinMate.DAL.DbContexts
 
         public DbSet<Menu> menus { get; set; }
         public DbSet<Notification> notifications { get; set; }
+        public DbSet<Order> order { get; set; }
+        public DbSet<OrderDetails> orderDetails { get; set; }
 
 
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
@@ -156,7 +159,23 @@ namespace TiffinMate.DAL.DbContexts
 
             });
 
+            modelBuilder.Entity<Order>(entity =>
+            {
+                entity.HasOne(m => m.user)
+                .WithMany(m => m.order)
+                .HasForeignKey(f => f.user_id);
 
+                entity.HasMany(m => m.category)
+                .WithOne(m => m.order)
+                .HasForeignKey(m => m.id);
+
+                entity.HasOne(m => m.provider)
+                .WithMany(p => p.order)
+                .HasForeignKey(p => p.provider_id);
+                    
+            });
+
+           
 
         }
 

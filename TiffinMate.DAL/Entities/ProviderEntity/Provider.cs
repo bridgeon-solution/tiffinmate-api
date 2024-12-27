@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TiffinMate.DAL.Entities.OrderEntity;
 
 namespace TiffinMate.DAL.Entities.ProviderEntity
 {
@@ -27,5 +28,6 @@ namespace TiffinMate.DAL.Entities.ProviderEntity
         public ICollection<Review> review { get; set; }
         public ICollection<FoodItem> food_items { get; set; }
         public ICollection<Menu> menus { get; set; }
+        public ICollection<Order> order { get; set; }
     }
 }

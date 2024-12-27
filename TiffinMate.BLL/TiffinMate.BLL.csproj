@@ -23,4 +23,8 @@
     <ProjectReference Include="..\TiffinMate.DAL\TiffinMate.DAL.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="DTOs\OrderDTOs\" />
+  </ItemGroup>
+
 </Project>

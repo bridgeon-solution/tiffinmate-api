@@ -167,19 +167,30 @@ namespace TiffinMate.DAL.DbContexts
             {
                 entity.HasOne(m => m.user)
                 .WithMany(m => m.order)
-                .HasForeignKey(f => f.user_id);
+                .HasForeignKey(f => f.user_id)
+                .OnDelete(DeleteBehavior.Cascade);
 
-                entity.HasMany(m => m.category)
+                entity.HasMany(o => o.category)
                 .WithOne(m => m.order)
-                .HasForeignKey(m => m.id);
+                .HasForeignKey(m => m.category_id)
+                .OnDelete(DeleteBehavior.Cascade);
 
                 entity.HasOne(m => m.provider)
                 .WithMany(p => p.order)
-                .HasForeignKey(p => p.provider_id);
-                    
+                .HasForeignKey(p => p.provider_id)
+                .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(o => o.details)
+                .WithOne(od => od.order)
+                .HasForeignKey<OrderDetails>(od => od.order_id)
+                .OnDelete(DeleteBehavior.Cascade);
+
+
             });
 
            
+
+
 
         }
 

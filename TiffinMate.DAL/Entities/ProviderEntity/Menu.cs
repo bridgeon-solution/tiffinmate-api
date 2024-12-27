@@ -27,6 +27,8 @@ namespace TiffinMate.DAL.Entities.ProviderEntity
         public List<FoodItem> food_items { get; set; }
         public Provider provider { get; set; }
 
+        public List<Order>order { get; set; }
+
         
     }
 }

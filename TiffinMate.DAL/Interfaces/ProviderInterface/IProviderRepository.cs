@@ -27,5 +27,6 @@ namespace TiffinMate.DAL.Interfaces.ProviderInterface
         Task<List<ProviderDetails>> GetProvidersWithDetail();
         Task<ProviderDetails> GetProviderDetailsById(Guid id);
         Task<ProviderDetails> GetProviderDetailsByProviderIdAsync(Guid providerId);
+        void UpdateDetails(ProviderDetails provider);
     }
 }

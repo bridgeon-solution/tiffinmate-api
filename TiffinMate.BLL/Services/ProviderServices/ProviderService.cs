@@ -339,7 +339,47 @@ namespace TiffinMate.BLL.Services.ProviderServices
                 throw new Exception(ex.Message);
             }
         }
+        public async Task<bool> EditDetails(EditDetailsDto providerDetailsdto, IFormFile logo)
+        {
+            try
+            {
+           
+                var provider = await _providerRepository.GetProviderById(providerDetailsdto.provider_id);
+                if (provider == null)
+                {
+                    throw new Exception("No provider available with the specified ID.");
+                }
 
+           
+                var existingDetails = await _providerRepository.GetProviderDetailsByProviderIdAsync(providerDetailsdto.provider_id);
+                if (existingDetails == null)
+                {
+                    throw new Exception("Provider details not found.");
+                }
+
+                if (logo != null && logo.Length > 0)
+                {
+                    var logoUrl = await _cloudinary.UploadDocumentAsync(logo);
+                    existingDetails.logo = logoUrl;
+                }
+
+
+                existingDetails.Provider.email = providerDetailsdto.email;
+                existingDetails.Provider.user_name = providerDetailsdto.username;
+                existingDetails.address = providerDetailsdto.address;
+                existingDetails.phone_no = providerDetailsdto.phone_no;
+                existingDetails.updated_at = DateTime.UtcNow;
+
+                _providerRepository.UpdateDetails(existingDetails);
+                await _providerRepository.SaveChangesAsync();
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An error occurred while editing the provider details: " + ex.Message);
+            }
+        }
     }
 }
 

@@ -88,9 +88,9 @@ namespace TiffinMate.BLL.Services.ProviderServices
 
         }
         //foodbyprovider
-        public async Task<List<FoodItemResponceDto>> GetByProviderAsync(Guid id)
+        public async Task<List<FoodItemResponceDto>> GetByProviderAsync(Guid providerId, Guid? menuId)
         {
-            var result = await _foodItemRepository.GetByProviderAsync(id);
+            var result = await _foodItemRepository.GetByProviderAsync(providerId,menuId);
             var foodItemsDto = result.Select(e =>
             {
                 var dto = _mapper.Map<FoodItemResponceDto>(e);
@@ -116,9 +116,9 @@ namespace TiffinMate.BLL.Services.ProviderServices
             
         }
 
-        public async Task<List<MenuDto>> GetMenuAsync()
+        public async Task<List<MenuDto>> GetMenuAsync(Guid? providerId)
         {
-            var result = await _foodItemRepository.GetAllMenuAsync();
+            var result = await _foodItemRepository.GetAllMenuAsync(providerId);
             if (result == null)
             {
                 return null;

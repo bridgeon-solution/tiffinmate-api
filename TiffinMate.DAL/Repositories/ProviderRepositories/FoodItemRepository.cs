@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Http.Features;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -53,14 +54,22 @@ namespace TiffinMate.DAL.Repositories.ProviderRepositories
             return "Category added";
         }
 
-        public async Task<List<FoodItem>> GetByProviderAsync(Guid providerId)
+        public async Task<List<FoodItem>> GetByProviderAsync(Guid providerId, Guid? menuId)
         {
+
+            var items = _context.FoodItems
+              .Include(f => f.category)
+              .Include(c => c.menu)
+              .Where(f => f.provider_id == providerId);
+                  
+
+            if (menuId != null)
+            {
+                items = items.Where(f => f.menu_id == menuId);
+
+            }
+            return await items.ToListAsync();
             
-             return await _context.FoodItems
-                    .Include(f => f.category)
-                    .Include(c=>c.menu)
-                    .Where(f=>f.provider_id==providerId)
-                    .ToListAsync();
         
         }
 
@@ -71,10 +80,16 @@ namespace TiffinMate.DAL.Repositories.ProviderRepositories
         }
 
 
-        public async Task<List<Menu>> GetAllMenuAsync()
+        public async Task<List<Menu>> GetAllMenuAsync(Guid?providerId)
         {
-
-            return await _context.menus.ToListAsync();
+            if (providerId != null)
+            {
+                return await _context.menus.Where(e=>e.provider_id == providerId).ToListAsync();
+            }
+            else
+            {
+                return await _context.menus.ToListAsync();
+            }
         }
 
         public async Task<string> AddMenuAsync(Menu menus)

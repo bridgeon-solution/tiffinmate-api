@@ -16,10 +16,10 @@ namespace TiffinMate.BLL.Interfaces.ProviderServiceInterafce
         Task<bool> AddFoodItemAsync(FoodItemDto foodItemDto, IFormFile image);
 
         Task<string> AddCategories( CategoryDto category);
-        Task<List<FoodItemResponceDto>> GetByProviderAsync(Guid id);
+        Task<List<FoodItemResponceDto>> GetByProviderAsync(Guid providerId,Guid?menuId);
         Task<List<Categories>> GetCategoryAsync();
 
-        Task<List<MenuDto>> GetMenuAsync();
+        Task<List<MenuDto>> GetMenuAsync(Guid?providerId);
 
         Task<bool> AddMenuAsync(MenuRequestDto menu, IFormFile image);
 

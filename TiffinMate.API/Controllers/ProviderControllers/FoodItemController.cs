@@ -83,9 +83,9 @@ namespace TiffinMate.API.Controllers.ProviderControllers
         }
 
         [HttpGet("providerid/{id}")]
-        public async Task<IActionResult> GetByProvider(Guid id)
+        public async Task<IActionResult> GetByProvider(Guid id,Guid?menuId)
         {
-            var result = await _foodItemService.GetByProviderAsync(id);
+            var result = await _foodItemService.GetByProviderAsync(id,menuId);
             if (result == null || !result.Any())
             {
                 return Ok(new ApiResponse<string>("failure", "No food items found for the given provider. ", null, HttpStatusCode.NotFound, "No food items found for the given provider."
@@ -114,9 +114,9 @@ namespace TiffinMate.API.Controllers.ProviderControllers
         }
 
         [HttpGet("menu")]
-        public async Task<IActionResult> Getmenu()
+        public async Task<IActionResult> Getmenu([FromQuery] Guid? providerId)
         {
-            var result = await _foodItemService.GetMenuAsync();
+            var result = await _foodItemService.GetMenuAsync(providerId);
             if (result == null || !result.Any())
             {
                 return NotFound(new ApiResponse<string>("failure", "No menu found", null, HttpStatusCode.NotFound, "No menu found"

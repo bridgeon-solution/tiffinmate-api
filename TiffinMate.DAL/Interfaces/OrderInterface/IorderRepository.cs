@@ -7,7 +7,7 @@ using TiffinMate.DAL.Entities.ProviderEntity;
 
 namespace TiffinMate.DAL.Interfaces.OrderInterface
 {
-    public interface IorderInterface
+    public interface IOrderRepository
     {
         public Task<List<Categories>> CreateOrder();
     }

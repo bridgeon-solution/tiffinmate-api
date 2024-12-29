@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TiffinMate.DAL.DbContexts;
@@ -11,9 +12,11 @@ using TiffinMate.DAL.DbContexts;
 namespace TiffinMate.DAL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241229035306_remove junctiontable")]
+    partial class removejunctiontable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,6 +24,21 @@ namespace TiffinMate.DAL.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("CategoriesOrder", b =>
+                {
+                    b.Property<Guid>("categoryid")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("orderid")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("categoryid", "orderid");
+
+                    b.HasIndex("orderid");
+
+                    b.ToTable("CategoriesOrder");
+                });
 
             modelBuilder.Entity("TiffinMate.DAL.Entities.Admin", b =>
                 {
@@ -104,6 +122,9 @@ namespace TiffinMate.DAL.Migrations
                     b.Property<Guid?>("Menuid")
                         .HasColumnType("uuid");
 
+                    b.Property<Guid>("category_id")
+                        .HasColumnType("uuid");
+
                     b.Property<DateTime?>("created_at")
                         .HasColumnType("timestamp with time zone");
 
@@ -150,9 +171,6 @@ namespace TiffinMate.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<Guid>("category_id")
-                        .HasColumnType("uuid");
-
                     b.Property<string>("city")
                         .IsRequired()
                         .HasColumnType("text");
@@ -183,7 +201,8 @@ namespace TiffinMate.DAL.Migrations
 
                     b.HasKey("id");
 
-                    b.HasIndex("order_id");
+                    b.HasIndex("order_id")
+                        .IsUnique();
 
                     b.ToTable("orderDetails");
                 });
@@ -547,6 +566,21 @@ namespace TiffinMate.DAL.Migrations
                     b.ToTable("users");
                 });
 
+            modelBuilder.Entity("CategoriesOrder", b =>
+                {
+                    b.HasOne("TiffinMate.DAL.Entities.ProviderEntity.Categories", null)
+                        .WithMany()
+                        .HasForeignKey("categoryid")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TiffinMate.DAL.Entities.OrderEntity.Order", null)
+                        .WithMany()
+                        .HasForeignKey("orderid")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("TiffinMate.DAL.Entities.OrderEntity.Order", b =>
                 {
                     b.HasOne("TiffinMate.DAL.Entities.ProviderEntity.Menu", null)
@@ -573,8 +607,8 @@ namespace TiffinMate.DAL.Migrations
             modelBuilder.Entity("TiffinMate.DAL.Entities.OrderEntity.OrderDetails", b =>
                 {
                     b.HasOne("TiffinMate.DAL.Entities.OrderEntity.Order", "order")
-                        .WithMany("details")
-                        .HasForeignKey("order_id")
+                        .WithOne("details")
+                        .HasForeignKey("TiffinMate.DAL.Entities.OrderEntity.OrderDetails", "order_id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -651,7 +685,8 @@ namespace TiffinMate.DAL.Migrations
 
             modelBuilder.Entity("TiffinMate.DAL.Entities.OrderEntity.Order", b =>
                 {
-                    b.Navigation("details");
+                    b.Navigation("details")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("TiffinMate.DAL.Entities.ProviderEntity.Categories", b =>

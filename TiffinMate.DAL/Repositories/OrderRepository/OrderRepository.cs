@@ -10,7 +10,7 @@ using TiffinMate.DAL.Interfaces.OrderInterface;
 
 namespace TiffinMate.DAL.Repositories.OrderRepository
 {
-    public class OrderRepository : IorderInterface
+    public class OrderRepository : IOrderRepository
     {
         private readonly AppDbContext _context;
 

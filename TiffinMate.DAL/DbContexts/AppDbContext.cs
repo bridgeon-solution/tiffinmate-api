@@ -32,6 +32,7 @@ namespace TiffinMate.DAL.DbContexts
         public DbSet<Notification> notifications { get; set; }
         public DbSet<Order> order { get; set; }
         public DbSet<OrderDetails> orderDetails { get; set; }
+        //public DbSet<OrderCategory> orderCategory { get; set; }
 
 
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
@@ -170,9 +171,10 @@ namespace TiffinMate.DAL.DbContexts
                 .HasForeignKey(f => f.user_id)
                 .OnDelete(DeleteBehavior.Cascade);
 
-                entity.HasMany(o => o.category)
-                .WithOne(m => m.order)
-                .HasForeignKey(m => m.category_id)
+
+                entity.HasMany(m => m.details)
+                .WithOne(c => c.order)
+                .HasForeignKey(o => o.order_id)
                 .OnDelete(DeleteBehavior.Cascade);
 
                 entity.HasOne(m => m.provider)
@@ -180,16 +182,19 @@ namespace TiffinMate.DAL.DbContexts
                 .HasForeignKey(p => p.provider_id)
                 .OnDelete(DeleteBehavior.Cascade);
 
-                entity.HasOne(o => o.details)
+                entity.HasMany(o => o.details)
                 .WithOne(od => od.order)
-                .HasForeignKey<OrderDetails>(od => od.order_id)
+                .HasForeignKey(od => od.order_id)
                 .OnDelete(DeleteBehavior.Cascade);
 
+               
 
             });
 
            
 
+
+            
 
 
         }

@@ -38,6 +38,10 @@ using System.Net.WebSockets;
 using TiffinMate.BLL.Interfaces.NotificationInterface;
 
 using TiffinMate.BLL.Services.NotificationService;
+using TiffinMate.BLL.Interfaces.OrderServiceInterface;
+using TiffinMate.BLL.Services.OrderService;
+using TiffinMate.DAL.Interfaces.OrderInterface;
+using TiffinMate.DAL.Repositories.OrderRepository;
 
 namespace TiffinMate.API
 {
@@ -92,6 +96,8 @@ namespace TiffinMate.API
             builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
             builder.Services.AddScoped<INotificationRepository,NotificationRepository>();
             builder.Services.AddScoped<INotificationService, NotificationService>();
+            builder.Services.AddScoped<IOrderService, OrderService>();
+            builder.Services.AddScoped<IOrderRepository, OrderRepository>();
            
 
       

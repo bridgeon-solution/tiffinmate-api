@@ -11,19 +11,17 @@ namespace TiffinMate.DAL.Entities.OrderEntity
     {
         public Guid id { get; set; }
         public Guid user_id { get; set; }
-        public Guid category_id { get; set; }
         public Guid provider_id { get; set; }
-     
         public Guid menu_id { get; set; }
-
-        public DateTime start_date { get; set; }  
+        public string start_date { get; set; }  
         public decimal total_price { get; set; }
 
-        public OrderDetails details { get; set; }
+        public List<OrderDetails> details { get; set; }
         public User user { get; set; }
-        public ICollection<Categories> category { get; set; }
+   
 
         public Provider provider { get; set; }
-        
+       
+
     }
 }

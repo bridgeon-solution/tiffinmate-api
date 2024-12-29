@@ -18,7 +18,7 @@ namespace TiffinMate.DAL.Entities.ProviderEntity
         public List<FoodItem> food_items { get; set; }
 
 
-        public Guid category_id { get; set; }
-        public Order order { get; set; }
+        
+        
     }
 }

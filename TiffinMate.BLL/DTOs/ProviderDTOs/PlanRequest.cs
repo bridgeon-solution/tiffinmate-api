@@ -10,5 +10,6 @@ namespace TiffinMate.BLL.DTOs.ProviderDTOs
     {
         public string date { get; set; }
         public List<Guid> categories { get; set; }
+        public Guid menuId { get; set; }
     }
 }

@@ -54,19 +54,28 @@ namespace TiffinMate.API.Controllers.ProviderControllers
 
 
         [HttpGet("fooditem")]
-        public async Task<IActionResult> GetFoodItems()
+        public async Task<IActionResult> GetFoodItems(Guid? menuId,Guid?category_id)
         {
-            var result=await _foodItemService.GetFoodItemsAsync();
-            if(result== null)
+            if (menuId.HasValue && category_id.HasValue)
             {
-                return NotFound(new ApiResponse<string>("failure","No food items found", null,HttpStatusCode.NotFound, "No food items available"
-            ));
+                var res = await _foodItemService.GetFoodItemByMenu(menuId,category_id);
+                if (res == null)
+                {
+                    return NotFound(new ApiResponse<string>("failure", "No food items found for the specified menu.", null, HttpStatusCode.NotFound, "No food items available."));
+                }
 
-           }
+                return Ok(new ApiResponse<List<FoodItemDto>>("success", "Food item retrieved successfully.", res, HttpStatusCode.OK, ""));
+            }
 
-            var responce = new ApiResponse<List<FoodItemResponceDto>>("success", "Food items retrieved successfully",result, HttpStatusCode.OK,"");
-            return Ok(responce);
+            var result = await _foodItemService.GetFoodItemsAsync();
+            if (result == null)
+            {
+                return NotFound(new ApiResponse<string>("failure", "No food items found.", null, HttpStatusCode.NotFound, "No food items available."));
+            }
+
+            return Ok(new ApiResponse<List<FoodItemResponceDto>>("success", "Food items retrieved successfully.", result, HttpStatusCode.OK, ""));
         }
+
 
 
         [HttpGet("{id}")]
@@ -114,9 +123,9 @@ namespace TiffinMate.API.Controllers.ProviderControllers
         }
 
         [HttpGet("menu")]
-        public async Task<IActionResult> Getmenu()
+        public async Task<IActionResult> Getmenu([FromQuery] Guid? providerId)
         {
-            var result = await _foodItemService.GetMenuAsync();
+            var result = await _foodItemService.GetMenuAsync(providerId);
             if (result == null || !result.Any())
             {
                 return NotFound(new ApiResponse<string>("failure", "No menu found", null, HttpStatusCode.NotFound, "No menu found"
@@ -157,11 +166,11 @@ namespace TiffinMate.API.Controllers.ProviderControllers
             return Ok(result);
         }
         [HttpPost("total-amount")]
-        public async Task<IActionResult> CalculateTotal([FromBody] PlanRequest request)
+        public async Task<IActionResult> CalculateTotal([FromBody] PlanRequest request,bool is_subscription)
         {
             try
             {
-                var totalAmount = await _foodItemService.CalculateTotal(request);
+                var totalAmount = await _foodItemService.CalculateTotal(request,is_subscription);
                 return Ok(new ApiResponse<decimal>("success", "total calculated succesfully", totalAmount, HttpStatusCode.OK, ""));
 
             }

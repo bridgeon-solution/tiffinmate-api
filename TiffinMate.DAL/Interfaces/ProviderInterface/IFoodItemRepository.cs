@@ -10,14 +10,16 @@ namespace TiffinMate.DAL.Interfaces.ProviderInterface
     public interface IFoodItemRepository
     {
         Task<List<FoodItem>> GetAllAsync();
+        Task<List<FoodItem>> GetByMenu(Guid? menuId, Guid? category_id);
         Task<FoodItem> GetByIdAsync(Guid id);
         Task<string> AddItemAsync(FoodItem item);
         Task<string> AddCategoryAsync(Categories category);
         Task<List<FoodItem>> GetByProviderAsync(Guid providerId);
         Task<List<Categories>> GetAllCategory();
-        Task<List<Menu>> GetAllMenuAsync();
+        Task<List<Menu>> GetAllMenuAsync(Guid?providerId);
         Task<string> AddMenuAsync(Menu menus);
         Task<List<Menu>> GetMenuByProviderAsync(Guid providerId);
-        Task<decimal> GetTotalAmount(List<Guid> categoryIds, string day);
+        Task<decimal> GetTotalAmount(Guid menuId,List<Guid> categoryIds, string day);
+        Task<decimal> GetMonthlyTotalAmount(Guid menuId);
     }
 }

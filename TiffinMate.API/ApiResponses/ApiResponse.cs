@@ -15,8 +15,6 @@ namespace TiffinMate.API.ApiRespons
         {
             status = Status;
             message = Message;
-            statusCode = StatusCode;
-            error_message = Errormesage;
             result = Result;
             statusCode = StatusCode;
             error_message = Errormesage;

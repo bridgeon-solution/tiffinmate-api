@@ -47,7 +47,12 @@ namespace TiffinMate.BLL.Services.ProviderServices
             return foodItemsDto;
         }
 
+        public async Task<List<FoodItemDto>> GetFoodItemByMenu(Guid? menuId,Guid? category_id)
+        {
+            var result = await _foodItemRepository.GetByMenu(menuId,category_id);
+            return _mapper.Map<List<FoodItemDto>>(result);
 
+        }
 
         public async Task<FoodItemDto> GetFoodItemAsync(Guid id)
         {
@@ -88,9 +93,9 @@ namespace TiffinMate.BLL.Services.ProviderServices
 
         }
         //foodbyprovider
-        public async Task<List<FoodItemResponceDto>> GetByProviderAsync(Guid providerId, Guid? menuId)
+        public async Task<List<FoodItemResponceDto>> GetByProviderAsync(Guid id)
         {
-            var result = await _foodItemRepository.GetByProviderAsync(providerId,menuId);
+            var result = await _foodItemRepository.GetByProviderAsync(id);
             var foodItemsDto = result.Select(e =>
             {
                 var dto = _mapper.Map<FoodItemResponceDto>(e);
@@ -157,13 +162,20 @@ namespace TiffinMate.BLL.Services.ProviderServices
             await _foodItemRepository.AddMenuAsync(menuitem);
             return true;
         }
-        public async Task<decimal> CalculateTotal(PlanRequest request)
+        public async Task<decimal> CalculateTotal(PlanRequest request, bool is_subscription)
         {
-            if (string.IsNullOrEmpty(request.date) || request.categories == null || !request.categories.Any())
-                throw new ArgumentException("Invalid input data.");
-
-            var day = DateTime.Parse(request.date).DayOfWeek.ToString();
-            return await _foodItemRepository.GetTotalAmount(request.categories, day);
+            if (is_subscription)
+            {
+                var dayOfMonth = DateTime.Parse(request.date).Day;
+                var remainingDays = 30 - dayOfMonth + 1;
+                var total = await _foodItemRepository.GetMonthlyTotalAmount(request.menuId);
+                var totalForMonth = total / 3 * request.categories.Count();
+                return totalForMonth / 30 * remainingDays;
+            }
+          
+                var day = DateTime.Parse(request.date).DayOfWeek.ToString();
+                return await _foodItemRepository.GetTotalAmount(request.menuId, request.categories, day);
+                   
         }
 
        

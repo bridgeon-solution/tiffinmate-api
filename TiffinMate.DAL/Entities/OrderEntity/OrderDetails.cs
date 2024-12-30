@@ -13,6 +13,7 @@
             public string user_name { get; set; }
             public string address { get; set; }
             public string city { get; set; }
+            public string ph_no { get; set; }
             public string fooditem_name { get; set; }
             public string fooditem_image { get; set; }
             public Guid category_id { get; set; }

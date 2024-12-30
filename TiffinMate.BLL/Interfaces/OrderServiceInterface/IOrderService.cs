@@ -11,5 +11,9 @@ namespace TiffinMate.BLL.Interfaces.OrderServiceInterface
    public interface IOrderService
     {
         Task<OrderResponceDto> OrderCreate( OrderRequestDTO orderRequestDTO);
+
+        Task<string> RazorPayorderIdCreate(long price);
+        Task<bool> payment(RazorPayDto razorPayDto);
+
     }
 }

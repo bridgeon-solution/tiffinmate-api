@@ -15,6 +15,9 @@ namespace TiffinMate.DAL.Entities.OrderEntity
         public Guid menu_id { get; set; }
         public string start_date { get; set; }  
         public decimal total_price { get; set; }
+        public string order_string { get; set; }
+        public string transaction_id { get; set; }
+        public bool payment_status { get; set; }=false;
 
         public List<OrderDetails> details { get; set; }
         public User user { get; set; }

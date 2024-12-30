@@ -164,18 +164,21 @@ namespace TiffinMate.BLL.Services.ProviderServices
         }
         public async Task<decimal> CalculateTotal(PlanRequest request, bool is_subscription)
         {
+            decimal totalAmount;
             if (is_subscription)
             {
                 var dayOfMonth = DateTime.Parse(request.date).Day;
                 var remainingDays = 30 - dayOfMonth + 1;
                 var total = await _foodItemRepository.GetMonthlyTotalAmount(request.menuId);
                 var totalForMonth = total / 3 * request.categories.Count();
-                return totalForMonth / 30 * remainingDays;
+                totalAmount= totalForMonth / 30 * remainingDays;
             }
-          
+            else
+            {
                 var day = DateTime.Parse(request.date).DayOfWeek.ToString();
-                return await _foodItemRepository.GetTotalAmount(request.menuId, request.categories, day);
-                   
+                totalAmount = await _foodItemRepository.GetTotalAmount(request.menuId, request.categories, day);
+            }
+            return Math.Ceiling(totalAmount);
         }
 
        

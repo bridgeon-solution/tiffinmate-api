@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TiffinMate.DAL.Entities.OrderEntity;
 
 namespace TiffinMate.DAL.Entities.ProviderEntity
 {
@@ -25,5 +26,9 @@ namespace TiffinMate.DAL.Entities.ProviderEntity
         public decimal monthly_plan_amount { get; set; }
         public List<FoodItem> food_items { get; set; }
         public Provider provider { get; set; }
+
+        public List<Order>order { get; set; }
+
+        
     }
 }

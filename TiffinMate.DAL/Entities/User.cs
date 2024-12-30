@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TiffinMate.DAL.Entities.OrderEntity;
 
 namespace TiffinMate.DAL.Entities
 {
@@ -28,5 +29,7 @@ namespace TiffinMate.DAL.Entities
         public string? image { get; set; }
         public bool is_blocked { get; set; }
         public ICollection<Review> review { get; set; }
+        public ICollection<Order> order { get; set; }
+
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Razorpay.Api;
 using sib_api_v3_sdk.Model;
 using System;
 using System.Collections.Generic;
@@ -19,11 +20,18 @@ namespace TiffinMate.BLL.Services.OrderService
     {
         private readonly IOrderRepository _orderRepository;
         private readonly AppDbContext _context;
+        private readonly string _KeyId;
+        private readonly string _KeySecret;
+
         public OrderService( IOrderRepository  orderRepository,AppDbContext appDbContext) {
 
             _orderRepository = orderRepository;
             _context = appDbContext;
+            _KeyId = Environment.GetEnvironmentVariable("RazorPay_KeyId");
+            _KeySecret = Environment.GetEnvironmentVariable("RazorPay_KeySecret");
         }
+
+        //post order details
         public async Task<OrderResponceDto> OrderCreate( OrderRequestDTO orderRequestDTO)
         {
             
@@ -67,6 +75,8 @@ namespace TiffinMate.BLL.Services.OrderService
                 provider_id = orderRequestDTO.provider_id,
                 menu_id = orderRequestDTO.menu_id,
                 start_date = orderRequestDTO.date,
+                order_string = orderRequestDTO.order_string,
+                transaction_id=orderRequestDTO.transacttion_id
             };
 
             await _context.order.AddAsync(newOrder);
@@ -92,6 +102,7 @@ namespace TiffinMate.BLL.Services.OrderService
                         user_name = orderRequestDTO.user_name,
                         address = orderRequestDTO.address,
                         city = orderRequestDTO.city,
+                        ph_no = orderRequestDTO.ph_no,
                         fooditem_name = foodItem.food_name, 
                         fooditem_image = foodItem.image,   
                         order_id = orderId,               
@@ -117,6 +128,46 @@ namespace TiffinMate.BLL.Services.OrderService
                 StartDate = newOrder.start_date,
                 
             };
+        }
+
+        //razaorpay id create
+
+        public async Task<string> RazorPayorderIdCreate(long price)
+        {
+            Dictionary<string,object> input=new Dictionary<string,object>();
+            Random random = new Random();
+            string TransactionId=random.Next(0,100).ToString();
+            input.Add("amount", Convert.ToDecimal(price) * 100);
+            input.Add("currency", "INR");
+            input.Add("receipt", TransactionId);
+
+           
+            RazorpayClient client=new RazorpayClient(_KeyId, _KeySecret);
+            Razorpay.Api.Order order=client.Order.Create(input);
+            var OrderId = order["id"].ToString();   
+            return OrderId;
+
+        }
+
+        //payment
+        public async Task <bool> payment(RazorPayDto razorPayDto)
+        {
+            if (razorPayDto == null ||
+                razorPayDto.razor_id == null ||
+                razorPayDto.razor_orderid == null ||
+                razorPayDto.razor_sign == null)
+                return false;
+           
+                RazorpayClient razorpay = new RazorpayClient(_KeyId,_KeySecret);
+                Dictionary<string, string> attributes = [];
+                attributes.Add("Razorpay_paymentId", razorPayDto.razor_id);
+                attributes.Add("Razorpay_orderId", razorPayDto.razor_orderid);
+                attributes.Add("Razorpay_signature", razorPayDto.razor_sign);
+                Utils.verifyPaymentLinkSignature(attributes);
+                return true;
+
+            
+               
         }
 
 

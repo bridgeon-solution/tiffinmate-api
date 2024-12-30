@@ -241,40 +241,57 @@ namespace TiffinMate.BLL.Services.ProviderServices
             };
         }
 
-        public async Task<List<ProviderResponseDTO>> GetProviders(int page, int pageSize, string search = null, string filter = null, string verifystatus = null)
+        public async Task<ProviderResultDTO> GetProviders(int page, int pageSize, string search = null, string filter = null, string verifystatus = null)
         {
-            var provider = await _providerRepository.GetProviders();
+            var providerList = await _providerRepository.GetProviders();
+            if (providerList == null)
+            {
+                throw new InvalidOperationException("No providers found.");
+            }
+            var providers = providerList.AsQueryable();
 
             if (!string.IsNullOrEmpty(search))
             {
-                provider = provider.Where(u => u.user_name.Contains(search, StringComparison.OrdinalIgnoreCase) ||
-                                               u.email.Contains(search, StringComparison.OrdinalIgnoreCase)).ToList();
+                providers = providers.Where(u =>
+                    (u.user_name != null && u.user_name.Contains(search, StringComparison.OrdinalIgnoreCase)) ||
+                    (u.email != null && u.email.Contains(search, StringComparison.OrdinalIgnoreCase)));
             }
 
             if (!string.IsNullOrEmpty(filter))
             {
                 if (filter.ToLower() == "true")
                 {
-                    provider = provider.Where(u => u.is_blocked == true).ToList();
+                    providers = providers.Where(u => u.is_blocked);
                 }
                 else if (filter.ToLower() == "false")
                 {
-                    provider = provider.Where(u => u.is_blocked == false).ToList();
+                    providers = providers.Where(u => !u.is_blocked);
                 }
             }
+
             if (!string.IsNullOrEmpty(verifystatus))
             {
-                provider = provider.Where(u => u.verification_status.Equals(verifystatus, StringComparison.OrdinalIgnoreCase)).ToList();
+                providers = providers.Where(u =>
+                    u.verification_status != null &&
+                    u.verification_status.Equals(verifystatus, StringComparison.OrdinalIgnoreCase));
             }
 
-            var providerPaged = provider
-               .OrderByDescending(u => u.created_at)
-               .Skip((page - 1) * pageSize)
-               .Take(pageSize);
+            var totalCount = providers.Count();
 
-            
-            return _mapper.Map<List<ProviderResponseDTO>>(providerPaged);
+            var pagedProviders = providers
+                .OrderByDescending(u => u.created_at)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            return new ProviderResultDTO
+            {
+                TotalCount = totalCount,
+                Providers = _mapper.Map<List<ProviderResponseDTO>>(pagedProviders)
+            };
         }
+
+
         public async Task<ProviderByIdDto> ProviderById(Guid providerId)
         {
             var provider = await _providerRepository.GetAProviderById(providerId);
@@ -286,7 +303,7 @@ namespace TiffinMate.BLL.Services.ProviderServices
             {
                 username = providers.user_name,
                 email = providers.email,
-                address = providers.provider_details.address,
+                address = providers.provider_details.address, 
                 phone_no = providers.provider_details.phone_no,
                 verification_status = providers.verification_status,
                 image = providers.provider_details.logo,
@@ -322,7 +339,47 @@ namespace TiffinMate.BLL.Services.ProviderServices
                 throw new Exception(ex.Message);
             }
         }
+        public async Task<bool> EditDetails(EditDetailsDto providerDetailsdto, IFormFile logo)
+        {
+            try
+            {
+           
+                var provider = await _providerRepository.GetProviderById(providerDetailsdto.provider_id);
+                if (provider == null)
+                {
+                    throw new Exception("No provider available with the specified ID.");
+                }
 
+           
+                var existingDetails = await _providerRepository.GetProviderDetailsByProviderIdAsync(providerDetailsdto.provider_id);
+                if (existingDetails == null)
+                {
+                    throw new Exception("Provider details not found.");
+                }
+
+                if (logo != null && logo.Length > 0)
+                {
+                    var logoUrl = await _cloudinary.UploadDocumentAsync(logo);
+                    existingDetails.logo = logoUrl;
+                }
+
+
+                existingDetails.Provider.email = providerDetailsdto.email;
+                existingDetails.Provider.user_name = providerDetailsdto.username;
+                existingDetails.address = providerDetailsdto.address;
+                existingDetails.phone_no = providerDetailsdto.phone_no;
+                existingDetails.updated_at = DateTime.UtcNow;
+
+                _providerRepository.UpdateDetails(existingDetails);
+                await _providerRepository.SaveChangesAsync();
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An error occurred while editing the provider details: " + ex.Message);
+            }
+        }
     }
 }
 

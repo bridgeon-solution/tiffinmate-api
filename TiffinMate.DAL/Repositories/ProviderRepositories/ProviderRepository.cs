@@ -111,7 +111,11 @@ namespace TiffinMate.DAL.Repositories.ProviderRepositories
         {
             return await _context.ProvidersDetails.FirstOrDefaultAsync(pd => pd.provider_id == providerId);
         }
+        public async void UpdateDetails(ProviderDetails provider)
+        {
+            _context.ProvidersDetails.Update(provider);
 
+        }
     }
 }
 

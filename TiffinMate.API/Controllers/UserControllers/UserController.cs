@@ -284,13 +284,13 @@ namespace TiffinMate.API.Controllers.UserControllers
         }
 
         [HttpGet]
-
+    
         public async Task<IActionResult> GetUsers(int pageSize , int page , string search="", string filter = "")
         {
             try
             {
                 var response = await _userService.GetUsers(page, pageSize,search,filter);
-                return Ok(new ApiResponse<List<UserResponseDTO>>("success", "provider getted", response, HttpStatusCode.OK, ""));
+                return Ok(new ApiResponse<UserResultDTO>("success", "provider getted", response, HttpStatusCode.OK, ""));
 
 
             }

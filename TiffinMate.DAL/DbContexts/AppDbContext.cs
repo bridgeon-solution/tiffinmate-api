@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TiffinMate.DAL.Entities;
+using TiffinMate.DAL.Entities.OrderEntity;
 using TiffinMate.DAL.Entities.ProviderEntity;
 using User = TiffinMate.DAL.Entities.User;
 
@@ -28,6 +29,11 @@ namespace TiffinMate.DAL.DbContexts
         public DbSet<Review> Reviews { get; set; }
 
         public DbSet<Menu> menus { get; set; }
+        public DbSet<Notification> notifications { get; set; }
+        public DbSet<Order> order { get; set; }
+        public DbSet<OrderDetails> orderDetails { get; set; }
+        //public DbSet<OrderCategory> orderCategory { get; set; }
+
 
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -152,8 +158,43 @@ namespace TiffinMate.DAL.DbContexts
                 entity.Property(m=>m.is_available)
                 .HasDefaultValue(true);
 
+                entity.Property(m => m.monthly_plan_amount)
+                .HasPrecision(18, 2)
+                .HasDefaultValue(0);
+
             });
 
+            modelBuilder.Entity<Order>(entity =>
+            {
+                entity.HasOne(m => m.user)
+                .WithMany(m => m.order)
+                .HasForeignKey(f => f.user_id)
+                .OnDelete(DeleteBehavior.Cascade);
+
+
+                entity.HasMany(m => m.details)
+                .WithOne(c => c.order)
+                .HasForeignKey(o => o.order_id)
+                .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(m => m.provider)
+                .WithMany(p => p.order)
+                .HasForeignKey(p => p.provider_id)
+                .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasMany(o => o.details)
+                .WithOne(od => od.order)
+                .HasForeignKey(od => od.order_id)
+                .OnDelete(DeleteBehavior.Cascade);
+
+               
+
+            });
+
+           
+
+
+            
 
 
         }

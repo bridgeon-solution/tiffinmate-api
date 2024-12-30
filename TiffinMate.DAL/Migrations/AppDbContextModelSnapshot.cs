@@ -44,7 +44,7 @@ namespace TiffinMate.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("username")
+                    b.Property<string>("user_name")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -95,13 +95,121 @@ namespace TiffinMate.DAL.Migrations
                     b.ToTable("ApiLogs");
                 });
 
+            modelBuilder.Entity("TiffinMate.DAL.Entities.OrderEntity.Order", b =>
+                {
+                    b.Property<Guid>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("Menuid")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("created_at")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool?>("is_delete")
+                        .HasColumnType("boolean");
+
+                    b.Property<Guid>("menu_id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("order_string")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("payment_status")
+                        .HasColumnType("boolean");
+
+                    b.Property<Guid>("provider_id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("start_date")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<decimal>("total_price")
+                        .HasColumnType("numeric");
+
+                    b.Property<string>("transaction_id")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("updated_at")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("user_id")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("id");
+
+                    b.HasIndex("Menuid");
+
+                    b.HasIndex("provider_id");
+
+                    b.HasIndex("user_id");
+
+                    b.ToTable("order");
+                });
+
+            modelBuilder.Entity("TiffinMate.DAL.Entities.OrderEntity.OrderDetails", b =>
+                {
+                    b.Property<Guid>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("address")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("category_id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("city")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("created_at")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("fooditem_image")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("fooditem_name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool?>("is_delete")
+                        .HasColumnType("boolean");
+
+                    b.Property<Guid>("order_id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ph_no")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("updated_at")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("user_name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("id");
+
+                    b.HasIndex("order_id");
+
+                    b.ToTable("orderDetails");
+                });
+
             modelBuilder.Entity("TiffinMate.DAL.Entities.ProviderEntity.Categories", b =>
                 {
                     b.Property<Guid>("id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<string>("categoryname")
+                    b.Property<string>("category_name")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -121,11 +229,11 @@ namespace TiffinMate.DAL.Migrations
 
             modelBuilder.Entity("TiffinMate.DAL.Entities.ProviderEntity.FoodItem", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<Guid>("id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("categoryid")
+                    b.Property<Guid>("category_id")
                         .HasColumnType("uuid");
 
                     b.Property<DateTime?>("created_at")
@@ -139,7 +247,7 @@ namespace TiffinMate.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("foodname")
+                    b.Property<string>("food_name")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -156,19 +264,19 @@ namespace TiffinMate.DAL.Migrations
                     b.Property<decimal>("price")
                         .HasColumnType("numeric");
 
-                    b.Property<Guid>("providerid")
+                    b.Property<Guid>("provider_id")
                         .HasColumnType("uuid");
 
                     b.Property<DateTime?>("updated_at")
                         .HasColumnType("timestamp with time zone");
 
-                    b.HasKey("Id");
+                    b.HasKey("id");
 
-                    b.HasIndex("categoryid");
+                    b.HasIndex("category_id");
 
                     b.HasIndex("menu_id");
 
-                    b.HasIndex("providerid");
+                    b.HasIndex("provider_id");
 
                     b.ToTable("FoodItems");
                 });
@@ -198,6 +306,12 @@ namespace TiffinMate.DAL.Migrations
                     b.Property<bool?>("is_delete")
                         .HasColumnType("boolean");
 
+                    b.Property<decimal>("monthly_plan_amount")
+                        .ValueGeneratedOnAdd()
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)")
+                        .HasDefaultValue(0m);
+
                     b.Property<string>("name")
                         .IsRequired()
                         .HasColumnType("text");
@@ -213,6 +327,39 @@ namespace TiffinMate.DAL.Migrations
                     b.HasIndex("provider_id");
 
                     b.ToTable("menus");
+                });
+
+            modelBuilder.Entity("TiffinMate.DAL.Entities.ProviderEntity.Notification", b =>
+                {
+                    b.Property<int>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("id"));
+
+                    b.Property<DateTime?>("created_at")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool?>("is_delete")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("isread")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("message")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("title")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("updated_at")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("id");
+
+                    b.ToTable("notifications");
                 });
 
             modelBuilder.Entity("TiffinMate.DAL.Entities.ProviderEntity.Provider", b =>
@@ -256,7 +403,7 @@ namespace TiffinMate.DAL.Migrations
                     b.Property<DateTime?>("updated_at")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("username")
+                    b.Property<string>("user_name")
                         .HasColumnType("text");
 
                     b.Property<string>("verification_status")
@@ -276,9 +423,6 @@ namespace TiffinMate.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
                         .HasDefaultValueSql("gen_random_uuid()");
-
-                    b.Property<Guid>("ProviderId")
-                        .HasColumnType("uuid");
 
                     b.Property<string>("about")
                         .IsRequired()
@@ -312,6 +456,9 @@ namespace TiffinMate.DAL.Migrations
                     b.Property<int>("phone_no")
                         .HasColumnType("integer");
 
+                    b.Property<Guid>("provider_id")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("resturent_name")
                         .IsRequired()
                         .HasColumnType("text");
@@ -321,7 +468,7 @@ namespace TiffinMate.DAL.Migrations
 
                     b.HasKey("id");
 
-                    b.HasIndex("ProviderId")
+                    b.HasIndex("provider_id")
                         .IsUnique();
 
                     b.ToTable("ProvidersDetails");
@@ -333,17 +480,14 @@ namespace TiffinMate.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("ProviderId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
-
                     b.Property<DateTime?>("created_at")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<bool?>("is_delete")
                         .HasColumnType("boolean");
+
+                    b.Property<Guid>("provider_id")
+                        .HasColumnType("uuid");
 
                     b.Property<string>("review")
                         .IsRequired()
@@ -352,11 +496,14 @@ namespace TiffinMate.DAL.Migrations
                     b.Property<DateTime?>("updated_at")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<Guid>("user_id")
+                        .HasColumnType("uuid");
+
                     b.HasKey("id");
 
-                    b.HasIndex("ProviderId");
+                    b.HasIndex("provider_id");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("user_id");
 
                     b.ToTable("Reviews");
                 });
@@ -415,23 +562,57 @@ namespace TiffinMate.DAL.Migrations
                     b.ToTable("users");
                 });
 
+            modelBuilder.Entity("TiffinMate.DAL.Entities.OrderEntity.Order", b =>
+                {
+                    b.HasOne("TiffinMate.DAL.Entities.ProviderEntity.Menu", null)
+                        .WithMany("order")
+                        .HasForeignKey("Menuid");
+
+                    b.HasOne("TiffinMate.DAL.Entities.ProviderEntity.Provider", "provider")
+                        .WithMany("order")
+                        .HasForeignKey("provider_id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TiffinMate.DAL.Entities.User", "user")
+                        .WithMany("order")
+                        .HasForeignKey("user_id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("provider");
+
+                    b.Navigation("user");
+                });
+
+            modelBuilder.Entity("TiffinMate.DAL.Entities.OrderEntity.OrderDetails", b =>
+                {
+                    b.HasOne("TiffinMate.DAL.Entities.OrderEntity.Order", "order")
+                        .WithMany("details")
+                        .HasForeignKey("order_id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("order");
+                });
+
             modelBuilder.Entity("TiffinMate.DAL.Entities.ProviderEntity.FoodItem", b =>
                 {
                     b.HasOne("TiffinMate.DAL.Entities.ProviderEntity.Categories", "category")
-                        .WithMany("foodItems")
-                        .HasForeignKey("categoryid")
+                        .WithMany("food_items")
+                        .HasForeignKey("category_id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("TiffinMate.DAL.Entities.ProviderEntity.Menu", "menu")
-                        .WithMany("foodItems")
+                        .WithMany("food_items")
                         .HasForeignKey("menu_id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("TiffinMate.DAL.Entities.ProviderEntity.Provider", "provider")
-                        .WithMany("FoodItems")
-                        .HasForeignKey("providerid")
+                        .WithMany("food_items")
+                        .HasForeignKey("provider_id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -444,20 +625,20 @@ namespace TiffinMate.DAL.Migrations
 
             modelBuilder.Entity("TiffinMate.DAL.Entities.ProviderEntity.Menu", b =>
                 {
-                    b.HasOne("TiffinMate.DAL.Entities.ProviderEntity.Provider", "Provider")
-                        .WithMany("Menus")
+                    b.HasOne("TiffinMate.DAL.Entities.ProviderEntity.Provider", "provider")
+                        .WithMany("menus")
                         .HasForeignKey("provider_id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Provider");
+                    b.Navigation("provider");
                 });
 
             modelBuilder.Entity("TiffinMate.DAL.Entities.ProviderEntity.ProviderDetails", b =>
                 {
                     b.HasOne("TiffinMate.DAL.Entities.ProviderEntity.Provider", "Provider")
-                        .WithOne("ProviderDetails")
-                        .HasForeignKey("TiffinMate.DAL.Entities.ProviderEntity.ProviderDetails", "ProviderId")
+                        .WithOne("provider_details")
+                        .HasForeignKey("TiffinMate.DAL.Entities.ProviderEntity.ProviderDetails", "provider_id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -466,48 +647,59 @@ namespace TiffinMate.DAL.Migrations
 
             modelBuilder.Entity("TiffinMate.DAL.Entities.Review", b =>
                 {
-                    b.HasOne("TiffinMate.DAL.Entities.ProviderEntity.Provider", "Provider")
-                        .WithMany("Review")
-                        .HasForeignKey("ProviderId")
+                    b.HasOne("TiffinMate.DAL.Entities.ProviderEntity.Provider", "provider")
+                        .WithMany("review")
+                        .HasForeignKey("provider_id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("TiffinMate.DAL.Entities.User", "User")
-                        .WithMany("Review")
-                        .HasForeignKey("UserId")
+                    b.HasOne("TiffinMate.DAL.Entities.User", "user")
+                        .WithMany("review")
+                        .HasForeignKey("user_id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Provider");
+                    b.Navigation("provider");
 
-                    b.Navigation("User");
+                    b.Navigation("user");
+                });
+
+            modelBuilder.Entity("TiffinMate.DAL.Entities.OrderEntity.Order", b =>
+                {
+                    b.Navigation("details");
                 });
 
             modelBuilder.Entity("TiffinMate.DAL.Entities.ProviderEntity.Categories", b =>
                 {
-                    b.Navigation("foodItems");
+                    b.Navigation("food_items");
                 });
 
             modelBuilder.Entity("TiffinMate.DAL.Entities.ProviderEntity.Menu", b =>
                 {
-                    b.Navigation("foodItems");
+                    b.Navigation("food_items");
+
+                    b.Navigation("order");
                 });
 
             modelBuilder.Entity("TiffinMate.DAL.Entities.ProviderEntity.Provider", b =>
                 {
-                    b.Navigation("FoodItems");
+                    b.Navigation("food_items");
 
-                    b.Navigation("Menus");
+                    b.Navigation("menus");
 
-                    b.Navigation("ProviderDetails")
+                    b.Navigation("order");
+
+                    b.Navigation("provider_details")
                         .IsRequired();
 
-                    b.Navigation("Review");
+                    b.Navigation("review");
                 });
 
             modelBuilder.Entity("TiffinMate.DAL.Entities.User", b =>
                 {
-                    b.Navigation("Review");
+                    b.Navigation("order");
+
+                    b.Navigation("review");
                 });
 #pragma warning restore 612, 618
         }

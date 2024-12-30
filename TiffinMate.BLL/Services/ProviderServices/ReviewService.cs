@@ -92,7 +92,7 @@ namespace TiffinMate.BLL.Services.ProviderServices
 
                 if (reviews == null || !reviews.Any())
                 {
-                    throw new ArgumentException("No reviews found for the given provider .");
+                    return [];
                 }
 
                 var reviewDtos = reviews.Select(review => new AllReview
@@ -113,6 +113,60 @@ namespace TiffinMate.BLL.Services.ProviderServices
             {
                 throw new Exception($"An error occurred while fetching reviews: {ex.Message}");
             }
+        }
+        public async Task<PaginationReview> ReviewsList(Guid ProviderId, int page, int pageSize, string search = null, string filter = null)
+        {
+            var reviews = (await _reviewRepository.GetProviderReview(ProviderId)).ToList();
+
+            // Apply search filter
+            if (!string.IsNullOrEmpty(search))
+            {
+                reviews = reviews
+                    .Where(u => u.user.name.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                                u.user.email.Contains(search, StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+            }
+
+            // sort filter
+            if (!string.IsNullOrEmpty(filter))
+            {
+                if (filter.ToLower() == "true")
+                {
+                    reviews = reviews.OrderByDescending(u => u.created_at).ToList();
+                }
+                else if (filter.ToLower() == "false")
+                {
+                    reviews = reviews.OrderBy(u => u.created_at).ToList();
+                }
+            }
+
+            var totalCount = reviews.Count;
+
+            // pagination
+            var pagedReviews = reviews
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            var reviewDtos = pagedReviews.Select(review => new AllReview
+            {
+                id = review.id,
+                ProviderId = review.provider_id,
+                UserId = review.user_id,
+                review = review.review,
+                username = review.user?.name,
+                providername = review.provider?.user_name,
+                image = review.user.image,
+                created_at = review.created_at
+            }).ToList();
+
+            var result = new PaginationReview
+            {
+                TotalCount = totalCount,
+                reviews = reviewDtos
+            };
+
+            return result;
         }
 
     }

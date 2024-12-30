@@ -13,6 +13,7 @@ using TiffinMate.DAL.DbContexts;
 using TiffinMate.DAL.Entities.ProviderEntity;
 using TiffinMate.DAL.Interfaces.ProviderInterface;
 using Twilio.Rest.Trunking.V1;
+using static Supabase.Gotrue.Constants;
 
 namespace TiffinMate.BLL.Services.ProviderServices
 {
@@ -32,19 +33,26 @@ namespace TiffinMate.BLL.Services.ProviderServices
            
         }
 
-        public async Task<List<FoodItemDto>> GetFoodItemsAsync()
+        public async Task<List<FoodItemResponceDto>> GetFoodItemsAsync()
         {
             var result=await _foodItemRepository.GetAllAsync();
             var foodItemsDto = result.Select(e =>
             {
-                var dto = _mapper.Map<FoodItemDto>(e);
-                dto.categoryname = e.category?.category_name;
+                var dto = _mapper.Map<FoodItemResponceDto>(e);
+                dto.category_name = e.category?.category_name;
+                dto.menu_name = e.menu?.name;
+                dto.menu_id = e.menu.id;
                 return dto;
             }).ToList();
             return foodItemsDto;
         }
 
+        public async Task<List<FoodItemDto>> GetFoodItemByMenu(Guid? menuId,Guid? category_id)
+        {
+            var result = await _foodItemRepository.GetByMenu(menuId,category_id);
+            return _mapper.Map<List<FoodItemDto>>(result);
 
+        }
 
         public async Task<FoodItemDto> GetFoodItemAsync(Guid id)
         {
@@ -84,12 +92,22 @@ namespace TiffinMate.BLL.Services.ProviderServices
             return "Added successfully";
 
         }
-
-        public async Task<List<FoodItemDto>> GetByProviderAsync(Guid id)
+        //foodbyprovider
+        public async Task<List<FoodItemResponceDto>> GetByProviderAsync(Guid id)
         {
             var result = await _foodItemRepository.GetByProviderAsync(id);
-            return _mapper.Map<List<FoodItemDto>>(result);
+            var foodItemsDto = result.Select(e =>
+            {
+                var dto = _mapper.Map<FoodItemResponceDto>(e);
+                dto.category_name = e.category?.category_name;
+                dto.menu_name = e.menu?.name;
+                //dto.menu_id = e.menu.id;
+                return dto;
+            }).ToList();
+            return foodItemsDto;
+            
         }
+
 
         public async Task<List<Categories>> GetCategoryAsync()
         {
@@ -102,6 +120,71 @@ namespace TiffinMate.BLL.Services.ProviderServices
             
             
         }
+
+        public async Task<List<MenuDto>> GetMenuAsync(Guid? providerId)
+        {
+            var result = await _foodItemRepository.GetAllMenuAsync(providerId);
+            if (result == null)
+            {
+                return null;
+            }
+            return _mapper.Map<List<MenuDto>>(result);
+
+
+        }
+
+        public async Task<List<MenuDto>> ByProvider(Guid id)
+        {
+            var result = await _foodItemRepository.GetMenuByProviderAsync(id);
+            return _mapper.Map<List<MenuDto>>(result);
+        }
+
+        public async Task<bool> AddMenuAsync(MenuRequestDto menu, IFormFile image)
+        {
+            if (menu == null)
+                throw new ArgumentNullException(nameof(menu));
+
+            if (image == null)
+                throw new ArgumentNullException(nameof(image));
+
+
+            var imageUrl = await _cloudinary.UploadDocumentAsync(image);
+
+            if (string.IsNullOrEmpty(imageUrl))
+            {
+
+                return false;
+            }
+
+            var menuitem = _mapper.Map<Menu>(menu);
+            menuitem.image = imageUrl;
+
+            await _foodItemRepository.AddMenuAsync(menuitem);
+            return true;
+        }
+        public async Task<decimal> CalculateTotal(PlanRequest request, bool is_subscription)
+        {
+            decimal totalAmount;
+            if (is_subscription)
+            {
+                var dayOfMonth = DateTime.Parse(request.date).Day;
+                var remainingDays = 30 - dayOfMonth + 1;
+                var total = await _foodItemRepository.GetMonthlyTotalAmount(request.menuId);
+                var totalForMonth = total / 3 * request.categories.Count();
+                totalAmount= totalForMonth / 30 * remainingDays;
+            }
+            else
+            {
+                var day = DateTime.Parse(request.date).DayOfWeek.ToString();
+                totalAmount = await _foodItemRepository.GetTotalAmount(request.menuId, request.categories, day);
+            }
+            return Math.Ceiling(totalAmount);
+        }
+
+       
+
+
+
 
     }
 }

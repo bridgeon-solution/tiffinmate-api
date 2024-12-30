@@ -32,6 +32,16 @@ using Microsoft.AspNetCore.Mvc;
 using Asp.Versioning;
 using TiffinMate.DAL.Interfaces.ReviewInterface;
 using TiffinMate.DAL.Repositories.ReviewRepository;
+using TiffinMate.DAL.Interfaces.NotificationInterfaces;
+using TiffinMate.DAL.Repositories.NotificationRepository;
+using System.Net.WebSockets;
+using TiffinMate.BLL.Interfaces.NotificationInterface;
+
+using TiffinMate.BLL.Services.NotificationService;
+using TiffinMate.BLL.Interfaces.OrderServiceInterface;
+using TiffinMate.BLL.Services.OrderService;
+using TiffinMate.DAL.Interfaces.OrderInterface;
+using TiffinMate.DAL.Repositories.OrderRepository;
 
 namespace TiffinMate.API
 {
@@ -53,7 +63,7 @@ namespace TiffinMate.API
             var brevoApiKey = Environment.GetEnvironmentVariable("BREVO_API_KEY");
             var brevoApiUrl = Environment.GetEnvironmentVariable("BREVO_API_URL");
             var brevoFromEmail = Environment.GetEnvironmentVariable("BREVO_FROM_EMAIL");
-            Console.WriteLine($"Brevo API Key: {brevoApiKey}");
+           
             // Add services to the container.
             builder.Services.AddControllers();
 
@@ -83,8 +93,15 @@ namespace TiffinMate.API
             builder.Services.AddScoped<ICloudinaryService, CloudinaryServices>();
             builder.Services.AddScoped<IProviderVerificationService, ProviderVerificationService>();
             builder.Services.AddScoped<IReviewService, ReviewService>();
-
             builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
+            builder.Services.AddScoped<INotificationRepository,NotificationRepository>();
+            builder.Services.AddScoped<INotificationService, NotificationService>();
+            builder.Services.AddScoped<IOrderService, OrderService>();
+            builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+           
+
+      
+
             builder.Services.Configure<BrevoSettings>(options =>
             {
                 options.ApiKey = brevoApiKey;
@@ -153,7 +170,50 @@ namespace TiffinMate.API
             });
 
             var app = builder.Build();
-           
+
+          
+
+            app.UseWebSockets(new WebSocketOptions
+            {
+                KeepAliveInterval = TimeSpan.FromMinutes(2)
+            });
+
+            app.UseWebSockets(new WebSocketOptions
+            {
+                KeepAliveInterval = TimeSpan.FromMinutes(2)
+            });
+
+            app.Map("/ws", async context =>
+            {
+                if (context.WebSockets.IsWebSocketRequest)
+                {
+                    var socket = await context.WebSockets.AcceptWebSocketAsync();
+                    var socketId = Guid.NewGuid().ToString();
+                    WebSocketManager.AddSocket(socketId, socket);
+
+                    try
+                    {
+                        var buffer = new byte[1024 * 4];
+                        WebSocketReceiveResult result;
+                        do
+                        {
+                            result = await socket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+                        } while (!result.CloseStatus.HasValue);
+
+                        WebSocketManager.RemoveSocket(socketId);
+                        await socket.CloseAsync(result.CloseStatus.Value, result.CloseStatusDescription, CancellationToken.None);
+                    }
+                    catch (Exception ex)
+                    {
+                        WebSocketManager.RemoveSocket(socketId);
+                    }
+                }
+                else
+                {
+                    context.Response.StatusCode = 400;
+                }
+            });
+
             if (env == "Development")
             {
                 app.UseSwagger();

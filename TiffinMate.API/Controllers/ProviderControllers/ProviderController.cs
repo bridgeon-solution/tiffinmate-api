@@ -1,6 +1,8 @@
 ﻿using Amazon.S3;
+using Amazon.S3.Model;
 using Asp.Versioning;
 using AutoMapper;
+using CloudinaryDotNet;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -213,7 +215,7 @@ namespace TiffinMate.API.Controllers.ControllerProvider
             var provider = await _providerService.ProviderById(providerid);
             if (provider == null)
             {
-                return NotFound(new ApiResponse<ProviderByIdDto>("failure", "No Provider Found", null, HttpStatusCode.NotFound, "No provider found for the given ID."));
+                return Ok(new ApiResponse<ProviderByIdDto>("failure", "No Provider Found", null, HttpStatusCode.NotFound, "No provider found for the given ID."));
             }
 
             return Ok(new ApiResponse<ProviderByIdDto>("success", "Provider Retrieved", provider, HttpStatusCode.OK, ""));
@@ -352,6 +354,67 @@ namespace TiffinMate.API.Controllers.ControllerProvider
             catch (Exception ex)
             {
                 return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse<string>("failure", "Error Occurred", null, HttpStatusCode.InternalServerError, ex.Message));
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetProviders(int page, int pageSize, string search = null, string filter = null, string verifystatus = null)
+        {
+            try
+            {
+                var res = await _providerService.GetProviders(page, pageSize, search, filter, verifystatus);
+                return Ok(new ApiResponse<ProviderResultDTO>("success", "Provider fetched successfully", res, HttpStatusCode.OK, null));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse<string>("failure", "Error Occurred", null, HttpStatusCode.InternalServerError, ex.Message));
+            }
+
+        }
+
+        [HttpPut("editdetails")]
+        public async Task<IActionResult> EditProviderDetails([FromForm] EditDetailsDto editProviderDTO, IFormFile logo)
+        {
+            try
+            {
+                var result = await _providerService.EditDetails(editProviderDTO, logo);
+
+                // Convert result to string if necessary
+                return Ok(new ApiResponse<string>("success", "Provider details edited successfully", result.ToString(), HttpStatusCode.OK, ""));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse<string>("failure", "Failed", null, HttpStatusCode.InternalServerError, ex.Message));
+            }
+        }
+
+        [HttpGet("{providerId}/reviews/list")]
+        public async Task<IActionResult> ReviewsList(
+    Guid providerId,
+    int page = 1,
+    int pageSize = 10,
+    string search = null,
+    string filter = null)
+        {
+            try
+            {
+                // Fetch paginated reviews list
+                var response = await _reviewService.ReviewsList(providerId, page, pageSize, search, filter);
+
+                // Check if the response is null or empty
+                if (response == null)
+                {
+                    return NotFound(new ApiResponse<string>("failure", "No reviews found", null, HttpStatusCode.NotFound, "No reviews available for the given provider."));
+                }
+
+                // Wrap the PaginationReview response in a list
+                var paginationReviewsList = new List<PaginationReview> { response };
+
+                return Ok(new ApiResponse<List<PaginationReview>>("success", "Reviews retrieved successfully", paginationReviewsList, HttpStatusCode.OK, ""));
+            }
+            catch (Exception ex)
+            {
+                return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse<string>("failure", "Error occurred", ex.Message, HttpStatusCode.InternalServerError, "An error occurred while fetching reviews."));
             }
         }
     }

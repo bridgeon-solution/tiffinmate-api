@@ -77,7 +77,8 @@ namespace TiffinMate.BLL.Services.UserServices
                 city=user.city,
                 image= user.image,
                 is_blocked=user.is_blocked,
-                subscription_status=user.subscription_status
+                subscription_status=user.subscription_status,
+                created_at=user.created_at
             };
         }
 
@@ -112,36 +113,40 @@ namespace TiffinMate.BLL.Services.UserServices
             await _userRepository.UpdateUser(user);
             return "Updated successfully";
         }
-        public async Task<List<UserResponseDTO>> GetUsers(int page, int pageSize, string search=null, string filter=null)
+        public async Task<UserResultDTO> GetUsers(int page, int pageSize, string search = null, string filter = null)
         {
-            var users = await _userRepository.GetUsers();
+            var allUsers = (await _userRepository.GetUsers()).AsQueryable();
+           
 
+           
             if (!string.IsNullOrEmpty(search))
             {
-                users = users.Where(u => u.name.Contains(search, StringComparison.OrdinalIgnoreCase) || u.email.Contains(search, StringComparison.OrdinalIgnoreCase)).ToList();
+                allUsers = allUsers.Where(u =>
+                    u.name.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                    u.email.Contains(search, StringComparison.OrdinalIgnoreCase));
             }
 
             if (!string.IsNullOrEmpty(filter))
             {
                 if (filter == "true")
                 {
-                    bool isBlocked = filter.ToLower() == "true";
-                    users = users.Where(u => u.is_blocked == true).ToList();
+                    allUsers = allUsers.Where(u => u.is_blocked);
                 }
-                if (filter == "false")
+                else if (filter == "false")
                 {
-                    bool isBlocked = filter.ToLower() == "false"; 
-                    users = users.Where(u => u.is_blocked == false).ToList();
-                }  
-
+                    allUsers = allUsers.Where(u => !u.is_blocked);
+                }
             }
+            var totalCount = allUsers.Count();
 
-            var usersPaged = users
+
+            var pagedUsers = allUsers
                 .OrderByDescending(u => u.created_at)
                 .Skip((page - 1) * pageSize)
-                .Take(pageSize);
+                .Take(pageSize)
+                .ToList();
 
-            return usersPaged.Select(u => new UserResponseDTO
+            var userResponseList = pagedUsers.Select(u => new UserResponseDTO
             {
                 id = u.id,
                 name = u.name,
@@ -151,6 +156,12 @@ namespace TiffinMate.BLL.Services.UserServices
                 created_at = u.created_at,
                 subscription_status = u.subscription_status,
             }).ToList();
+
+            return new UserResultDTO
+            {
+                TotalCount = totalCount,
+                Users = userResponseList
+            };
         }
 
 

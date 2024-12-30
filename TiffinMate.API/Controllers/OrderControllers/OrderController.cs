@@ -1,8 +1,12 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using sib_api_v3_sdk.Client;
+using System.Net;
 using TiffinMate.BLL.DTOs.OrderDTOs;
 using TiffinMate.BLL.DTOs.ProviderDTOs;
 using TiffinMate.BLL.Interfaces.OrderServiceInterface;
+using TiffinMate.DAL.Entities.ProviderEntity;
+using Twilio.Http;
 
 namespace TiffinMate.API.Controllers.OrderControllers
 {
@@ -19,10 +23,17 @@ namespace TiffinMate.API.Controllers.OrderControllers
         }
 
         [HttpPost]
-        public async Task<IActionResult>createorder([FromBody] PlanRequest planreqest, [FromQuery] Guid providerid, [FromQuery] Guid menuid, Guid userid, [FromQuery] OrderRequestDTO orderRequestDTO)
+        public async Task<IActionResult>Createorder( [FromBody] OrderRequestDTO orderRequestDTO)
         {
-            var res = await _orderService.OrderCreate(planreqest, providerid, menuid, userid, orderRequestDTO);
-            return Ok(res);
+                var res = await _orderService.OrderCreate( orderRequestDTO);
+                if (res==null)
+                {
+                    return BadRequest(new TiffinMate.API.ApiRespons.ApiResponse<string>("failure", "Addition failed", null, HttpStatusCode.BadRequest, "food is not available"));
+                }
+                var result = new TiffinMate.API.ApiRespons.ApiResponse<OrderResponceDto>("success", "Addition Successful", res, HttpStatusCode.OK, "");
+                return Ok(result);
+            
+           
         }
     }
 }

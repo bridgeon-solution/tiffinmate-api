@@ -10,6 +10,6 @@ namespace TiffinMate.BLL.Interfaces.OrderServiceInterface
 {
    public interface IOrderService
     {
-        Task<bool> OrderCreate(PlanRequest planreqest, Guid providerid, Guid menuid, Guid userid, OrderRequestDTO orderRequestDTO);
+        Task<OrderResponceDto> OrderCreate( OrderRequestDTO orderRequestDTO);
     }
 }

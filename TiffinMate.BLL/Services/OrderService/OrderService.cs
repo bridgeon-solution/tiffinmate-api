@@ -24,31 +24,31 @@ namespace TiffinMate.BLL.Services.OrderService
             _orderRepository = orderRepository;
             _context = appDbContext;
         }
-        public async Task<bool> OrderCreate(PlanRequest planreqest, Guid providerid, Guid menuid, Guid userid, OrderRequestDTO orderRequestDTO)
+        public async Task<OrderResponceDto> OrderCreate( OrderRequestDTO orderRequestDTO)
         {
             
             var categories = await _orderRepository.CreateOrder();
-            var selectedCategories = categories.Where(c => planreqest.categories.Contains(c.id)).ToList();
+            var selectedCategories = categories.Where(c => orderRequestDTO.categories.Contains(c.id)).ToList();
 
             if (!selectedCategories.Any())
             {
                 throw new Exception("No matching categories found.");
             }
 
-            var provider = await _context.Providers.FirstOrDefaultAsync(p => p.id == providerid);
+            var provider = await _context.Providers.FirstOrDefaultAsync(p => p.id == orderRequestDTO.provider_id);
             if (provider == null)
             {
                 throw new Exception("Provider not found.");
             }
 
-            var dayOfWeek = DateTime.Parse(planreqest.date).DayOfWeek.ToString();
-            var parsedDate = DateTime.Parse(planreqest.date);
+            var dayOfWeek = DateTime.Parse(orderRequestDTO.date).DayOfWeek.ToString();
+            var parsedDate = DateTime.Parse(orderRequestDTO.date);
             var isoStartDate = parsedDate.ToString("o");
 
         
             var foodItems = await _context.FoodItems
-                .Where(f => f.menu_id == menuid &&
-                            f.provider_id == providerid &&
+                .Where(f => f.menu_id == orderRequestDTO.menu_id &&
+                            f.provider_id == orderRequestDTO.provider_id &&
                             f.day == dayOfWeek &&
                             selectedCategories.Select(c => c.id).Contains(f.category_id))
                 .ToListAsync();
@@ -63,10 +63,10 @@ namespace TiffinMate.BLL.Services.OrderService
             var newOrder = new DAL.Entities.OrderEntity.Order
             {
                 id = orderId,
-                user_id = userid,
-                provider_id = providerid,
-                menu_id = menuid,
-                start_date = isoStartDate,
+                user_id = orderRequestDTO.user_id,
+                provider_id = orderRequestDTO.provider_id,
+                menu_id = orderRequestDTO.menu_id,
+                start_date = orderRequestDTO.date,
             };
 
             await _context.order.AddAsync(newOrder);
@@ -100,13 +100,23 @@ namespace TiffinMate.BLL.Services.OrderService
 
                    
                     await _context.orderDetails.AddAsync(details);
+
+                    
                 }
             }
 
             
             await _context.SaveChangesAsync();
 
-            return true;
+            return new OrderResponceDto
+            {
+                OrderId = newOrder.id,
+                UserId = newOrder.user_id,
+                ProviderId = newOrder.provider_id,
+                MenuId = newOrder.menu_id,
+                StartDate = newOrder.start_date,
+                
+            };
         }
 
 

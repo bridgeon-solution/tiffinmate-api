@@ -31,9 +31,9 @@ namespace TiffinMate.API.Controllers.OrderControllers
                 var res = await _orderService.OrderCreate(orderRequestDTO);
                 if (res == null)
                 {
-                    return BadRequest(new TiffinMate.API.ApiRespons.ApiResponse<string>("failure", "Addition failed", null, HttpStatusCode.BadRequest, "food is not available"));
+                    return BadRequest(new TiffinMate.API.ApiRespons.ApiResponse<string>("failure", "order failed", null, HttpStatusCode.BadRequest, "order failed"));
                 }
-                var result = new TiffinMate.API.ApiRespons.ApiResponse<OrderResponceDto>("success", "Addition Successful", res, HttpStatusCode.OK, "");
+                var result = new TiffinMate.API.ApiRespons.ApiResponse<Guid>("success", "Addition Successful", res, HttpStatusCode.OK, "");
                 return Ok(result);
             }
             catch (Exception ex)
@@ -46,6 +46,27 @@ namespace TiffinMate.API.Controllers.OrderControllers
 
 
 
+        }
+
+        [HttpPost("details")]
+        public async Task<IActionResult> CreateOrderDetails(OrderDetailsRequestDto orderDetailrequest,Guid orderid)
+        {
+            try
+            {
+                var res = await _orderService.OrderDetailsCreate(orderDetailrequest, orderid);
+                if (res == null)
+                {
+                    return BadRequest(new TiffinMate.API.ApiRespons.ApiResponse<string>("failure", "Addition failed", null, HttpStatusCode.BadRequest, "order details are necessary"));
+                }
+                var result = new TiffinMate.API.ApiRespons.ApiResponse<OrderResponceDto>("success", "order details added Successfully", res, HttpStatusCode.OK, "");
+                return Ok(result);
+            }
+            catch(Exception ex) 
+            {
+                var response = new TiffinMate.API.ApiRespons.ApiResponse<string>("failed", "", ex.Message, HttpStatusCode.InternalServerError, "error occured");
+                return StatusCode((int)HttpStatusCode.InternalServerError, response);
+
+            }
         }
 
         [HttpPost("razorpay_order")]

@@ -13,6 +13,7 @@ using TiffinMate.DAL.DbContexts;
 using TiffinMate.DAL.Entities.OrderEntity;
 using TiffinMate.DAL.Interfaces.OrderInterface;
 using TiffinMate.DAL.Repositories.OrderRepository;
+using static Supabase.Postgrest.Constants;
 
 namespace TiffinMate.BLL.Services.OrderService
 {
@@ -32,16 +33,8 @@ namespace TiffinMate.BLL.Services.OrderService
         }
 
         //post order details
-        public async Task<OrderResponceDto> OrderCreate( OrderRequestDTO orderRequestDTO)
+        public async Task<Guid> OrderCreate( OrderRequestDTO orderRequestDTO)
         {
-            
-            var categories = await _orderRepository.CreateOrder();
-            var selectedCategories = categories.Where(c => orderRequestDTO.categories.Contains(c.id)).ToList();
-
-            if (!selectedCategories.Any())
-            {
-                throw new Exception("No matching categories found.");
-            }
 
             var provider = await _context.Providers.FirstOrDefaultAsync(p => p.id == orderRequestDTO.provider_id);
             if (provider == null)
@@ -53,19 +46,6 @@ namespace TiffinMate.BLL.Services.OrderService
             var parsedDate = DateTime.Parse(orderRequestDTO.date);
             var isoStartDate = parsedDate.ToString("o");
 
-        
-            var foodItems = await _context.FoodItems
-                .Where(f => f.menu_id == orderRequestDTO.menu_id &&
-                            f.provider_id == orderRequestDTO.provider_id &&
-                            f.day == dayOfWeek &&
-                            selectedCategories.Select(c => c.id).Contains(f.category_id))
-                .ToListAsync();
-
-            if (!foodItems.Any())
-            {
-                throw new Exception("No food items found for the selected menu and categories.");
-            }
-
             var orderId = Guid.NewGuid();
 
             var newOrder = new DAL.Entities.OrderEntity.Order
@@ -74,61 +54,117 @@ namespace TiffinMate.BLL.Services.OrderService
                 user_id = orderRequestDTO.user_id,
                 provider_id = orderRequestDTO.provider_id,
                 menu_id = orderRequestDTO.menu_id,
-                start_date = orderRequestDTO.date,
-                order_string = orderRequestDTO.order_string,
-                transaction_id=orderRequestDTO.transacttion_id
+                start_date = isoStartDate
+                //order_string = orderRequestDTO.order_string,
+                //transaction_id=orderRequestDTO.transacttion_id
             };
 
             await _context.order.AddAsync(newOrder);
-
-           
-            foreach (var category in selectedCategories)
-            {
-                
-                var categoryFoodItems = foodItems.Where(f => f.category_id == category.id).ToList();
-
-                
-                if (!categoryFoodItems.Any())
-                {
-                    continue;
-                }
-
-                
-                foreach (var foodItem in categoryFoodItems)
-                {
-                    var details = new OrderDetails
-                    {
-                        id = Guid.NewGuid(),
-                        user_name = orderRequestDTO.user_name,
-                        address = orderRequestDTO.address,
-                        city = orderRequestDTO.city,
-                        ph_no = orderRequestDTO.ph_no,
-                        fooditem_name = foodItem.food_name, 
-                        fooditem_image = foodItem.image,   
-                        order_id = orderId,               
-                        category_id = category.id        
-                    };
-
-                   
-                    await _context.orderDetails.AddAsync(details);
-
-                    
-                }
-            }
-
-            
             await _context.SaveChangesAsync();
 
-            return new OrderResponceDto
-            {
-                OrderId = newOrder.id,
-                UserId = newOrder.user_id,
-                ProviderId = newOrder.provider_id,
-                MenuId = newOrder.menu_id,
-                StartDate = newOrder.start_date,
-                
-            };
+            return orderId;
+            
         }
+
+
+        public async Task<OrderResponceDto> OrderDetailsCreate(OrderDetailsRequestDto orderDetailsRequestDto, Guid orderId)
+        {
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                // Fetch categories and filter them based on the request DTO
+                var categories = await _orderRepository.CreateOrder();
+                var selectedCategories = categories.Where(c => orderDetailsRequestDto.categories.Contains(c.id)).ToList();
+
+                if (!selectedCategories.Any())
+                {
+                    throw new Exception("No matching categories found.");
+                }
+
+                var parsedDate = DateTime.Parse(orderDetailsRequestDto.date);
+                var dayOfWeek = parsedDate.DayOfWeek.ToString();
+
+                var foodItems = await _context.FoodItems
+                    .Where(f => f.menu_id == orderDetailsRequestDto.menu_id &&
+                                f.provider_id == orderDetailsRequestDto.provider_id &&
+                                f.day == dayOfWeek &&
+                                selectedCategories.Select(c => c.id).Contains(f.category_id))
+                    .ToListAsync();
+
+                if (!foodItems.Any())
+                {
+                    throw new Exception("No food items found for the selected menu and categories.");
+                }
+
+                foreach (var category in selectedCategories)
+                {
+                    var categoryFoodItems = foodItems.Where(f => f.category_id == category.id).ToList();
+
+                    if (!categoryFoodItems.Any())
+                    {
+                        continue;
+                    }
+
+                    foreach (var foodItem in categoryFoodItems)
+                    {
+                        var details = new OrderDetails
+                        {
+                            id = Guid.NewGuid(),
+                            user_name = orderDetailsRequestDto.user_name,
+                            address = orderDetailsRequestDto.address,
+                            city = orderDetailsRequestDto.city,
+                            ph_no = orderDetailsRequestDto.ph_no,
+                            fooditem_name = foodItem.food_name,
+                            fooditem_image = foodItem.image,
+                            order_id = orderId,
+                            category_id = category.id
+                        };
+
+                        await _context.orderDetails.AddAsync(details);
+                    }
+                }
+
+                await _context.SaveChangesAsync();
+
+                
+                    var order = await _context.order.FirstOrDefaultAsync(o => o.id == orderId);
+                    if (order != null)
+                    {
+                        order.payment_status = true;
+                        _context.order.Update(order);
+                        await _context.SaveChangesAsync();
+                    }
+                
+                else
+                {
+                    throw new Exception("Payment failed. Cannot complete the order.");
+                }
+
+                // Commit the transaction
+                await transaction.CommitAsync();
+
+                // Return the response DTO
+                return new OrderResponceDto
+                {
+                    orderdetails_id = Guid.NewGuid(),
+                    order_id = orderId,
+                    user_name = orderDetailsRequestDto.user_name,
+                    city = orderDetailsRequestDto.city,
+                    phone_number = orderDetailsRequestDto.ph_no,
+                };
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                throw new Exception($"Order creation failed: {ex.Message}", ex);
+            }
+        }
+
+       
+
+
+
+
 
         //razaorpay id create
 

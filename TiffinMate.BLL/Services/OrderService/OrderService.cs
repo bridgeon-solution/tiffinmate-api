@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using Razorpay.Api;
 using sib_api_v3_sdk.Model;
 using System;
@@ -23,13 +24,15 @@ namespace TiffinMate.BLL.Services.OrderService
         private readonly AppDbContext _context;
         private readonly string _KeyId;
         private readonly string _KeySecret;
+        private readonly IMapper _mapper;
 
-        public OrderService( IOrderRepository  orderRepository,AppDbContext appDbContext) {
+        public OrderService( IOrderRepository  orderRepository,AppDbContext appDbContext,IMapper mapper) {
 
             _orderRepository = orderRepository;
             _context = appDbContext;
             _KeyId = Environment.GetEnvironmentVariable("RazorPay_KeyId");
             _KeySecret = Environment.GetEnvironmentVariable("RazorPay_KeySecret");
+            _mapper = mapper;
         }
 
         //post order details
@@ -54,9 +57,11 @@ namespace TiffinMate.BLL.Services.OrderService
                 user_id = orderRequestDTO.user_id,
                 provider_id = orderRequestDTO.provider_id,
                 menu_id = orderRequestDTO.menu_id,
-                start_date = isoStartDate
+                start_date = isoStartDate,
+                total_price=orderRequestDTO.total_price,
+
                 //order_string = orderRequestDTO.order_string,
-                //transaction_id=orderRequestDTO.transacttion_id
+                //transaction_id = orderRequestDTO.transaction_string
             };
 
             await _context.order.AddAsync(newOrder);
@@ -131,6 +136,8 @@ namespace TiffinMate.BLL.Services.OrderService
                     if (order != null)
                     {
                         order.payment_status = true;
+                    order.order_string = orderDetailsRequestDto.order_string;
+                    order.transaction_id=orderDetailsRequestDto.transaction_string;
                         _context.order.Update(order);
                         await _context.SaveChangesAsync();
                     }
@@ -200,11 +207,15 @@ namespace TiffinMate.BLL.Services.OrderService
                 attributes.Add("Razorpay_orderId", razorPayDto.razor_orderid);
                 attributes.Add("Razorpay_signature", razorPayDto.razor_sign);
                 Utils.verifyPaymentLinkSignature(attributes);
-                return true;
-
-            
+                return true; 
                
         }
+
+        public async Task <OrderRequestDTO> OrderGetedByOrderId(Guid OrderId)
+        {
+            var order=await _orderRepository.GetOrders(OrderId);
+            return  _mapper.Map<OrderRequestDTO>(order);
+        } 
 
 
     }

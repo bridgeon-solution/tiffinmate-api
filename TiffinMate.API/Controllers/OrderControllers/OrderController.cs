@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Asp.Versioning;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using sib_api_v3_sdk.Client;
 using System.Net;
@@ -10,7 +11,9 @@ using Twilio.Http;
 
 namespace TiffinMate.API.Controllers.OrderControllers
 {
-    [Route("api/[controller]")]
+
+    [Route("api/v{version:apiVersion}/[controller]")]
+    [ApiVersion("1.0")]
     [ApiController]
     public class OrderController : ControllerBase
     {
@@ -38,18 +41,28 @@ namespace TiffinMate.API.Controllers.OrderControllers
             }
             catch (Exception ex)
             {
+                // Capture the inner exception message, if available
+                var innerExceptionMessage = ex.InnerException != null ? ex.InnerException.Message : "No inner exception";
 
-                var response = new TiffinMate.API.ApiRespons.ApiResponse<string>("failed", "", ex.Message, HttpStatusCode.InternalServerError, "error occured");
+                // Create a response that includes both the main exception and the inner exception
+                var response = new TiffinMate.API.ApiRespons.ApiResponse<string>(
+                    "failed",
+                    "",
+                    $"{ex.Message} | InnerException: {innerExceptionMessage}",
+                    HttpStatusCode.InternalServerError,
+                    "error occurred"
+                );
+
                 return StatusCode((int)HttpStatusCode.InternalServerError, response);
-
             }
+
 
 
 
         }
 
         [HttpPost("details")]
-        public async Task<IActionResult> CreateOrderDetails(OrderDetailsRequestDto orderDetailrequest,Guid orderid)
+        public async Task<IActionResult> CreateOrderDetails(OrderDetailsRequestDto orderDetailrequest, Guid orderid)
         {
             try
             {
@@ -61,7 +74,7 @@ namespace TiffinMate.API.Controllers.OrderControllers
                 var result = new TiffinMate.API.ApiRespons.ApiResponse<OrderResponceDto>("success", "order details added Successfully", res, HttpStatusCode.OK, "");
                 return Ok(result);
             }
-            catch(Exception ex) 
+            catch (Exception ex)
             {
                 var response = new TiffinMate.API.ApiRespons.ApiResponse<string>("failed", "", ex.Message, HttpStatusCode.InternalServerError, "error occured");
                 return StatusCode((int)HttpStatusCode.InternalServerError, response);
@@ -98,8 +111,26 @@ namespace TiffinMate.API.Controllers.OrderControllers
         {
             try
             {
-                var res=await _orderService.payment(razorPayDto);
+                var res = await _orderService.payment(razorPayDto);
                 var result = new TiffinMate.API.ApiRespons.ApiResponse<bool>("succesfull", "payment succesfully", res, HttpStatusCode.OK, "");
+                return Ok(result);
+
+            }
+            catch (Exception ex)
+            {
+                var response = new TiffinMate.API.ApiRespons.ApiResponse<string>("failed", "", ex.Message, HttpStatusCode.InternalServerError, "error occured");
+                return StatusCode((int)HttpStatusCode.InternalServerError, response);
+
+            }
+        }
+
+        [HttpGet("{orderid}")]
+        public async Task<IActionResult> GetOrderById(Guid orderid)
+        {
+            try
+            {
+                var res = await _orderService.OrderGetedByOrderId(orderid);
+                var result = new TiffinMate.API.ApiRespons.ApiResponse<OrderRequestDTO>("succesfull", "Order details getted succesfully", res, HttpStatusCode.OK, "");
                 return Ok(result);
 
             }

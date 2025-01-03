@@ -14,6 +14,7 @@ namespace TiffinMate.BLL.Interfaces.OrderServiceInterface
         Task<OrderResponceDto> OrderDetailsCreate(OrderDetailsRequestDto orderDetailsRequestDto, Guid orderId); 
         Task<string> RazorPayorderIdCreate(long price);
         Task<bool> payment(RazorPayDto razorPayDto);
+        Task<OrderRequestDTO> OrderGetedByOrderId(Guid OrderId);
 
     }
 }

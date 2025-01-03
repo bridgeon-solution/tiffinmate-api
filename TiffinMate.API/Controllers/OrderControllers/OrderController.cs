@@ -41,18 +41,7 @@ namespace TiffinMate.API.Controllers.OrderControllers
             }
             catch (Exception ex)
             {
-                // Capture the inner exception message, if available
-                var innerExceptionMessage = ex.InnerException != null ? ex.InnerException.Message : "No inner exception";
-
-                // Create a response that includes both the main exception and the inner exception
-                var response = new TiffinMate.API.ApiRespons.ApiResponse<string>(
-                    "failed",
-                    "",
-                    $"{ex.Message} | InnerException: {innerExceptionMessage}",
-                    HttpStatusCode.InternalServerError,
-                    "error occurred"
-                );
-
+                var response = new TiffinMate.API.ApiRespons.ApiResponse<string>("failed", "", ex.Message, HttpStatusCode.InternalServerError, "error occured");
                 return StatusCode((int)HttpStatusCode.InternalServerError, response);
             }
 

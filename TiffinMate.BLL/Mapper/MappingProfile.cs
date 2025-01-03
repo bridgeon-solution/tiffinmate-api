@@ -33,6 +33,7 @@ namespace TiffinMate.BLL.Mapper
             CreateMap<ProviderResponseDTO,Provider>().ReverseMap();
             CreateMap<MenuRequestDto, Menu>().ReverseMap();
             CreateMap<Order,OrderRequestDTO>().ReverseMap();
+            CreateMap<Subscription, OrderRequestDTO>();
             
         }
     }

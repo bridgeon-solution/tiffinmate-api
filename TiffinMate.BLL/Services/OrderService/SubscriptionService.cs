@@ -1,83 +1,73 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
-using Razorpay.Api;
-using sib_api_v3_sdk.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TiffinMate.BLL.DTOs.OrderDTOs;
-using TiffinMate.BLL.DTOs.ProviderDTOs;
 using TiffinMate.BLL.Interfaces.OrderServiceInterface;
 using TiffinMate.DAL.DbContexts;
 using TiffinMate.DAL.Entities.OrderEntity;
 using TiffinMate.DAL.Interfaces.OrderInterface;
 using TiffinMate.DAL.Repositories.OrderRepository;
-using static Supabase.Postgrest.Constants;
 
 namespace TiffinMate.BLL.Services.OrderService
 {
-    public class OrderService :IOrderService
+    public class SubscriptionService : ISubscriptionService
     {
-        private readonly IOrderRepository _orderRepository;
+        private readonly ISubscriptionRepository _subscriptionRepository;
         private readonly AppDbContext _context;
-        private readonly string _KeyId;
-        private readonly string _KeySecret;
         private readonly IMapper _mapper;
-
-        public OrderService( IOrderRepository  orderRepository,AppDbContext appDbContext,IMapper mapper) {
-
-            _orderRepository = orderRepository;
-            _context = appDbContext;
-            _KeyId = Environment.GetEnvironmentVariable("RazorPay_KeyId");
-            _KeySecret = Environment.GetEnvironmentVariable("RazorPay_KeySecret");
-            _mapper = mapper;
-        }
-
-        //post order details
-        public async Task<Guid> OrderCreate( OrderRequestDTO orderRequestDTO)
+        public SubscriptionService(ISubscriptionRepository subscription, AppDbContext appDbContext,IMapper mapper)
         {
+            _subscriptionRepository = subscription;
+            _context = appDbContext;
+            _mapper = mapper;
 
+        }
+        public async Task<Guid> SubscriptionCreate(OrderRequestDTO orderRequestDTO)
+        {
             var provider = await _context.Providers.FirstOrDefaultAsync(p => p.id == orderRequestDTO.provider_id);
             if (provider == null)
             {
                 throw new Exception("Provider not found.");
             }
-
             var dayOfWeek = DateTime.Parse(orderRequestDTO.date).DayOfWeek.ToString();
             var parsedDate = DateTime.Parse(orderRequestDTO.date);
             var isoStartDate = parsedDate.ToString("o");
 
             var orderId = Guid.NewGuid();
-
-            var newOrder = new DAL.Entities.OrderEntity.Order
+            var newSubscription = new DAL.Entities.OrderEntity.Subscription
             {
                 id = orderId,
                 user_id = orderRequestDTO.user_id,
                 provider_id = orderRequestDTO.provider_id,
                 menu_id = orderRequestDTO.menu_id,
                 start_date = isoStartDate,
-                total_price=orderRequestDTO.total_price,
-
-                //order_string = orderRequestDTO.order_string,
-                //transaction_id = orderRequestDTO.transaction_string
+                total_price = orderRequestDTO.total_price,
             };
-
-            await _context.order.AddAsync(newOrder);
-            await _context.SaveChangesAsync();
+            await _context.subscriptions.AddAsync(newSubscription);
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException ex)
+            {
+                throw new Exception($"An error occurred while saving changes: {ex.InnerException?.Message}", ex);
+            }
 
             return orderId;
-            
+
         }
 
-
-        public async Task<OrderResponceDto> OrderDetailsCreate(OrderDetailsRequestDto orderDetailsRequestDto, Guid orderId)
+        //Subscription details adding
+        public async Task<OrderResponceDto> SubscriptionDetailsCreate(OrderDetailsRequestDto orderDetailsRequestDto, Guid orderId)
         {
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
-                var categories = await _orderRepository.CreateOrder();
+                var categories = await _subscriptionRepository.CreateSubscription();
                 var selectedCategories = categories.Where(c => orderDetailsRequestDto.categories.Contains(c.id)).ToList();
 
                 if (!selectedCategories.Any())
@@ -111,42 +101,41 @@ namespace TiffinMate.BLL.Services.OrderService
 
                     foreach (var foodItem in categoryFoodItems)
                     {
-                        var details = new OrderDetails
+                        var details = new SubscriptionDetails
                         {
                             id = Guid.NewGuid(),
                             user_name = orderDetailsRequestDto.user_name,
                             address = orderDetailsRequestDto.address,
                             city = orderDetailsRequestDto.city,
                             ph_no = orderDetailsRequestDto.ph_no,
-                            fooditem_name = foodItem.food_name,
-                            fooditem_image = foodItem.image,
-                            order_id = orderId,
+                            
+                            subscription_id = orderId,
                             category_id = category.id
                         };
 
-                        await _context.orderDetails.AddAsync(details);
+                        await _context.subscriptionDetails.AddAsync(details);
                     }
                 }
 
                 await _context.SaveChangesAsync();
 
-                
-                    var order = await _context.order.FirstOrDefaultAsync(o => o.id == orderId);
-                    if (order != null)
-                    {
-                        order.payment_status = true;
+
+                var order = await _context.subscriptions.FirstOrDefaultAsync(o => o.id == orderId);
+                if (order != null)
+                {
+                    order.payment_status = true;
                     order.order_string = orderDetailsRequestDto.order_string;
-                    order.transaction_id=orderDetailsRequestDto.transaction_string;
-                        _context.order.Update(order);
-                        await _context.SaveChangesAsync();
-                    }
-                
+                    order.transaction_id = orderDetailsRequestDto.transaction_string;
+                    _context.subscriptions.Update(order);
+                    await _context.SaveChangesAsync();
+                }
+
                 else
                 {
                     throw new Exception("Payment failed. Cannot complete the order.");
                 }
 
-                
+
                 await transaction.CommitAsync();
 
                 return new OrderResponceDto
@@ -165,56 +154,12 @@ namespace TiffinMate.BLL.Services.OrderService
             }
         }
 
-       
-
-
-
-
-
-        //razaorpay id create
-
-        public async Task<string> RazorPayorderIdCreate(long price)
+        public async Task<OrderRequestDTO> SubscriptionGetedById(Guid OrderId)
         {
-            Dictionary<string,object> input=new Dictionary<string,object>();
-            Random random = new Random();
-            string TransactionId=random.Next(0,100).ToString();
-            input.Add("amount", Convert.ToDecimal(price) * 100);
-            input.Add("currency", "INR");
-            input.Add("receipt", TransactionId);
-
-           
-            RazorpayClient client=new RazorpayClient(_KeyId, _KeySecret);
-            Razorpay.Api.Order order=client.Order.Create(input);
-            var OrderId = order["id"].ToString();   
-            return OrderId;
-
+            var order = await _subscriptionRepository.GetSubscriptionByid(OrderId);
+            return _mapper.Map<OrderRequestDTO>(order);
         }
-
-        //payment
-        public async Task <bool> payment(RazorPayDto razorPayDto)
-        {
-            if (razorPayDto == null ||
-                razorPayDto.razor_id == null ||
-                razorPayDto.razor_orderid == null ||
-                razorPayDto.razor_sign == null)
-                return false;
-           
-                RazorpayClient razorpay = new RazorpayClient(_KeyId,_KeySecret);
-                Dictionary<string, string> attributes = [];
-                attributes.Add("Razorpay_paymentId", razorPayDto.razor_id);
-                attributes.Add("Razorpay_orderId", razorPayDto.razor_orderid);
-                attributes.Add("Razorpay_signature", razorPayDto.razor_sign);
-                Utils.verifyPaymentLinkSignature(attributes);
-                return true; 
-               
-        }
-
-        public async Task <OrderRequestDTO> OrderGetedByOrderId(Guid OrderId)
-        {
-            var order=await _orderRepository.GetOrders(OrderId);
-            return  _mapper.Map<OrderRequestDTO>(order);
-        } 
-
 
     }
+
 }

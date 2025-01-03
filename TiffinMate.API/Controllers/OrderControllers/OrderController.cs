@@ -40,18 +40,17 @@ namespace TiffinMate.API.Controllers.OrderControllers
             }
             catch (Exception ex)
             {
-
                 var response = new TiffinMate.API.ApiRespons.ApiResponse<string>("failed", "", ex.Message, HttpStatusCode.InternalServerError, "error occured");
                 return StatusCode((int)HttpStatusCode.InternalServerError, response);
-
             }
+
 
 
 
         }
 
         [HttpPost("details")]
-        public async Task<IActionResult> CreateOrderDetails(OrderDetailsRequestDto orderDetailrequest,Guid orderid)
+        public async Task<IActionResult> CreateOrderDetails(OrderDetailsRequestDto orderDetailrequest, Guid orderid)
         {
             try
             {
@@ -63,7 +62,7 @@ namespace TiffinMate.API.Controllers.OrderControllers
                 var result = new TiffinMate.API.ApiRespons.ApiResponse<OrderResponceDto>("success", "order details added Successfully", res, HttpStatusCode.OK, "");
                 return Ok(result);
             }
-            catch(Exception ex) 
+            catch (Exception ex)
             {
                 var response = new TiffinMate.API.ApiRespons.ApiResponse<string>("failed", "", ex.Message, HttpStatusCode.InternalServerError, "error occured");
                 return StatusCode((int)HttpStatusCode.InternalServerError, response);
@@ -136,6 +135,24 @@ namespace TiffinMate.API.Controllers.OrderControllers
                 var res = await _orderService.UsersLists(providerId, page, pageSize, search);
                 var result = new TiffinMate.API.ApiRespons.ApiResponse<List<AllUserOutputDto>>("succesfull", "Getting Users succesfully", res, HttpStatusCode.OK, "");
                 return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                var response = new TiffinMate.API.ApiRespons.ApiResponse<string>("failed", "", ex.Message, HttpStatusCode.InternalServerError, "error occured");
+                return StatusCode((int)HttpStatusCode.InternalServerError, response);
+
+            }
+        }
+
+        [HttpGet("{orderid}")]
+        public async Task<IActionResult> GetOrderById(Guid orderid)
+        {
+            try
+            {
+                var res = await _orderService.OrderGetedByOrderId(orderid);
+                var result = new TiffinMate.API.ApiRespons.ApiResponse<OrderRequestDTO>("succesfull", "Order details getted succesfully", res, HttpStatusCode.OK, "");
+                return Ok(result);
+
             }
             catch (Exception ex)
             {

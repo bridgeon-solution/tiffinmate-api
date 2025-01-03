@@ -98,6 +98,8 @@ namespace TiffinMate.API
             builder.Services.AddScoped<INotificationService, NotificationService>();
             builder.Services.AddScoped<IOrderService, OrderService>();
             builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+            builder.Services.AddScoped<ISubscriptionRepository, SubscriptionRepository>();
+            builder.Services.AddScoped<ISubscriptionService, SubscriptionService>();
            
 
       

@@ -39,7 +39,7 @@ namespace TiffinMate.API.Controllers.UserControllers
                 var response = await _authService.RegisterUser(userDto);
                 if (!response)
                 {
-                    return Conflict(new ApiResponse<string>("failure", "registration failed", null, HttpStatusCode.Conflict, "user already exist"));
+                    return Ok(new ApiResponse<string>("failure", "registration failed", null, HttpStatusCode.Conflict, "user already exist"));
                 }
                 var result = new ApiResponse<bool>("success", "registration Successfull", response, HttpStatusCode.OK, "");
 

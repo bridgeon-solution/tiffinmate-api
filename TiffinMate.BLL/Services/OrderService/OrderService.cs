@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using Razorpay.Api;
 using sib_api_v3_sdk.Model;
 using System;
@@ -23,13 +24,15 @@ namespace TiffinMate.BLL.Services.OrderService
         private readonly AppDbContext _context;
         private readonly string _KeyId;
         private readonly string _KeySecret;
+        private readonly IMapper _mapper;
 
-        public OrderService( IOrderRepository  orderRepository,AppDbContext appDbContext) {
+        public OrderService( IOrderRepository  orderRepository,AppDbContext appDbContext,IMapper mapper) {
 
             _orderRepository = orderRepository;
             _context = appDbContext;
             _KeyId = Environment.GetEnvironmentVariable("RazorPay_KeyId");
             _KeySecret = Environment.GetEnvironmentVariable("RazorPay_KeySecret");
+            _mapper = mapper;
         }
 
         //post order details
@@ -54,9 +57,11 @@ namespace TiffinMate.BLL.Services.OrderService
                 user_id = orderRequestDTO.user_id,
                 provider_id = orderRequestDTO.provider_id,
                 menu_id = orderRequestDTO.menu_id,
-                start_date = isoStartDate
+                start_date = isoStartDate,
+                total_price=orderRequestDTO.total_price,
+
                 //order_string = orderRequestDTO.order_string,
-                //transaction_id=orderRequestDTO.transacttion_id
+                //transaction_id = orderRequestDTO.transaction_string
             };
 
             await _context.order.AddAsync(newOrder);
@@ -72,7 +77,6 @@ namespace TiffinMate.BLL.Services.OrderService
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
-                // Fetch categories and filter them based on the request DTO
                 var categories = await _orderRepository.CreateOrder();
                 var selectedCategories = categories.Where(c => orderDetailsRequestDto.categories.Contains(c.id)).ToList();
 
@@ -131,6 +135,8 @@ namespace TiffinMate.BLL.Services.OrderService
                     if (order != null)
                     {
                         order.payment_status = true;
+                    order.order_string = orderDetailsRequestDto.order_string;
+                    order.transaction_id=orderDetailsRequestDto.transaction_string;
                         _context.order.Update(order);
                         await _context.SaveChangesAsync();
                     }
@@ -140,10 +146,9 @@ namespace TiffinMate.BLL.Services.OrderService
                     throw new Exception("Payment failed. Cannot complete the order.");
                 }
 
-                // Commit the transaction
+                
                 await transaction.CommitAsync();
 
-                // Return the response DTO
                 return new OrderResponceDto
                 {
                     orderdetails_id = Guid.NewGuid(),
@@ -186,24 +191,31 @@ namespace TiffinMate.BLL.Services.OrderService
         }
 
         //payment
-        public async Task <bool> payment(RazorPayDto razorPayDto)
+        public async Task<bool> payment(RazorPayDto razorPayDto)
         {
             if (razorPayDto == null ||
                 razorPayDto.razor_id == null ||
                 razorPayDto.razor_orderid == null ||
                 razorPayDto.razor_sign == null)
                 return false;
-           
-                RazorpayClient razorpay = new RazorpayClient(_KeyId,_KeySecret);
-                Dictionary<string, string> attributes = [];
-                attributes.Add("Razorpay_paymentId", razorPayDto.razor_id);
-                attributes.Add("Razorpay_orderId", razorPayDto.razor_orderid);
-                attributes.Add("Razorpay_signature", razorPayDto.razor_sign);
-                Utils.verifyPaymentLinkSignature(attributes);
-                return true;
+
+            RazorpayClient razorpay = new RazorpayClient(_KeyId, _KeySecret);
+            Dictionary<string, string> attributes = [];
+            attributes.Add("Razorpay_paymentId", razorPayDto.razor_id);
+            attributes.Add("Razorpay_orderId", razorPayDto.razor_orderid);
+            attributes.Add("Razorpay_signature", razorPayDto.razor_sign);
+            Utils.verifyPaymentLinkSignature(attributes);
+            return true;
 
         }
 
+        public async Task<OrderRequestDTO> OrderGetedByOrderId(Guid OrderId)
+        {
+            var order = await _orderRepository.GetOrders(OrderId);
+            return _mapper.Map<OrderRequestDTO>(order);
+        }
+
+        //orders
         public async Task<List<AllOrderByProviderDto>> OrderLists(Guid ProviderId, int page, int pageSize, string search = null)
 
         {
@@ -217,8 +229,6 @@ namespace TiffinMate.BLL.Services.OrderService
 
             }
             var totalCount = orders.Count;
-
-
 
             var Allorder = orders.SelectMany(o => o.details.Select(d => new GetOrderDetailsDto
             {
@@ -238,6 +248,7 @@ namespace TiffinMate.BLL.Services.OrderService
             };
             return new List<AllOrderByProviderDto> { result };
         }
+        //users
         public async Task<List<AllUserOutputDto>> UsersLists(Guid ProviderId, int page, int pageSize, string search = null)
 
         {

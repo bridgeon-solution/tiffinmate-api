@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,10 +9,11 @@ using TiffinMate.DAL.Entities.ProviderEntity;
 
 namespace TiffinMate.DAL.Interfaces.OrderInterface
 {
-    public interface IOrderRepository
+    public interface ISubscriptionRepository
     {
-        public Task<List<Categories>> CreateOrder();
-        public Task<Order> GetOrders(Guid OrderId);
-        Task<List<Order>> GetOrdersByProvider(Guid providerId);
+        Task<List<Categories>> CreateSubscription();
+        Task<Subscription> GetSubscriptionByid(Guid OrderId);
+
+
     }
 }

@@ -14,6 +14,7 @@ namespace TiffinMate.BLL.DTOs.ProviderDTOs
         public string email { get; set; }
         public string address { get; set; }
         public int phone_no { get; set; }
-      
+     
+
     }
 }

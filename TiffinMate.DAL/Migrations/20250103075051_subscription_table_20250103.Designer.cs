@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TiffinMate.DAL.DbContexts;
@@ -11,9 +12,11 @@ using TiffinMate.DAL.DbContexts;
 namespace TiffinMate.DAL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250103075051_subscription_table_20250103")]
+    partial class subscription_table_20250103
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -211,6 +214,7 @@ namespace TiffinMate.DAL.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<string>("cancelled_at")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<DateTime?>("created_at")
@@ -258,7 +262,7 @@ namespace TiffinMate.DAL.Migrations
 
                     b.HasIndex("user_id");
 
-                    b.ToTable("subscriptions");
+                    b.ToTable("Subscription");
                 });
 
             modelBuilder.Entity("TiffinMate.DAL.Entities.OrderEntity.SubscriptionDetails", b =>
@@ -302,7 +306,7 @@ namespace TiffinMate.DAL.Migrations
 
                     b.HasIndex("subscription_id");
 
-                    b.ToTable("subscriptionDetails");
+                    b.ToTable("SubscriptionDetails");
                 });
 
             modelBuilder.Entity("TiffinMate.DAL.Entities.ProviderEntity.Categories", b =>

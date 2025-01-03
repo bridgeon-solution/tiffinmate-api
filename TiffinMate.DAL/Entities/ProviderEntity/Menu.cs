@@ -28,6 +28,7 @@ namespace TiffinMate.DAL.Entities.ProviderEntity
         public Provider provider { get; set; }
 
         public List<Order>order { get; set; }
+        public List<Subscription> subscription { get; set; }
 
         
     }

@@ -30,6 +30,7 @@ namespace TiffinMate.DAL.Entities
         public bool is_blocked { get; set; }
         public ICollection<Review> review { get; set; }
         public ICollection<Order> order { get; set; }
+        public ICollection<Subscription> subscription { get; set; }
 
     }
 }

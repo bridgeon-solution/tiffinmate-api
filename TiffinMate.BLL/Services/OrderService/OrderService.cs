@@ -191,30 +191,97 @@ namespace TiffinMate.BLL.Services.OrderService
         }
 
         //payment
-        public async Task <bool> payment(RazorPayDto razorPayDto)
+        public async Task<bool> payment(RazorPayDto razorPayDto)
         {
             if (razorPayDto == null ||
                 razorPayDto.razor_id == null ||
                 razorPayDto.razor_orderid == null ||
                 razorPayDto.razor_sign == null)
                 return false;
-           
-                RazorpayClient razorpay = new RazorpayClient(_KeyId,_KeySecret);
-                Dictionary<string, string> attributes = [];
-                attributes.Add("Razorpay_paymentId", razorPayDto.razor_id);
-                attributes.Add("Razorpay_orderId", razorPayDto.razor_orderid);
-                attributes.Add("Razorpay_signature", razorPayDto.razor_sign);
-                Utils.verifyPaymentLinkSignature(attributes);
-                return true; 
-               
+
+            RazorpayClient razorpay = new RazorpayClient(_KeyId, _KeySecret);
+            Dictionary<string, string> attributes = [];
+            attributes.Add("Razorpay_paymentId", razorPayDto.razor_id);
+            attributes.Add("Razorpay_orderId", razorPayDto.razor_orderid);
+            attributes.Add("Razorpay_signature", razorPayDto.razor_sign);
+            Utils.verifyPaymentLinkSignature(attributes);
+            return true;
+
         }
 
-        public async Task <OrderRequestDTO> OrderGetedByOrderId(Guid OrderId)
+        public async Task<OrderRequestDTO> OrderGetedByOrderId(Guid OrderId)
         {
-            var order=await _orderRepository.GetOrders(OrderId);
-            return  _mapper.Map<OrderRequestDTO>(order);
-        } 
+            var order = await _orderRepository.GetOrders(OrderId);
+            return _mapper.Map<OrderRequestDTO>(order);
+        }
+
+        //orders
+        public async Task<List<AllOrderByProviderDto>> OrderLists(Guid ProviderId, int page, int pageSize, string search = null)
+
+        {
+            var orders = (await _orderRepository.GetOrdersByProvider(ProviderId)).ToList();
+
+            if (!string.IsNullOrEmpty(search))
+            {
+                orders = orders
+            .Where(u => u.user.name.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                        u.details.Any(d => d.fooditem_name.Contains(search, StringComparison.OrdinalIgnoreCase))).ToList();
+
+            }
+            var totalCount = orders.Count;
+
+            var Allorder = orders.SelectMany(o => o.details.Select(d => new GetOrderDetailsDto
+            {
+                user_name = d.user_name,
+                address = d.address,
+                city = d.city,
+                ph_no = d.ph_no,
+                fooditem_name = d.fooditem_name,
+
+            })).ToList();
+            var pagedOrders = Allorder.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+
+            var result = new AllOrderByProviderDto
+            {
+                TotalCount = totalCount,
+                Allorders = pagedOrders
+            };
+            return new List<AllOrderByProviderDto> { result };
+        }
+        //users
+        public async Task<List<AllUserOutputDto>> UsersLists(Guid ProviderId, int page, int pageSize, string search = null)
+
+        {
+            var orders = (await _orderRepository.GetOrdersByProvider(ProviderId)).ToList();
+
+            if (!string.IsNullOrEmpty(search))
+            {
+                orders = orders
+            .Where(u => u.user.name.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                        u.user.email.Contains(search, StringComparison.OrdinalIgnoreCase)).ToList();
+
+            }
+            var totalCount = orders.Count;
 
 
+
+            var Allusers = orders.GroupBy(o => o.user_id).Select(g => g.First()).Select(o => new AllUsersDto
+            {
+                user_name = o.user.name,
+                address = o.user.address,
+                city = o.user.city,
+                ph_no = o.user.phone,
+                image = o.user.image,
+                email = o.user.email
+            }).ToList();
+            var pagedOrders = Allusers.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+
+            var result = new AllUserOutputDto
+            {
+                TotalCount = totalCount,
+                AllUsers = pagedOrders
+            };
+            return new List<AllUserOutputDto> { result };
+        }
     }
 }

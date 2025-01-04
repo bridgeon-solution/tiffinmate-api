@@ -14,6 +14,11 @@ namespace TiffinMate.BLL.DTOs.OrderDTOs
         public string ph_no { get; set; }
         public string email { get; set; }
         public string? image { get; set; }
+        public decimal total_price { get; set; }
+        public Guid order_id { get; set; }
+        public DateTime? created_at { get; set; }
+        public DateTime start_date { get; set; }
+
 
     }
 }

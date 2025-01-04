@@ -32,5 +32,7 @@ namespace TiffinMate.DAL.Repositories.OrderRepository
         {
             return await _context.order.Where(u => u.provider_id == providerId).Include(o => o.details).Include(o => o.user).Include(o => o.provider).ToListAsync();
         }
+
+       
     }
 };

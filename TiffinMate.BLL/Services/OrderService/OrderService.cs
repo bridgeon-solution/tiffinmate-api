@@ -287,10 +287,10 @@ namespace TiffinMate.BLL.Services.OrderService
 
         public async Task<AllUserOutputDto> GetUserOrders(int page, int pageSize, string search = null, string filter = null)
         {
-            // Fetch data from the database
+            
             var result = await _context.order
                 .Include(o => o.details)
-                .Where(o => o.payment_status) // Filter by payment status
+                .Where(o => o.payment_status) 
                 .SelectMany(order => order.details, (order, detail) => new AllUsersDto
                 {
                     user_name = detail.user_name,
@@ -302,7 +302,6 @@ namespace TiffinMate.BLL.Services.OrderService
                 })
                 .ToListAsync();
 
-            // Apply search filter
             if (!string.IsNullOrEmpty(search))
             {
                 result = result.Where(u =>
@@ -310,29 +309,26 @@ namespace TiffinMate.BLL.Services.OrderService
                     u.city.Contains(search, StringComparison.OrdinalIgnoreCase)).ToList();
             }
 
-            // Apply sorting based on the filter parameter
             if (!string.IsNullOrEmpty(filter))
             {
                 if (filter.Equals("newest", StringComparison.OrdinalIgnoreCase))
                 {
-                    result = result.OrderByDescending(u => u.start_date).ToList(); // Newest to oldest
+                    result = result.OrderByDescending(u => u.start_date).ToList(); 
                 }
                 else if (filter.Equals("oldest", StringComparison.OrdinalIgnoreCase))
                 {
-                    result = result.OrderBy(u => u.start_date).ToList(); // Oldest to newest
+                    result = result.OrderBy(u => u.start_date).ToList(); 
                 }
             }
 
           
             var total = result.Count;
 
-            // Apply pagination
             var pagedUsers = result
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToList();
 
-            // Prepare the output DTO
             var newResult = new AllUserOutputDto
             {
                 TotalCount = total,

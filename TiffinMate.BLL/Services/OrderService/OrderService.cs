@@ -283,5 +283,60 @@ namespace TiffinMate.BLL.Services.OrderService
             };
             return new List<AllUserOutputDto> { result };
         }
+
+
+        public async Task<AllUserOutputDto> GetUserOrders(int page, int pageSize, string search = null, string filter = null)
+        {
+            
+            var result = await _context.order
+                .Include(o => o.details)
+                .Where(o => o.payment_status) 
+                .SelectMany(order => order.details, (order, detail) => new AllUsersDto
+                {
+                    user_name = detail.user_name,
+                    ph_no = detail.ph_no,
+                    city = detail.city,
+                    total_price = order.total_price,
+                    order_id = order.id,
+                    start_date = DateTime.Parse(order.start_date)
+                })
+                .ToListAsync();
+
+            if (!string.IsNullOrEmpty(search))
+            {
+                result = result.Where(u =>
+                    u.user_name.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                    u.city.Contains(search, StringComparison.OrdinalIgnoreCase)).ToList();
+            }
+
+            if (!string.IsNullOrEmpty(filter))
+            {
+                if (filter.Equals("newest", StringComparison.OrdinalIgnoreCase))
+                {
+                    result = result.OrderByDescending(u => u.start_date).ToList(); 
+                }
+                else if (filter.Equals("oldest", StringComparison.OrdinalIgnoreCase))
+                {
+                    result = result.OrderBy(u => u.start_date).ToList(); 
+                }
+            }
+
+          
+            var total = result.Count;
+
+            var pagedUsers = result
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            var newResult = new AllUserOutputDto
+            {
+                TotalCount = total,
+                AllUsers = pagedUsers,
+            };
+
+            return newResult;
+        }
+
     }
 }

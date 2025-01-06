@@ -209,11 +209,35 @@ namespace TiffinMate.BLL.Services.OrderService
 
         }
 
+
+
         public async Task<OrderRequestDTO> OrderGetedByOrderId(Guid OrderId)
         {
-            var order = await _orderRepository.GetOrders(OrderId);
-            return _mapper.Map<OrderRequestDTO>(order);
+
+           var order=await _context.order.Include(o=>o.details).FirstOrDefaultAsync(o=>o.id==OrderId);
+            var items = new OrderRequestDTO
+            {
+                date = order.start_date,
+                menu_id = order.menu_id,
+                provider_id = order.provider_id,
+                total_price = order.total_price,
+                user_id = order.user_id,
+                details = order.details.Select(d => new OrderDetailsDto
+                {
+                    Id = d.id,
+                    FoodItemImage = d.fooditem_image,
+                    FoodItemName = d.fooditem_name,
+                    UserName = d.user_name,
+                    Address = d.address,
+                    City = d.city
+                }).ToList()
+
+            };
+            return items;
         }
+
+
+
 
         //orders
         public async Task<List<AllOrderByProviderDto>> OrderLists(Guid ProviderId, int page, int pageSize, string search = null)

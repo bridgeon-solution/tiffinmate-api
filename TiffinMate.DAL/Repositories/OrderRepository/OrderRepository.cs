@@ -24,10 +24,12 @@ namespace TiffinMate.DAL.Repositories.OrderRepository
         {
             return await _context.Categories.ToListAsync();
         }
-        public async Task<Order> GetOrders(Guid OrderId)
-        {
-            return await _context.order.FirstOrDefaultAsync(o => o.id == OrderId);
-        }
+
+
+      
+
+
+
         public async Task<List<Order>> GetOrdersByProvider(Guid providerId)
         {
             return await _context.order.Where(u => u.provider_id == providerId).Include(o => o.details)
@@ -45,5 +47,7 @@ namespace TiffinMate.DAL.Repositories.OrderRepository
                 .Include(o => o.provider).ThenInclude(p => p.food_items)
                 .ThenInclude(f => f.category).ToListAsync();
         }
+
+       
     }
 };

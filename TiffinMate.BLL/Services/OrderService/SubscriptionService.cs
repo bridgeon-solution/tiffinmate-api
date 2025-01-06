@@ -177,10 +177,16 @@ namespace TiffinMate.BLL.Services.OrderService
                 subscription = subscription.Where(o => !string.IsNullOrEmpty(o.start_date) && o.start_date.Substring(0, 10) == filter).ToList();
             }
             var totalCount = subscription.Count;
-            var firstCategoryId = subscription.Select(p => p.details?.FirstOrDefault()?.category_id ?? Guid.Empty).FirstOrDefault();
-            var categoryName = await categoryById(firstCategoryId);
-            Console.WriteLine("category_id" + firstCategoryId);
-            Console.WriteLine("category_name" + categoryName);
+            var categoryIds = subscription.SelectMany(p => p.provider?.food_items?.Select(f => f.category?.id))
+                                  .Where(id => id.HasValue)
+                                  .Distinct()
+                                  .ToList();
+
+            // Fetch all category names based on the category IDs
+            var categoryNames = await Task.WhenAll(categoryIds.Select(id => categoryById(id ?? Guid.Empty)));
+
+            Console.WriteLine("totallllllllllllllll: " + totalCount);
+            Console.WriteLine("category_name" + categoryNames);
             Console.WriteLine("totallllllllllllllll: " + totalCount);
             var Allorder = subscription.Select(o => new GetSubscriptionDetailsDto
             {
@@ -190,7 +196,7 @@ namespace TiffinMate.BLL.Services.OrderService
                 ph_no = o.user.phone,
                 fooditem_name = o.provider.food_items?.FirstOrDefault().food_name,
                 menu_name = o.provider.menus?.FirstOrDefault().name,
-                category_name=categoryName, 
+                category_name = string.Join(", ", categoryNames),
                 total_price = o.total_price,
                 start_date = o.start_date,
                 is_active = o.is_active

@@ -17,6 +17,8 @@ namespace TiffinMate.BLL.Interfaces.OrderServiceInterface
         Task<OrderRequestDTO> OrderGetedByOrderId(Guid OrderId);
         Task<List<AllOrderByProviderDto>> OrderLists(Guid ProviderId, int page, int pageSize, string search = null, string? filter = null);
         Task<List<AllUserOutputDto>> UsersLists(Guid ProviderId, int page, int pageSize, string search = null);
+        Task<AllUserOutputDto> GetUserOrders(int page, int pageSize, string search = null, string filter = null);
+
         Task<List<AllOrderByProviderDto>> OrdersOfUsers(Guid ProviderId, Guid UserId, int page, int pageSize, string search = null);
 
     }

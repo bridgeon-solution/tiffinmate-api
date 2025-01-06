@@ -209,11 +209,35 @@ namespace TiffinMate.BLL.Services.OrderService
 
         }
 
+
+
         public async Task<OrderRequestDTO> OrderGetedByOrderId(Guid OrderId)
         {
-            var order = await _orderRepository.GetOrders(OrderId);
-            return _mapper.Map<OrderRequestDTO>(order);
+
+           var order=await _context.order.Include(o=>o.details).FirstOrDefaultAsync(o=>o.id==OrderId);
+            var items = new OrderRequestDTO
+            {
+                date = order.start_date,
+                menu_id = order.menu_id,
+                provider_id = order.provider_id,
+                total_price = order.total_price,
+                user_id = order.user_id,
+                details = order.details.Select(d => new OrderDetailsDto
+                {
+                    Id = d.id,
+                    FoodItemImage = d.fooditem_image,
+                    FoodItemName = d.fooditem_name,
+                    UserName = d.user_name,
+                    Address = d.address,
+                    City = d.city
+                }).ToList()
+
+            };
+            return items;
         }
+
+
+
 
         //orders
         public async Task<List<AllOrderByProviderDto>> OrderLists(Guid ProviderId, int page, int pageSize, string search = null, string? filter = null)
@@ -294,10 +318,62 @@ namespace TiffinMate.BLL.Services.OrderService
             };
             return new List<AllUserOutputDto> { result };
         }
+        public async Task<AllUserOutputDto> GetUserOrders(int page, int pageSize, string search = null, string filter = null)
+        {
+
+            var result = await _context.order
+                .Include(o => o.details)
+                .Where(o => o.payment_status)
+                .SelectMany(order => order.details, (order, detail) => new AllUsersDto
+                {
+                    user_name = detail.user_name,
+                    ph_no = detail.ph_no,
+                    city = detail.city,
+                    total_price = order.total_price,
+                    order_id = order.id,
+                    start_date = DateTime.Parse(order.start_date)
+                })
+                .ToListAsync();
+
+            if (!string.IsNullOrEmpty(search))
+            {
+                result = result.Where(u =>
+                    u.user_name.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                    u.city.Contains(search, StringComparison.OrdinalIgnoreCase)).ToList();
+            }
+
+            if (!string.IsNullOrEmpty(filter))
+            {
+                if (filter.Equals("newest", StringComparison.OrdinalIgnoreCase))
+                {
+                    result = result.OrderByDescending(u => u.start_date).ToList();
+                }
+                else if (filter.Equals("oldest", StringComparison.OrdinalIgnoreCase))
+                {
+                    result = result.OrderBy(u => u.start_date).ToList();
+                }
+            }
+
+
+            var total = result.Count;
+
+            var pagedUsers = result
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            var newResult = new AllUserOutputDto
+            {
+                TotalCount = total,
+                AllUsers = pagedUsers,
+            };
+
+            return newResult;
+        }
         public async Task<List<AllOrderByProviderDto>> OrdersOfUsers(Guid ProviderId, Guid UserId, int page, int pageSize, string search = null)
 
         {
-            var orders = (await _orderRepository.GetOrderOfUser(ProviderId,UserId)).ToList();
+            var orders = (await _orderRepository.GetOrderOfUser(ProviderId, UserId)).ToList();
 
             if (!string.IsNullOrEmpty(search))
             {
@@ -328,5 +404,6 @@ namespace TiffinMate.BLL.Services.OrderService
             };
             return new List<AllOrderByProviderDto> { result };
         }
+
     }
 }

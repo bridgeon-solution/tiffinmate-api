@@ -93,11 +93,6 @@ namespace TiffinMate.API.Controllers.OrderControllers
             }
 
         }
-        [HttpGet("categg")]
-        public async Task<string>sdfghjkl(Guid id)
-        {
-            var res = await _subscriptionService.categoryById(id);
-            return res;
-        }
+       
     }
 }

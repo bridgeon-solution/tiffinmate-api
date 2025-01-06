@@ -111,6 +111,7 @@ namespace TiffinMate.API.Controllers.OrderControllers
 
             }
         }
+
         [HttpGet("{providerId}/orders/list")]
         public async Task<IActionResult> AllOrders(Guid providerId, int page = 1, int pageSize = 10, string search = null, string? filter = null)
         {
@@ -167,6 +168,24 @@ namespace TiffinMate.API.Controllers.OrderControllers
             {
                 var res = await _orderService.OrderGetedByOrderId(orderid);
                 var result = new TiffinMate.API.ApiRespons.ApiResponse<OrderRequestDTO>("succesfull", "Order details getted succesfully", res, HttpStatusCode.OK, "");
+                return Ok(result);
+
+            }
+            catch (Exception ex)
+            {
+                var response = new TiffinMate.API.ApiRespons.ApiResponse<string>("failed", "", ex.Message, HttpStatusCode.InternalServerError, "error occured");
+                return StatusCode((int)HttpStatusCode.InternalServerError, response);
+
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetUsersOrder(int page, int pageSize, string search = null, string filter = null)
+        {
+            try
+            {
+                var res = await _orderService.GetUserOrders(page,pageSize,search,filter);
+                var result = new TiffinMate.API.ApiRespons.ApiResponse<AllUserOutputDto>("succesfull", "Order details getted succesfully", res, HttpStatusCode.OK, "");
                 return Ok(result);
 
             }

@@ -159,7 +159,56 @@ namespace TiffinMate.BLL.Services.OrderService
             var order = await _subscriptionRepository.GetSubscriptionByid(OrderId);
             return _mapper.Map<OrderRequestDTO>(order);
         }
+        public async Task<List<AllSubByProviderDto>> SubscriptionLists(Guid ProviderId, int page, int pageSize, string search = null, string filter = null)
 
+        {
+            var subscription = (await _subscriptionRepository.GetProviderSubscription(ProviderId)).ToList();
+
+            if (!string.IsNullOrEmpty(search))
+            {
+                subscription = subscription
+            .Where(u => u.user.name.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                        u.provider.food_items.FirstOrDefault().food_name.Contains(search, StringComparison.OrdinalIgnoreCase)).ToList();
+
+            }
+
+            if (!string.IsNullOrEmpty(filter))
+            {
+                subscription = subscription.Where(o => !string.IsNullOrEmpty(o.start_date) && o.start_date.Substring(0, 10) == filter).ToList();
+            }
+            var totalCount = subscription.Count;
+            var firstCategoryId = subscription.Select(p => p.details?.FirstOrDefault()?.category_id ?? Guid.Empty).FirstOrDefault();
+            var categoryName = await categoryById(firstCategoryId);
+            Console.WriteLine("category_id" + firstCategoryId);
+            Console.WriteLine("category_name" + categoryName);
+            Console.WriteLine("totallllllllllllllll: " + totalCount);
+            var Allorder = subscription.Select(o => new GetSubscriptionDetailsDto
+            {
+                user_name = o.user.name,
+                address = o.user.address,
+                city = o.user.city,
+                ph_no = o.user.phone,
+                fooditem_name = o.provider.food_items?.FirstOrDefault().food_name,
+                menu_name = o.provider.menus?.FirstOrDefault().name,
+                category_name=categoryName, 
+                total_price = o.total_price,
+                start_date = o.start_date,
+                is_active = o.is_active
+
+            }).ToList();
+            var pagedOrders = Allorder.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+
+            var result = new AllSubByProviderDto
+            {
+                TotalCount = totalCount,
+                Allsubscription = pagedOrders
+            };
+            return new List<AllSubByProviderDto> { result };
+        }
+        public async Task<string> categoryById(Guid id)
+        {
+          return  await _subscriptionRepository.categoryById(id);
+        }
     }
 
 }

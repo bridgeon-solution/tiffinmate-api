@@ -76,5 +76,28 @@ namespace TiffinMate.API.Controllers.OrderControllers
 
             }
         }
+        [HttpGet("{providerId}/list")]
+        public async Task<IActionResult> AllOrders(Guid providerId, int page = 1, int pageSize = 10, string search = null, string filter = null)
+        {
+            try
+            {
+                var res = await _subscriptionService.SubscriptionLists(providerId, page, pageSize, search, filter);
+                var result = new TiffinMate.API.ApiRespons.ApiResponse<List<AllSubByProviderDto>>("succesfull", "Getting Orders succesfully", res, HttpStatusCode.OK, "");
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                var response = new TiffinMate.API.ApiRespons.ApiResponse<string>("failed", "", ex.Message, HttpStatusCode.InternalServerError, "error occured");
+                return StatusCode((int)HttpStatusCode.InternalServerError, response);
+
+            }
+
+        }
+        [HttpGet("categg")]
+        public async Task<string>sdfghjkl(Guid id)
+        {
+            var res = await _subscriptionService.categoryById(id);
+            return res;
+        }
     }
 }

@@ -63,6 +63,7 @@ namespace TiffinMate.BLL.Services.ProviderServices
                 var prd = _mapper.Map<Provider>(provider);
                 Console.WriteLine(prd);
                 prd.certificate = certificateUrl;
+              
                 await _providerRepository.AddProviderAsync(prd);
                 await _providerRepository.SaveChangesAsync();
               

@@ -9,7 +9,6 @@ namespace TiffinMate.DAL.Entities.OrderEntity
 {
     public class Subscription:AuditableEntity
     {
-        
             public Guid id { get; set; }
             public Guid user_id { get; set; }
             public Guid provider_id { get; set; }
@@ -21,14 +20,9 @@ namespace TiffinMate.DAL.Entities.OrderEntity
             public string? transaction_id { get; set; }
             public bool payment_status { get; set; } = false;
             public bool is_active { get; set; }=false;
-
             public List<SubscriptionDetails> details { get; set; }
             public User user { get; set; }
-
-
             public Provider provider { get; set; }
-
-
         
     }
 }

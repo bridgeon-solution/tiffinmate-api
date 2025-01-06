@@ -15,8 +15,9 @@ namespace TiffinMate.BLL.Interfaces.OrderServiceInterface
         Task<string> RazorPayorderIdCreate(long price);
         Task<bool> payment(RazorPayDto razorPayDto);
         Task<OrderRequestDTO> OrderGetedByOrderId(Guid OrderId);
-        Task<List<AllOrderByProviderDto>> OrderLists(Guid ProviderId, int page, int pageSize, string search = null);
+        Task<List<AllOrderByProviderDto>> OrderLists(Guid ProviderId, int page, int pageSize, string search = null, string? filter = null);
         Task<List<AllUserOutputDto>> UsersLists(Guid ProviderId, int page, int pageSize, string search = null);
+        Task<List<AllOrderByProviderDto>> OrdersOfUsers(Guid ProviderId, Guid UserId, int page, int pageSize, string search = null);
 
     }
 }

@@ -23,7 +23,23 @@ namespace TiffinMate.DAL.Repositories.OrderRepository
         }
         public async Task<Subscription> GetSubscriptionByid(Guid OrderId)
         {
-            return await _context.subscriptions.FirstOrDefaultAsync(o => o.id==OrderId);
+            return await _context.subscriptions.FirstOrDefaultAsync(o => o.id == OrderId);
+        }
+        public async Task<List<Subscription>> GetProviderSubscription(Guid providerId)
+        {
+            return await _context.subscriptions
+         .Where(o => o.provider_id == providerId)
+         .Include(p => p.provider).ThenInclude(o => o.menus)
+         .Include(f => f.provider).ThenInclude(f => f.food_items)
+         .Include(u => u.user)
+         .ToListAsync();
+        }
+        public async Task <string>categoryById(Guid id)
+        {
+            var category = await _context.Categories
+        .FirstOrDefaultAsync(o => o.id == id);
+            return category?.category_name;
+
         }
     }
 }

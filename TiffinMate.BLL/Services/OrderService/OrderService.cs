@@ -242,7 +242,7 @@ namespace TiffinMate.BLL.Services.OrderService
 
 
         //orders
-        public async Task<List<AllOrderByProviderDto>> OrderLists(Guid ProviderId, int page, int pageSize, string search = null)
+        public async Task<List<AllOrderByProviderDto>> OrderLists(Guid ProviderId, int page, int pageSize, string search = null, string? filter = null)
 
         {
             var orders = (await _orderRepository.GetOrdersByProvider(ProviderId)).ToList();
@@ -254,6 +254,13 @@ namespace TiffinMate.BLL.Services.OrderService
                         u.details.Any(d => d.fooditem_name.Contains(search, StringComparison.OrdinalIgnoreCase))).ToList();
 
             }
+
+            if (!string.IsNullOrEmpty(filter))
+            {
+                orders = orders.Where(o => !string.IsNullOrEmpty(o.start_date) && o.start_date.Substring(0,10) == filter).ToList();
+            }
+
+
             var totalCount = orders.Count;
 
             var Allorder = orders.SelectMany(o => o.details.Select(d => new GetOrderDetailsDto
@@ -263,7 +270,11 @@ namespace TiffinMate.BLL.Services.OrderService
                 city = d.city,
                 ph_no = d.ph_no,
                 fooditem_name = d.fooditem_name,
-
+                menu_name=o.provider.menus.FirstOrDefault().name,
+                category_name=o.provider.food_items.FirstOrDefault().category.category_name,
+                total_price=o.total_price,
+                start_date = o.start_date
+                
             })).ToList();
             var pagedOrders = Allorder.Skip((page - 1) * pageSize).Take(pageSize).ToList();
 
@@ -287,7 +298,7 @@ namespace TiffinMate.BLL.Services.OrderService
                         u.user.email.Contains(search, StringComparison.OrdinalIgnoreCase)).ToList();
 
             }
-            var totalCount = orders.Count;
+
 
 
 
@@ -300,6 +311,7 @@ namespace TiffinMate.BLL.Services.OrderService
                 image = o.user.image,
                 email = o.user.email
             }).ToList();
+            var totalCount = Allusers.Count;
             var pagedOrders = Allusers.Skip((page - 1) * pageSize).Take(pageSize).ToList();
 
             var result = new AllUserOutputDto
@@ -309,14 +321,12 @@ namespace TiffinMate.BLL.Services.OrderService
             };
             return new List<AllUserOutputDto> { result };
         }
-
-
         public async Task<AllUserOutputDto> GetUserOrders(int page, int pageSize, string search = null, string filter = null)
         {
-            
+
             var result = await _context.order
                 .Include(o => o.details)
-                .Where(o => o.payment_status) 
+                .Where(o => o.payment_status)
                 .SelectMany(order => order.details, (order, detail) => new AllUsersDto
                 {
                     user_name = detail.user_name,
@@ -340,15 +350,15 @@ namespace TiffinMate.BLL.Services.OrderService
             {
                 if (filter.Equals("newest", StringComparison.OrdinalIgnoreCase))
                 {
-                    result = result.OrderByDescending(u => u.start_date).ToList(); 
+                    result = result.OrderByDescending(u => u.start_date).ToList();
                 }
                 else if (filter.Equals("oldest", StringComparison.OrdinalIgnoreCase))
                 {
-                    result = result.OrderBy(u => u.start_date).ToList(); 
+                    result = result.OrderBy(u => u.start_date).ToList();
                 }
             }
 
-          
+
             var total = result.Count;
 
             var pagedUsers = result
@@ -363,6 +373,40 @@ namespace TiffinMate.BLL.Services.OrderService
             };
 
             return newResult;
+        }
+        public async Task<List<AllOrderByProviderDto>> OrdersOfUsers(Guid ProviderId, Guid UserId, int page, int pageSize, string search = null)
+
+        {
+            var orders = (await _orderRepository.GetOrderOfUser(ProviderId, UserId)).ToList();
+
+            if (!string.IsNullOrEmpty(search))
+            {
+                orders = orders
+            .Where(u => u.user.name.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                        u.details.Any(d => d.fooditem_name.Contains(search, StringComparison.OrdinalIgnoreCase))).ToList();
+
+            }
+            var totalCount = orders.Count;
+
+            var Allorder = orders.SelectMany(o => o.details.Select(d => new GetOrderDetailsDto
+            {
+                user_name = d.user_name,
+                address = d.address,
+                city = d.city,
+                ph_no = d.ph_no,
+                fooditem_name = d.fooditem_name,
+                menu_name = o.provider.menus.FirstOrDefault().name,
+                category_name = o.provider.food_items.FirstOrDefault().category.category_name,
+                total_price = o.total_price
+            })).ToList();
+            var pagedOrders = Allorder.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+
+            var result = new AllOrderByProviderDto
+            {
+                TotalCount = totalCount,
+                Allorders = pagedOrders
+            };
+            return new List<AllOrderByProviderDto> { result };
         }
 
     }

@@ -12,5 +12,7 @@ namespace TiffinMate.BLL.Interfaces.OrderServiceInterface
         Task<Guid> SubscriptionCreate(OrderRequestDTO orderRequestDTO);
         Task<OrderResponceDto> SubscriptionDetailsCreate(OrderDetailsRequestDto orderDetailsRequestDto, Guid orderId);
         Task<OrderRequestDTO> SubscriptionGetedById(Guid OrderId);
+        Task<List<AllSubByProviderDto>> SubscriptionLists(Guid ProviderId, int page, int pageSize, string search = null, string filter = null);
+        Task<string> categoryById(Guid id);
     }
 }

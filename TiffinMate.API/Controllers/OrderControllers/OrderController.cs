@@ -128,7 +128,7 @@ namespace TiffinMate.API.Controllers.OrderControllers
 
             }
         }
-        [HttpGet("{providerId}/users/list")]
+        [HttpGet("{providerId}/users")]
         public async Task<IActionResult> AllUsers(Guid providerId, int page = 1, int pageSize = 10, string search = null)
         {
             try
@@ -144,7 +144,7 @@ namespace TiffinMate.API.Controllers.OrderControllers
 
             }
         }
-        [HttpGet("{providerId}/users/orders/list")]
+        [HttpGet("{providerId}/users/orders")]
         public async Task<IActionResult> UserOrders(Guid providerId,Guid UserId, int page = 1, int pageSize = 10, string search = null)
         {
             try

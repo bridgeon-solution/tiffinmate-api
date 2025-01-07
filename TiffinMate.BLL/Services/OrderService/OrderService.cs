@@ -296,7 +296,7 @@ namespace TiffinMate.BLL.Services.OrderService
                         u.user.email.Contains(search, StringComparison.OrdinalIgnoreCase)).ToList();
 
             }
-            var totalCount = orders.Count;
+
 
 
 
@@ -309,6 +309,7 @@ namespace TiffinMate.BLL.Services.OrderService
                 image = o.user.image,
                 email = o.user.email
             }).ToList();
+            var totalCount = Allusers.Count;
             var pagedOrders = Allusers.Skip((page - 1) * pageSize).Take(pageSize).ToList();
 
             var result = new AllUserOutputDto

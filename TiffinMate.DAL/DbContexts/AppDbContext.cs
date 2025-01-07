@@ -217,6 +217,12 @@ namespace TiffinMate.DAL.DbContexts
 
 
             });
+            modelBuilder.Entity<OrderDetails>(entity =>
+            {
+                entity.HasOne(o => o.Category)
+                .WithMany(c => c.order_details)
+                .HasForeignKey(o => o.category_id);
+            });
 
 
 

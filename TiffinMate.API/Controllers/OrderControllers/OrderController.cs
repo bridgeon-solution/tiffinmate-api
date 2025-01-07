@@ -112,7 +112,7 @@ namespace TiffinMate.API.Controllers.OrderControllers
             }
         }
 
-        [HttpGet("{providerId}/orders/list")]
+        [HttpGet("{providerId}/orders")]
         public async Task<IActionResult> AllOrders(Guid providerId, int page = 1, int pageSize = 10, string search = null, string? filter = null)
         {
             try

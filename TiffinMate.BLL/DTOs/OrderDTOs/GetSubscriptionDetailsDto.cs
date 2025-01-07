@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TiffinMate.BLL.DTOs.OrderDTOs
 {
-    public class GetOrderDetailsDto
+   public class GetSubscriptionDetailsDto
     {
         public string user_name { get; set; }
         public string address { get; set; }
@@ -16,6 +16,7 @@ namespace TiffinMate.BLL.DTOs.OrderDTOs
         public string category_name { get; set; }
         public string menu_name { get; set; }
         public decimal total_price { get; set; }
-        public string? start_date { get; set; }
+        public string start_date { get; set; }
+        public bool is_active { get; set; } 
     }
 }

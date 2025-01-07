@@ -112,12 +112,12 @@ namespace TiffinMate.API.Controllers.OrderControllers
             }
         }
 
-        [HttpGet("{providerId}/orders/list")]
-        public async Task<IActionResult> AllOrders(Guid providerId, int page = 1, int pageSize = 10, string search = null)
+        [HttpGet("{providerId}/orders")]
+        public async Task<IActionResult> AllOrders(Guid providerId, int page = 1, int pageSize = 10, string search = null, string? filter = null)
         {
             try
             {
-                var res = await _orderService.OrderLists(providerId, page, pageSize, search);
+                var res = await _orderService.OrderLists(providerId, page, pageSize, search, filter);
                 var result = new TiffinMate.API.ApiRespons.ApiResponse<List<AllOrderByProviderDto>>("succesfull", "Getting Orders succesfully", res, HttpStatusCode.OK, "");
                 return Ok(result);
             }
@@ -128,13 +128,29 @@ namespace TiffinMate.API.Controllers.OrderControllers
 
             }
         }
-        [HttpGet("{providerId}/users/list")]
+        [HttpGet("{providerId}/users")]
         public async Task<IActionResult> AllUsers(Guid providerId, int page = 1, int pageSize = 10, string search = null)
         {
             try
             {
                 var res = await _orderService.UsersLists(providerId, page, pageSize, search);
                 var result = new TiffinMate.API.ApiRespons.ApiResponse<List<AllUserOutputDto>>("succesfull", "Getting Users succesfully", res, HttpStatusCode.OK, "");
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                var response = new TiffinMate.API.ApiRespons.ApiResponse<string>("failed", "", ex.Message, HttpStatusCode.InternalServerError, "error occured");
+                return StatusCode((int)HttpStatusCode.InternalServerError, response);
+
+            }
+        }
+        [HttpGet("{providerId}/users/orders")]
+        public async Task<IActionResult> UserOrders(Guid providerId,Guid UserId, int page = 1, int pageSize = 10, string search = null)
+        {
+            try
+            {
+                var res = await _orderService.OrdersOfUsers(providerId,UserId, page, pageSize, search);
+                var result = new TiffinMate.API.ApiRespons.ApiResponse<List<AllOrderByProviderDto>>("succesfull", "Getting users Orders succesfully", res, HttpStatusCode.OK, "");
                 return Ok(result);
             }
             catch (Exception ex)

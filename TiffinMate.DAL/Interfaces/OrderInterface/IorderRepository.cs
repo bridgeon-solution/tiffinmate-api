@@ -13,5 +13,6 @@ namespace TiffinMate.DAL.Interfaces.OrderInterface
         public Task<List<Categories>> CreateOrder();
 
         Task<List<Order>> GetOrdersByProvider(Guid providerId);
+        Task<List<Order>> GetOrderOfUser(Guid providerId, Guid userId);
     }
 }

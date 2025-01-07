@@ -211,11 +211,11 @@ namespace TiffinMate.BLL.Services.OrderService
 
 
 
-        public async Task<OrderRequestDTO> OrderGetedByOrderId(Guid OrderId)
+        public async Task<OrderDetailsResponseDTO> OrderGetedByOrderId(Guid OrderId)
         {
 
            var order=await _context.order.Include(o=>o.details).FirstOrDefaultAsync(o=>o.id==OrderId);
-            var items = new OrderRequestDTO
+            var items = new OrderDetailsResponseDTO
             {
                 date = order.start_date,
                 menu_id = order.menu_id,
@@ -229,7 +229,9 @@ namespace TiffinMate.BLL.Services.OrderService
                     FoodItemName = d.fooditem_name,
                     UserName = d.user_name,
                     Address = d.address,
-                    City = d.city
+                    City = d.city,
+                    CategoryId=d.category_id
+                    
                 }).ToList()
 
             };
@@ -320,6 +322,7 @@ namespace TiffinMate.BLL.Services.OrderService
                     user_name = detail.user_name,
                     ph_no = detail.ph_no,
                     city = detail.city,
+                    address=detail.address,
                     total_price = order.total_price,
                     order_id = order.id,
                     start_date = DateTime.Parse(order.start_date)

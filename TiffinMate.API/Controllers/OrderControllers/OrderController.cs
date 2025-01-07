@@ -151,7 +151,7 @@ namespace TiffinMate.API.Controllers.OrderControllers
             try
             {
                 var res = await _orderService.OrderGetedByOrderId(orderid);
-                var result = new TiffinMate.API.ApiRespons.ApiResponse<OrderRequestDTO>("succesfull", "Order details getted succesfully", res, HttpStatusCode.OK, "");
+                var result = new TiffinMate.API.ApiRespons.ApiResponse<OrderDetailsResponseDTO>("succesfull", "Order details getted succesfully", res, HttpStatusCode.OK, "");
                 return Ok(result);
 
             }

@@ -211,15 +211,15 @@ namespace TiffinMate.BLL.Services.OrderService
 
 
 
-        public async Task<OrderRequestDTO> OrderGetedByOrderId(Guid OrderId)
+        public async Task<OrderDetailsResponseDTO> OrderGetedByOrderId(Guid OrderId)
         {
 
-           var order=await _context.order.Include(o=>o.details).FirstOrDefaultAsync(o=>o.id==OrderId);
-            var items = new OrderRequestDTO
+           var order=await _context.order.Include(o=>o.provider).Include(o => o.details).ThenInclude(d=>d.Category). FirstOrDefaultAsync(o=>o.id==OrderId);
+            var items = new OrderDetailsResponseDTO
             {
                 date = order.start_date,
                 menu_id = order.menu_id,
-                provider_id = order.provider_id,
+                provider = order.provider.user_name,
                 total_price = order.total_price,
                 user_id = order.user_id,
                 details = order.details.Select(d => new OrderDetailsDto
@@ -229,7 +229,9 @@ namespace TiffinMate.BLL.Services.OrderService
                     FoodItemName = d.fooditem_name,
                     UserName = d.user_name,
                     Address = d.address,
-                    City = d.city
+                    City = d.city,
+                    Category=d.Category.category_name,
+                    
                 }).ToList()
 
             };
@@ -319,58 +321,78 @@ namespace TiffinMate.BLL.Services.OrderService
             };
             return new List<AllUserOutputDto> { result };
         }
-        public async Task<AllUserOutputDto> GetUserOrders(int page, int pageSize, string search = null, string filter = null)
-        {
 
-            var result = await _context.order
-                .Include(o => o.details)
-                .Where(o => o.payment_status)
-                .SelectMany(order => order.details, (order, detail) => new AllUsersDto
-                {
-                    user_name = detail.user_name,
-                    ph_no = detail.ph_no,
-                    city = detail.city,
-                    total_price = order.total_price,
-                    order_id = order.id,
-                    start_date = DateTime.Parse(order.start_date)
-                })
+
+        //AllOrders
+        public async Task<AllOrderDTO> GetUserOrders(int page, int pageSize, string search = null, string filter = null)
+        {
+            
+            var orders = await _context.order
+                 .Include(o=>o.provider).Include(o => o.details).ThenInclude(d=>d.Category)
+                .Where(o => o.payment_status) 
                 .ToListAsync();
 
+            var result = orders.Select(order => new OrderDetailsResponseDTO
+            {
+                date = order.start_date,
+                menu_id = order.menu_id,
+                provider = order.provider.user_name,
+                user_id = order.user_id,
+                total_price = order.total_price,
+                details = order.details.Select(d => new OrderDetailsDto
+                {
+                    Id=d.id,
+                    FoodItemImage = d.fooditem_image,
+                    FoodItemName = d.fooditem_name, 
+                    UserName = d.user_name,
+                    Address = d.address,
+                    City = d.city,
+                    Category = d.Category.category_name
+                }).ToList() 
+            }).ToList();
+
+           
             if (!string.IsNullOrEmpty(search))
             {
                 result = result.Where(u =>
-                    u.user_name.Contains(search, StringComparison.OrdinalIgnoreCase) ||
-                    u.city.Contains(search, StringComparison.OrdinalIgnoreCase)).ToList();
+                    u.details.Any(d =>
+                        d.UserName.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                        d.City.Contains(search, StringComparison.OrdinalIgnoreCase))
+                ).ToList();
             }
 
+           
             if (!string.IsNullOrEmpty(filter))
             {
                 if (filter.Equals("newest", StringComparison.OrdinalIgnoreCase))
                 {
-                    result = result.OrderByDescending(u => u.start_date).ToList();
+                    result = result.OrderByDescending(u => u.date).ToList();
                 }
                 else if (filter.Equals("oldest", StringComparison.OrdinalIgnoreCase))
                 {
-                    result = result.OrderBy(u => u.start_date).ToList();
+                    result = result.OrderBy(u => u.date).ToList();
                 }
             }
 
-
+           
             var total = result.Count;
 
+            
             var pagedUsers = result
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToList();
 
-            var newResult = new AllUserOutputDto
+            
+            var newResult = new AllOrderDTO
             {
                 TotalCount = total,
-                AllUsers = pagedUsers,
+               AllDetails = pagedUsers
             };
 
             return newResult;
         }
+
         public async Task<List<AllOrderByProviderDto>> OrdersOfUsers(Guid ProviderId, Guid UserId, int page, int pageSize, string search = null)
 
         {

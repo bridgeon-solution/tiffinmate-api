@@ -93,6 +93,24 @@ namespace TiffinMate.API.Controllers.OrderControllers
             }
 
         }
-       
+
+        [HttpGet]
+        public async Task<IActionResult> GetSubscriptionOrder(int page, int pageSize, string search = null, string filter = null)
+        {
+            try
+            {
+                var res = await _subscriptionService.GetSubscribtionOrders(page, pageSize, search, filter);
+                var result = new TiffinMate.API.ApiRespons.ApiResponse<AllOrderDTO>("succesfull", "Subscription details getted succesfully", res, HttpStatusCode.OK, "");
+                return Ok(result);
+
+            }
+            catch (Exception ex)
+            {
+                var response = new TiffinMate.API.ApiRespons.ApiResponse<string>("failed", "", ex.Message, HttpStatusCode.InternalServerError, "error occured");
+                return StatusCode((int)HttpStatusCode.InternalServerError, response);
+
+            }
+        }
+
     }
 }

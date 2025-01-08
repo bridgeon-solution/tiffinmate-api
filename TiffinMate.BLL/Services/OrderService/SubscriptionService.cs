@@ -124,6 +124,7 @@ namespace TiffinMate.BLL.Services.OrderService
                 if (order != null)
                 {
                     order.payment_status = true;
+                    order.is_active = true;
                     order.order_string = orderDetailsRequestDto.order_string;
                     order.transaction_id = orderDetailsRequestDto.transaction_string;
                     _context.subscriptions.Update(order);
@@ -207,6 +208,86 @@ namespace TiffinMate.BLL.Services.OrderService
         {
           return  await _subscriptionRepository.categoryById(id);
         }
+
+
+        //All_Subsribtion_Orders
+
+        public async Task<AllOrderDTO> GetSubscribtionOrders(int page, int pageSize, string search = null, string filter = null)
+        {
+            var orders = await _context.subscriptions
+                .Include(o => o.provider).Include(o => o.user).Include(o => o.details).ThenInclude(d => d.Category)
+               .Where(o => o.payment_status)
+               .ToListAsync();
+
+            var result = orders.Select(order => new OrderDetailsResponseDTO
+            {
+                date = order.start_date,
+                menu_id = order.menu_id,
+                order_id = order.id,
+                provider = order.provider.user_name,
+                user = order.user.name,
+                user_id = order.user_id,
+                total_price = order.total_price,
+                payment_status=order.payment_status,
+                cancelled_at=order.cancelled_at,
+                details = order.details.Select(d => new OrderDetailsDto
+                {
+                    Id = d.id,
+                    UserName = d.user_name,
+                    Address = d.address,
+                    City = d.city,
+                    Category = d.Category.category_name,
+                }).ToList()
+            }).ToList();
+
+
+            if (!string.IsNullOrEmpty(search))
+            {
+                result = result.Where(u =>
+                   u.user.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                   u.provider.Contains(search, StringComparison.OrdinalIgnoreCase)
+                ).ToList();
+            }
+
+          
+
+
+            if (!string.IsNullOrEmpty(filter))
+            {
+                if (filter.Equals("newest", StringComparison.OrdinalIgnoreCase))
+                {
+                    result = result.OrderByDescending(u => u.date).ToList();
+                }
+                else if (filter.Equals("oldest", StringComparison.OrdinalIgnoreCase))
+                {
+                    result = result.OrderBy(u => u.date).ToList();
+                }
+            }
+
+
+            var total = result.Count;
+
+
+            var pagedUsers = result
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+
+            var newResult = new AllOrderDTO
+            {
+                TotalCount = total,
+                AllDetails = pagedUsers
+            };
+
+            return newResult;
+        }
+
+
+
     }
+
+
+
 
 }

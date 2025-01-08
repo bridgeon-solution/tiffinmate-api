@@ -186,7 +186,9 @@ namespace TiffinMate.DAL.DbContexts
                 entity.HasMany(o => o.details)
                 .WithOne(od => od.order)
                 .HasForeignKey(od => od.order_id)
-                .OnDelete(DeleteBehavior.Cascade);  
+                .OnDelete(DeleteBehavior.Cascade);
+
+               
 
             });
 
@@ -214,6 +216,8 @@ namespace TiffinMate.DAL.DbContexts
                 .HasForeignKey(od => od.subscription_id)
                 .OnDelete(DeleteBehavior.Cascade);
 
+               
+
 
 
             });
@@ -221,11 +225,16 @@ namespace TiffinMate.DAL.DbContexts
             {
                 entity.HasOne(o => o.Category)
                 .WithMany(c => c.order_details)
-                .HasForeignKey(o => o.category_id);
+                .HasForeignKey(o => o.category_id)
+                .OnDelete(DeleteBehavior.Cascade);
             });
 
-
-
+            modelBuilder.Entity<SubscriptionDetails>(entity =>
+            {
+                entity.HasOne(o => o.Category)
+                .WithMany(c => c.subscription_details)
+                .HasForeignKey(o => o.category_id);
+            });
 
 
 

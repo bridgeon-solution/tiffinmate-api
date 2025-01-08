@@ -8,11 +8,12 @@ namespace TiffinMate.BLL.DTOs.OrderDTOs
 {
     public class OrderResponceDto
     {
-        public Guid OrderId { get; set; }
-        public Guid UserId { get; set; }
-        public Guid ProviderId { get; set; }
-        public Guid MenuId { get; set; }
-        public string StartDate { get; set; }
+        public Guid orderdetails_id { get; set; }
+        public Guid order_id { get; set; }
+        public string user_name { get; set; }
+        public string city { get; set; }
+        public string phone_number { get; set; }
+       
        
     }
 }

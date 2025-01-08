@@ -32,7 +32,8 @@ namespace TiffinMate.DAL.DbContexts
         public DbSet<Notification> notifications { get; set; }
         public DbSet<Order> order { get; set; }
         public DbSet<OrderDetails> orderDetails { get; set; }
-        //public DbSet<OrderCategory> orderCategory { get; set; }
+        public DbSet<Subscription> subscriptions { get; set; }
+        public DbSet<SubscriptionDetails>subscriptionDetails { get; set; }
 
 
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
@@ -185,16 +186,48 @@ namespace TiffinMate.DAL.DbContexts
                 entity.HasMany(o => o.details)
                 .WithOne(od => od.order)
                 .HasForeignKey(od => od.order_id)
-                .OnDelete(DeleteBehavior.Cascade);
-
-               
+                .OnDelete(DeleteBehavior.Cascade);  
 
             });
 
-           
+
+            modelBuilder.Entity<Subscription>(entity =>
+            {
+                entity.HasOne(m => m.user)
+                .WithMany(m => m.subscription)
+                .HasForeignKey(f => f.user_id)
+                .OnDelete(DeleteBehavior.Cascade);
 
 
-            
+                entity.HasMany(m => m.details)
+                .WithOne(c => c.subscription)
+                .HasForeignKey(o => o.subscription_id)
+                .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(m => m.provider)
+                .WithMany(p => p.subscription)
+                .HasForeignKey(p => p.provider_id)
+                .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasMany(o => o.details)
+                .WithOne(od => od.subscription)
+                .HasForeignKey(od => od.subscription_id)
+                .OnDelete(DeleteBehavior.Cascade);
+
+
+
+            });
+            modelBuilder.Entity<OrderDetails>(entity =>
+            {
+                entity.HasOne(o => o.Category)
+                .WithMany(c => c.order_details)
+                .HasForeignKey(o => o.category_id);
+            });
+
+
+
+
+
 
 
         }

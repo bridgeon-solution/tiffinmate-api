@@ -5,8 +5,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TiffinMate.BLL.DTOs.OrderDTOs;
 using TiffinMate.BLL.DTOs.ProviderDTOs;
 using TiffinMate.BLL.DTOs.UserDTOs;
+using TiffinMate.DAL.Entities.OrderEntity;
 using TiffinMate.DAL.Entities.ProviderEntity;
 
 namespace TiffinMate.BLL.Mapper
@@ -30,6 +32,8 @@ namespace TiffinMate.BLL.Mapper
             CreateMap<Categories,CategoryDto>().ReverseMap();
             CreateMap<ProviderResponseDTO,Provider>().ReverseMap();
             CreateMap<MenuRequestDto, Menu>().ReverseMap();
+            CreateMap<Order,OrderRequestDTO>().ReverseMap();
+            CreateMap<Subscription, OrderRequestDTO>();
             
         }
     }

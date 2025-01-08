@@ -20,18 +20,23 @@ using System.Net;
 using TiffinMate.BLL.DTOs.UserDTOs;
 using Supabase.Gotrue;
 using BCrypt.Net;
-
+using TiffinMate.DAL.Interfaces.AdminInterfaces;
+using static Supabase.Gotrue.Constants;
+using TiffinMate.BLL.Interfaces.NotificationInterface;
+using Provider = TiffinMate.DAL.Entities.ProviderEntity.Provider;
 namespace TiffinMate.BLL.Services.ProviderServices
 {
     public class ProviderService : IProviderService
     {
         private readonly IProviderRepository _providerRepository;
+        private readonly IAdminRepository _adminRepository;
         private readonly IMapper _mapper;
         private readonly ICloudinaryService _cloudinary;
         private readonly IConfiguration _config;
         private readonly AppDbContext _context;
         private readonly string _jwtKey;
-        public ProviderService(IProviderRepository providerRepository, IMapper mapper, ICloudinaryService cloudinary, IConfiguration config, AppDbContext context)
+        private readonly INotificationService _notificationService;
+        public ProviderService(IProviderRepository providerRepository, IMapper mapper, ICloudinaryService cloudinary, IConfiguration config, AppDbContext context, INotificationService notificationService)
         {
             _providerRepository = providerRepository;
             _mapper = mapper;
@@ -39,10 +44,11 @@ namespace TiffinMate.BLL.Services.ProviderServices
             _config = config;
             _context = context;
             _jwtKey = Environment.GetEnvironmentVariable("JWT_KEY");
+            _notificationService= notificationService;
         }
 
         //register
-        public async Task<bool> AddProvider(ProviderDTO product, IFormFile certificateFile)
+        public async Task<bool> AddProvider(ProviderDTO provider, IFormFile certificateFile)
         {
             try
             {
@@ -54,11 +60,18 @@ namespace TiffinMate.BLL.Services.ProviderServices
 
                 var certificateUrl = await _cloudinary.UploadDocumentAsync(certificateFile);
 
-                var prd = _mapper.Map<Provider>(product);
-
+                var prd = _mapper.Map<Provider>(provider);
+                Console.WriteLine(prd);
                 prd.certificate = certificateUrl;
+              
                 await _providerRepository.AddProviderAsync(prd);
                 await _providerRepository.SaveChangesAsync();
+              
+                        
+                        string title = "New Provider Registration";
+                        string message = $"A new provider, {provider.user_name}, has registered.";
+                        await _notificationService.CreateAndSendNotificationAsync(title, message);
+              
 
                 return true;
             }
@@ -197,23 +210,23 @@ namespace TiffinMate.BLL.Services.ProviderServices
             }
         }
         //Token
-        private string CreateToken(Provider user)
+        private string CreateToken(Provider provider)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtKey));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
             var claims = new[]
             {
-                new Claim (ClaimTypes.NameIdentifier, user.id.ToString()),
-                new Claim (ClaimTypes.Name,user.user_name),
-                new Claim (ClaimTypes.Role, user.role),
-                new Claim(ClaimTypes.Email, user.email)
+                new Claim (ClaimTypes.NameIdentifier, provider.id.ToString()),
+                new Claim (ClaimTypes.Name,provider.user_name),
+                new Claim (ClaimTypes.Role, provider.role),
+                new Claim(ClaimTypes.Email, provider.email)
             };
 
             var token = new JwtSecurityToken(
                     claims: claims,
                     signingCredentials: credentials,
-                    expires: DateTime.Now.AddDays(1)
+                    expires: DateTime.Now.AddSeconds(2)
                 );
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
@@ -362,8 +375,9 @@ namespace TiffinMate.BLL.Services.ProviderServices
                     var logoUrl = await _cloudinary.UploadDocumentAsync(logo);
                     existingDetails.logo = logoUrl;
                 }
+              
 
-
+                
                 existingDetails.Provider.email = providerDetailsdto.email;
                 existingDetails.Provider.user_name = providerDetailsdto.username;
                 existingDetails.address = providerDetailsdto.address;

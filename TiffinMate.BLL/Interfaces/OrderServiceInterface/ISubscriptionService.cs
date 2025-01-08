@@ -14,5 +14,6 @@ namespace TiffinMate.BLL.Interfaces.OrderServiceInterface
         Task<OrderRequestDTO> SubscriptionGetedById(Guid OrderId);
         Task<List<AllSubByProviderDto>> SubscriptionLists(Guid ProviderId, int page, int pageSize, string search = null, string filter = null);
         Task<string> categoryById(Guid id);
+        Task<AllOrderDTO> GetSubscribtionOrders(int page, int pageSize, string search = null, string filter = null);
     }
 }

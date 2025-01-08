@@ -60,8 +60,7 @@ namespace TiffinMate.BLL.Services.OrderService
                 start_date = isoStartDate,
                 total_price=orderRequestDTO.total_price,
 
-                //order_string = orderRequestDTO.order_string,
-                //transaction_id = orderRequestDTO.transaction_string
+              
             };
 
             await _context.order.AddAsync(newOrder);
@@ -328,7 +327,7 @@ namespace TiffinMate.BLL.Services.OrderService
         {
             
             var orders = await _context.order
-                 .Include(o=>o.provider).Include(o => o.details).ThenInclude(d=>d.Category)
+                 .Include(o=>o.provider).Include(o=>o.user).Include(o => o.details).ThenInclude(d=>d.Category)
                 .Where(o => o.payment_status) 
                 .ToListAsync();
 
@@ -336,29 +335,33 @@ namespace TiffinMate.BLL.Services.OrderService
             {
                 date = order.start_date,
                 menu_id = order.menu_id,
+                order_id = order.id,
                 provider = order.provider.user_name,
+                user = order.user.name,
                 user_id = order.user_id,
                 total_price = order.total_price,
+                payment_status= order.payment_status,
                 details = order.details.Select(d => new OrderDetailsDto
                 {
-                    Id=d.id,
+                    Id = d.id,
                     FoodItemImage = d.fooditem_image,
-                    FoodItemName = d.fooditem_name, 
+                    FoodItemName = d.fooditem_name,
                     UserName = d.user_name,
                     Address = d.address,
                     City = d.city,
-                    Category = d.Category.category_name
-                }).ToList() 
+                    Category = d.Category.category_name,
+                    
+                    
+                }).ToList()
             }).ToList();
 
            
             if (!string.IsNullOrEmpty(search))
             {
                 result = result.Where(u =>
-                    u.details.Any(d =>
-                        d.UserName.Contains(search, StringComparison.OrdinalIgnoreCase) ||
-                        d.City.Contains(search, StringComparison.OrdinalIgnoreCase))
-                ).ToList();
+                  u.user.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                  u.provider.Contains(search, StringComparison.OrdinalIgnoreCase)
+               ).ToList();
             }
 
            

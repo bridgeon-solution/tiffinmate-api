@@ -21,7 +21,6 @@ namespace TiffinMate.DAL.Entities.OrderEntity
 
         public List<OrderDetails> details { get; set; }
         public User user { get; set; }
-   
 
         public Provider provider { get; set; }
        

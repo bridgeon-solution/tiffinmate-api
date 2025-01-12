@@ -61,6 +61,10 @@ namespace TiffinMate.BLL.Services.ProviderServices
                 var certificateUrl = await _cloudinary.UploadDocumentAsync(certificateFile);
 
                 var prd = _mapper.Map<Provider>(provider);
+                if (await _providerRepository.EmailExistOrNot(prd.email))
+                {
+                    throw new Exception("Email already exists.");
+                }
                 Console.WriteLine(prd);
                 prd.certificate = certificateUrl;
               

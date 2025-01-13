@@ -181,11 +181,11 @@ namespace TiffinMate.API.Controllers.OrderControllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetUsersOrder(int page, int pageSize, string search = null, string filter = null)
+        public async Task<IActionResult> GetUsersOrder(int page, int pageSize, string search = null, string filter = null,Guid? userId=null)
         {
             try
             {
-                var res = await _orderService.GetUserOrders(page, pageSize, search, filter);
+                var res = await _orderService.GetUserOrders(page,pageSize,search,filter, userId);
                 var result = new TiffinMate.API.ApiRespons.ApiResponse<AllOrderDTO>("succesfull", "Order details getted succesfully", res, HttpStatusCode.OK, "");
                 return Ok(result);
 

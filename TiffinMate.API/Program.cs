@@ -42,6 +42,8 @@ using TiffinMate.BLL.Interfaces.OrderServiceInterface;
 using TiffinMate.BLL.Services.OrderService;
 using TiffinMate.DAL.Interfaces.OrderInterface;
 using TiffinMate.DAL.Repositories.OrderRepository;
+using TiffinMate.BLL.Hubs;
+
 
 namespace TiffinMate.API
 {
@@ -66,6 +68,7 @@ namespace TiffinMate.API
            
             // Add services to the container.
             builder.Services.AddControllers();
+            builder.Services.AddSignalR();
 
             builder.Services.AddApiVersioning(options =>
             {
@@ -109,13 +112,15 @@ namespace TiffinMate.API
                 options.FromEmail = brevoFromEmail;
             });
 
-
             builder.Services.AddCors(options =>
             {
-                options.AddPolicy("AllowAllOrigins", builder => builder
-                    .AllowAnyOrigin()
-                    .AllowAnyMethod()
-                    .AllowAnyHeader());
+                options.AddPolicy("AllowSpecificOrigin", builder =>
+                    builder
+                        .WithOrigins("http://localhost:5175", "http://localhost:5174", "http://localhost:5180", "https://beta.tiffinmate.online", "https://betaprovider.tiffinmate.online", "https://betaadmin.tiffinmate.online", "https://tiffinmate.online") 
+
+                        .AllowAnyMethod()
+                        .AllowAnyHeader()
+                        .AllowCredentials());
             });
 
 
@@ -170,61 +175,23 @@ namespace TiffinMate.API
             });
 
             var app = builder.Build();
-
+            
           
 
-            app.UseWebSockets(new WebSocketOptions
-            {
-                KeepAliveInterval = TimeSpan.FromMinutes(2)
-            });
-
-            app.UseWebSockets(new WebSocketOptions
-            {
-                KeepAliveInterval = TimeSpan.FromMinutes(2)
-            });
-
-            app.Map("/ws", async context =>
-            {
-                if (context.WebSockets.IsWebSocketRequest)
-                {
-                    var socket = await context.WebSockets.AcceptWebSocketAsync();
-                    var socketId = Guid.NewGuid().ToString();
-                    WebSocketManager.AddSocket(socketId, socket);
-
-                    try
-                    {
-                        var buffer = new byte[1024 * 4];
-                        WebSocketReceiveResult result;
-                        do
-                        {
-                            result = await socket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
-                        } while (!result.CloseStatus.HasValue);
-
-                        WebSocketManager.RemoveSocket(socketId);
-                        await socket.CloseAsync(result.CloseStatus.Value, result.CloseStatusDescription, CancellationToken.None);
-                    }
-                    catch (Exception ex)
-                    {
-                        WebSocketManager.RemoveSocket(socketId);
-                    }
-                }
-                else
-                {
-                    context.Response.StatusCode = 400;
-                }
-            });
-
+           
             if (env == "Development")
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();
                 app.UseHttpsRedirection();
             }
+            app.UseCors("AllowSpecificOrigin");
             //app.UseMiddleware<LoggingMiddleware>();          
-            app.UseCors("AllowAllOrigins");
             app.UseAuthentication();
             app.UseAuthorization();
             app.MapControllers();
+            app.MapHub<NotificationHub>("/adminHub");
+
             app.MapGet("/ping", () => "ping");
             app.Run();
         }

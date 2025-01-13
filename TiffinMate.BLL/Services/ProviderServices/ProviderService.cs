@@ -20,6 +20,10 @@ using System.Net;
 using TiffinMate.BLL.DTOs.UserDTOs;
 using Supabase.Gotrue;
 using BCrypt.Net;
+using TiffinMate.BLL.Interfaces.NotificationInterface;
+using static Supabase.Gotrue.Constants;
+using Org.BouncyCastle.Cms;
+using Twilio.TwiML.Messaging;
 
 namespace TiffinMate.BLL.Services.ProviderServices
 {
@@ -31,7 +35,8 @@ namespace TiffinMate.BLL.Services.ProviderServices
         private readonly IConfiguration _config;
         private readonly AppDbContext _context;
         private readonly string _jwtKey;
-        public ProviderService(IProviderRepository providerRepository, IMapper mapper, ICloudinaryService cloudinary, IConfiguration config, AppDbContext context)
+        private readonly INotificationService _notificationService;
+        public ProviderService(IProviderRepository providerRepository, IMapper mapper, ICloudinaryService cloudinary, IConfiguration config, AppDbContext context,INotificationService notificationService)
         {
             _providerRepository = providerRepository;
             _mapper = mapper;
@@ -39,6 +44,7 @@ namespace TiffinMate.BLL.Services.ProviderServices
             _config = config;
             _context = context;
             _jwtKey = Environment.GetEnvironmentVariable("JWT_KEY");
+            _notificationService= notificationService;
         }
 
         //register
@@ -54,12 +60,18 @@ namespace TiffinMate.BLL.Services.ProviderServices
 
                 var certificateUrl = await _cloudinary.UploadDocumentAsync(certificateFile);
 
-                var prd = _mapper.Map<Provider>(product);
+                var prd = _mapper.Map<TiffinMate.DAL.Entities.ProviderEntity.Provider>(product);
 
                 prd.certificate = certificateUrl;
                 await _providerRepository.AddProviderAsync(prd);
                 await _providerRepository.SaveChangesAsync();
-
+                var adminTitle = "Provider Registration";
+                var adminMessage = $"New provider registered: {product.user_name}.";
+                await _notificationService.NotifyAdminsAsync(
+                 "Admin", adminTitle, adminMessage, "Registration"
+                    
+                   
+                );
                 return true;
             }
             catch (Exception ex)
@@ -197,7 +209,7 @@ namespace TiffinMate.BLL.Services.ProviderServices
             }
         }
         //Token
-        private string CreateToken(Provider user)
+        private string CreateToken(TiffinMate.DAL.Entities.ProviderEntity.Provider user)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtKey));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);

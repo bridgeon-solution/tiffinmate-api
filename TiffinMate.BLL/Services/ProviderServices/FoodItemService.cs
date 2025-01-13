@@ -159,9 +159,15 @@ namespace TiffinMate.BLL.Services.ProviderServices
             var menuitem = _mapper.Map<Menu>(menu);
             menuitem.image = imageUrl;
 
-            await _foodItemRepository.AddMenuAsync(menuitem);
+           var menuResponce= await _foodItemRepository.AddMenuAsync(menuitem);
+            if (menuResponce != "menu added")
+            {
+                return false;
+            }
             return true;
         }
+
+
         public async Task<decimal> CalculateTotal(PlanRequest request, bool is_subscription)
         {
             decimal totalAmount;

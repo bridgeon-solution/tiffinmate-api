@@ -32,6 +32,7 @@ namespace TiffinMate.DAL.DbContexts
         public DbSet<Notification> notifications { get; set; }
         public DbSet<Order> order { get; set; }
         public DbSet<OrderDetails> orderDetails { get; set; }
+        
         //public DbSet<OrderCategory> orderCategory { get; set; }
 
 

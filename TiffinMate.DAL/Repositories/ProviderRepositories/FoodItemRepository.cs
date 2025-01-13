@@ -95,10 +95,10 @@ namespace TiffinMate.DAL.Repositories.ProviderRepositories
                 return await _context.menus.ToListAsync();
             }
         }
-
+        //add menu
         public async Task<string> AddMenuAsync(Menu menus)
         {
-            var existingcategory = await _context.menus.FirstOrDefaultAsync(c => c.name == menus.name);
+            var existingcategory = await _context.menus.FirstOrDefaultAsync(c => c.name == menus.name && c.provider_id==menus.provider_id);
             if (existingcategory != null)
             {
                 return "menu with same name already exists.";

@@ -39,7 +39,7 @@ namespace TiffinMate.API.Controllers.UserControllers
                 var response = await _authService.RegisterUser(userDto);
                 if (!response)
                 {
-                    return Conflict(new ApiResponse<string>("failure", "registration failed", null, HttpStatusCode.Conflict, "user already exist"));
+                    return Ok(new ApiResponse<string>("failure", "registration failed", null, HttpStatusCode.Conflict, "user already exist"));
                 }
                 var result = new ApiResponse<bool>("success", "registration Successfull", response, HttpStatusCode.OK, "");
 
@@ -96,12 +96,12 @@ namespace TiffinMate.API.Controllers.UserControllers
 
                 if (response.message == "User Not Found")
                 {
-                    return NotFound(new ApiResponse<string>("failure", "Login Failed", null, HttpStatusCode.NotFound, "user not found"));
+                    return Ok(new ApiResponse<string>("failure", "Login Failed", null, HttpStatusCode.NotFound, "user not found"));
                 }
 
                 if (response.message == "Invalid Email")
                 {
-                    return BadRequest(new ApiResponse<string>("failure", "Login Failed", null, HttpStatusCode.BadRequest, "Email or password is incorrect"));
+                    return Ok(new ApiResponse<string>("failure", "Login Failed", null, HttpStatusCode.BadRequest, "Email or password is incorrect"));
                 }
 
                 var result = new ApiResponse<LoginResponseDto>("success", "Login Successful", response, HttpStatusCode.OK, "");

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TiffinMate.DAL.DbContexts;
@@ -11,9 +12,11 @@ using TiffinMate.DAL.DbContexts;
 namespace TiffinMate.DAL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250103091059_update-subscription_table_20250103")]
+    partial class updatesubscription_table_20250103
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -196,8 +199,6 @@ namespace TiffinMate.DAL.Migrations
 
                     b.HasKey("id");
 
-                    b.HasIndex("category_id");
-
                     b.HasIndex("order_id");
 
                     b.ToTable("orderDetails");
@@ -301,8 +302,6 @@ namespace TiffinMate.DAL.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("id");
-
-                    b.HasIndex("category_id");
 
                     b.HasIndex("subscription_id");
 
@@ -453,17 +452,6 @@ namespace TiffinMate.DAL.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<string>("message")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("notification_type")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("recipient_id")
-                        .HasColumnType("text");
-
-                    b.Property<string>("recipient_type")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -704,19 +692,11 @@ namespace TiffinMate.DAL.Migrations
 
             modelBuilder.Entity("TiffinMate.DAL.Entities.OrderEntity.OrderDetails", b =>
                 {
-                    b.HasOne("TiffinMate.DAL.Entities.ProviderEntity.Categories", "Category")
-                        .WithMany("order_details")
-                        .HasForeignKey("category_id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("TiffinMate.DAL.Entities.OrderEntity.Order", "order")
                         .WithMany("details")
                         .HasForeignKey("order_id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Category");
 
                     b.Navigation("order");
                 });
@@ -746,19 +726,11 @@ namespace TiffinMate.DAL.Migrations
 
             modelBuilder.Entity("TiffinMate.DAL.Entities.OrderEntity.SubscriptionDetails", b =>
                 {
-                    b.HasOne("TiffinMate.DAL.Entities.ProviderEntity.Categories", "Category")
-                        .WithMany("subscription_details")
-                        .HasForeignKey("category_id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("TiffinMate.DAL.Entities.OrderEntity.Subscription", "subscription")
                         .WithMany("details")
                         .HasForeignKey("subscription_id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Category");
 
                     b.Navigation("subscription");
                 });
@@ -844,10 +816,6 @@ namespace TiffinMate.DAL.Migrations
             modelBuilder.Entity("TiffinMate.DAL.Entities.ProviderEntity.Categories", b =>
                 {
                     b.Navigation("food_items");
-
-                    b.Navigation("order_details");
-
-                    b.Navigation("subscription_details");
                 });
 
             modelBuilder.Entity("TiffinMate.DAL.Entities.ProviderEntity.Menu", b =>

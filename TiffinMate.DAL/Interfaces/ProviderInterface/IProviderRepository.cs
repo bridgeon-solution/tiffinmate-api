@@ -12,6 +12,7 @@ namespace TiffinMate.DAL.Interfaces.ProviderInterface
         Task<Provider> AddProviderAsync(Provider provider);
         Task<string> AddProviderDetailsAsync(ProviderDetails proDetails);
         Task<Provider> Login(string email);
+        Task<bool> EmailExistOrNot(string email);
         Task<List<Provider>> GetAProviderById(Guid id);
         void Update(Provider provider);
         Task SaveChangesAsync();

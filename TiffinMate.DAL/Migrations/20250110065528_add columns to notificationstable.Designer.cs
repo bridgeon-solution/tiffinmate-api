@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TiffinMate.DAL.DbContexts;
@@ -11,9 +12,11 @@ using TiffinMate.DAL.DbContexts;
 namespace TiffinMate.DAL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250110065528_add columns to notificationstable")]
+    partial class addcolumnstonotificationstable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -196,117 +199,9 @@ namespace TiffinMate.DAL.Migrations
 
                     b.HasKey("id");
 
-                    b.HasIndex("category_id");
-
                     b.HasIndex("order_id");
 
                     b.ToTable("orderDetails");
-                });
-
-            modelBuilder.Entity("TiffinMate.DAL.Entities.OrderEntity.Subscription", b =>
-                {
-                    b.Property<Guid>("id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid?>("Menuid")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("cancelled_at")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime?>("created_at")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<bool>("is_active")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool?>("is_delete")
-                        .HasColumnType("boolean");
-
-                    b.Property<Guid>("menu_id")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("order_string")
-                        .HasColumnType("text");
-
-                    b.Property<bool>("payment_status")
-                        .HasColumnType("boolean");
-
-                    b.Property<Guid>("provider_id")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("start_date")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<decimal>("total_price")
-                        .HasColumnType("numeric");
-
-                    b.Property<string>("transaction_id")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime?>("updated_at")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid>("user_id")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("id");
-
-                    b.HasIndex("Menuid");
-
-                    b.HasIndex("provider_id");
-
-                    b.HasIndex("user_id");
-
-                    b.ToTable("subscriptions");
-                });
-
-            modelBuilder.Entity("TiffinMate.DAL.Entities.OrderEntity.SubscriptionDetails", b =>
-                {
-                    b.Property<Guid>("id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("address")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<Guid>("category_id")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("city")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime?>("created_at")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<bool?>("is_delete")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("ph_no")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<Guid>("subscription_id")
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime?>("updated_at")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("user_name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("id");
-
-                    b.HasIndex("category_id");
-
-                    b.HasIndex("subscription_id");
-
-                    b.ToTable("subscriptionDetails");
                 });
 
             modelBuilder.Entity("TiffinMate.DAL.Entities.ProviderEntity.Categories", b =>
@@ -460,7 +355,7 @@ namespace TiffinMate.DAL.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("recipient_id")
+                    b.Property<string>("recipientId")
                         .HasColumnType("text");
 
                     b.Property<string>("recipient_type")
@@ -704,63 +599,13 @@ namespace TiffinMate.DAL.Migrations
 
             modelBuilder.Entity("TiffinMate.DAL.Entities.OrderEntity.OrderDetails", b =>
                 {
-                    b.HasOne("TiffinMate.DAL.Entities.ProviderEntity.Categories", "Category")
-                        .WithMany("order_details")
-                        .HasForeignKey("category_id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("TiffinMate.DAL.Entities.OrderEntity.Order", "order")
                         .WithMany("details")
                         .HasForeignKey("order_id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Category");
-
                     b.Navigation("order");
-                });
-
-            modelBuilder.Entity("TiffinMate.DAL.Entities.OrderEntity.Subscription", b =>
-                {
-                    b.HasOne("TiffinMate.DAL.Entities.ProviderEntity.Menu", null)
-                        .WithMany("subscription")
-                        .HasForeignKey("Menuid");
-
-                    b.HasOne("TiffinMate.DAL.Entities.ProviderEntity.Provider", "provider")
-                        .WithMany("subscription")
-                        .HasForeignKey("provider_id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("TiffinMate.DAL.Entities.User", "user")
-                        .WithMany("subscription")
-                        .HasForeignKey("user_id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("provider");
-
-                    b.Navigation("user");
-                });
-
-            modelBuilder.Entity("TiffinMate.DAL.Entities.OrderEntity.SubscriptionDetails", b =>
-                {
-                    b.HasOne("TiffinMate.DAL.Entities.ProviderEntity.Categories", "Category")
-                        .WithMany("subscription_details")
-                        .HasForeignKey("category_id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("TiffinMate.DAL.Entities.OrderEntity.Subscription", "subscription")
-                        .WithMany("details")
-                        .HasForeignKey("subscription_id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Category");
-
-                    b.Navigation("subscription");
                 });
 
             modelBuilder.Entity("TiffinMate.DAL.Entities.ProviderEntity.FoodItem", b =>
@@ -836,18 +681,9 @@ namespace TiffinMate.DAL.Migrations
                     b.Navigation("details");
                 });
 
-            modelBuilder.Entity("TiffinMate.DAL.Entities.OrderEntity.Subscription", b =>
-                {
-                    b.Navigation("details");
-                });
-
             modelBuilder.Entity("TiffinMate.DAL.Entities.ProviderEntity.Categories", b =>
                 {
                     b.Navigation("food_items");
-
-                    b.Navigation("order_details");
-
-                    b.Navigation("subscription_details");
                 });
 
             modelBuilder.Entity("TiffinMate.DAL.Entities.ProviderEntity.Menu", b =>
@@ -855,8 +691,6 @@ namespace TiffinMate.DAL.Migrations
                     b.Navigation("food_items");
 
                     b.Navigation("order");
-
-                    b.Navigation("subscription");
                 });
 
             modelBuilder.Entity("TiffinMate.DAL.Entities.ProviderEntity.Provider", b =>
@@ -871,8 +705,6 @@ namespace TiffinMate.DAL.Migrations
                         .IsRequired();
 
                     b.Navigation("review");
-
-                    b.Navigation("subscription");
                 });
 
             modelBuilder.Entity("TiffinMate.DAL.Entities.User", b =>
@@ -880,8 +712,6 @@ namespace TiffinMate.DAL.Migrations
                     b.Navigation("order");
 
                     b.Navigation("review");
-
-                    b.Navigation("subscription");
                 });
 #pragma warning restore 612, 618
         }

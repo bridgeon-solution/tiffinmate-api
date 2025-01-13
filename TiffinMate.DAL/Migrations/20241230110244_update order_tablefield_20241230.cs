@@ -14,7 +14,7 @@ namespace TiffinMate.DAL.Migrations
                 name: "transaction_id",
                 table: "order",
                 type: "text",
-                nullable: true,
+                nullable: true,                         
                 oldClrType: typeof(string),
                 oldType: "text");
 

@@ -160,11 +160,12 @@ namespace TiffinMate.API.Controllers.ProviderControllers
             var response = await _foodItemService.AddMenuAsync(menu, image);
             if (!response)
             {
-                return BadRequest(new ApiResponse<string>("failure", "Addition failed", null, HttpStatusCode.BadRequest, "Image is not uploaded"));
+                return BadRequest(new ApiResponse<string>("failure", "Addition failed", null, HttpStatusCode.BadRequest, "Menu with the same name already exists under this provider or image upload failed."));
             }
             var result = new ApiResponse<bool>("success", "Addition Successful", response, HttpStatusCode.OK, "");
             return Ok(result);
         }
+
         [HttpPost("total-amount")]
         public async Task<IActionResult> CalculateTotal([FromBody] PlanRequest request,bool is_subscription)
         {

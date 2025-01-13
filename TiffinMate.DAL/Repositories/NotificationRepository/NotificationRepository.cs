@@ -22,11 +22,9 @@ namespace TiffinMate.DAL.Repositories.NotificationRepository
         public async Task AddAsync(Notification notification)
         {
             await _context.notifications.AddAsync(notification);
-        }
-
-        public async Task SaveChangesAsync()
-        {
             await _context.SaveChangesAsync();
         }
+
+        
     }
 }

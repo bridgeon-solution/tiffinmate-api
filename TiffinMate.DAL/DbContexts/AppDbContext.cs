@@ -33,7 +33,8 @@ namespace TiffinMate.DAL.DbContexts
         public DbSet<Order> order { get; set; }
         public DbSet<OrderDetails> orderDetails { get; set; }
         public DbSet<Subscription> subscriptions { get; set; }
-        public DbSet<SubscriptionDetails>subscriptionDetails { get; set; }
+        public DbSet<SubscriptionDetails> subscriptionDetails { get; set; }
+        //public DbSet<OrderCategory> orderCategory { get; set; }
 
 
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }

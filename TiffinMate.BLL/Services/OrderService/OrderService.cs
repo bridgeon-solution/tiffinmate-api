@@ -353,6 +353,7 @@ namespace TiffinMate.BLL.Services.OrderService
                     UserName = d.user_name,
                     Address = d.address,
                     City = d.city,
+                    ph_no=d.ph_no,
                     Category = d.Category.category_name,
                     
                     

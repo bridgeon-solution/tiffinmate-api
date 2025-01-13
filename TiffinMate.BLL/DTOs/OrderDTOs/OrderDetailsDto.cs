@@ -16,6 +16,7 @@ namespace TiffinMate.BLL.DTOs.OrderDTOs
         public string FoodItemImage { get; set; }
         public string Category { get; set; }
         public string Menu { get; set; }
-        
+        public string ph_no { get; set; }
+
     }
 }

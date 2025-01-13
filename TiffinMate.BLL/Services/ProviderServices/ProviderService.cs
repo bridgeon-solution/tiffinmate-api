@@ -33,14 +33,11 @@ namespace TiffinMate.BLL.Services.ProviderServices
     public class ProviderService : IProviderService
     {
         private readonly IProviderRepository _providerRepository;
-        private readonly IAdminRepository _adminRepository;
         private readonly IMapper _mapper;
         private readonly ICloudinaryService _cloudinary;
         private readonly IConfiguration _config;
         private readonly AppDbContext _context;
         private readonly string _jwtKey;
-        private readonly INotificationService _notificationService;
-
         private readonly INotificationService _notificationService;
         public ProviderService(IProviderRepository providerRepository, IMapper mapper, ICloudinaryService cloudinary, IConfiguration config, AppDbContext context,INotificationService notificationService)
         {
@@ -51,7 +48,7 @@ namespace TiffinMate.BLL.Services.ProviderServices
             _context = context;
             _jwtKey = Environment.GetEnvironmentVariable("JWT_KEY");
             _notificationService = notificationService;
-            _notificationService = notificationService;
+           
         }
 
         //register
@@ -67,24 +64,16 @@ namespace TiffinMate.BLL.Services.ProviderServices
 
                 var certificateUrl = await _cloudinary.UploadDocumentAsync(certificateFile);
 
-                var prd = _mapper.Map<TiffinMate.DAL.Entities.ProviderEntity.Provider>(product);
+                var prd = _mapper.Map<TiffinMate.DAL.Entities.ProviderEntity.Provider>(provider);
 
                 prd.certificate = certificateUrl;
                 await _providerRepository.AddProviderAsync(prd);
                 await _providerRepository.SaveChangesAsync();
                 var adminTitle = "Provider Registration";
-                var adminMessage = $"New provider registered: {product.user_name}.";
-                await _notificationService.NotifyAdminsAsync(
-                 "Admin", adminTitle, adminMessage, "Registration"
-
-
-                );
-                var adminTitle = "Provider Registration";
-                var adminMessage = $"New provider registered: {product.user_name}.";
+                var adminMessage = $"New provider registered: {provider.user_name}.";
                 await _notificationService.NotifyAdminsAsync(
                  "Admin", adminTitle, adminMessage, "Registration"
                     
-                   
                 );
                 return true;
             }
@@ -230,10 +219,10 @@ namespace TiffinMate.BLL.Services.ProviderServices
 
             var claims = new[]
             {
-                new Claim (ClaimTypes.NameIdentifier, provider.id.ToString()),
-                new Claim (ClaimTypes.Name,provider.user_name),
-                new Claim (ClaimTypes.Role, provider.role),
-                new Claim(ClaimTypes.Email, provider.email)
+                new Claim (ClaimTypes.NameIdentifier, user.id.ToString()),
+                new Claim (ClaimTypes.Name,user.user_name),
+                new Claim (ClaimTypes.Role, user.role),
+                new Claim(ClaimTypes.Email, user.email)
             };
 
             var token = new JwtSecurityToken(

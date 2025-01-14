@@ -112,7 +112,8 @@ namespace TiffinMate.API.Controllers.OrderControllers
             }
         }
 
-        [HttpGet("{providerId}/orders")]
+        //all orders of provider
+        [HttpGet("provider/{providerId}/")]
         public async Task<IActionResult> AllOrders(Guid providerId, int page = 1, int pageSize = 10, string search = null, string? filter = null)
         {
             try
@@ -128,24 +129,9 @@ namespace TiffinMate.API.Controllers.OrderControllers
 
             }
         }
-        [HttpGet("{providerId}/users")]
-        public async Task<IActionResult> AllUsers(Guid providerId, int page = 1, int pageSize = 10, string search = null)
-        {
-            try
-            {
-                var res = await _orderService.UsersLists(providerId, page, pageSize, search);
-                var result = new TiffinMate.API.ApiRespons.ApiResponse<List<AllUserOutputDto>>("succesfull", "Getting Users succesfully", res, HttpStatusCode.OK, "");
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                var response = new TiffinMate.API.ApiRespons.ApiResponse<string>("failed", "", ex.Message, HttpStatusCode.InternalServerError, "error occured");
-                return StatusCode((int)HttpStatusCode.InternalServerError, response);
-
-            }
-        }
-
-        [HttpGet("{providerId}/users/orders")]
+     
+        //order of user
+        [HttpGet("users/{providerId}")]
         public async Task<IActionResult> UserOrders(Guid providerId, Guid UserId, int page = 1, int pageSize = 10, string search = null)
         {
             try

@@ -258,7 +258,7 @@ namespace TiffinMate.BLL.Services.OrderService
             {
                 orders = orders.Where(o => !string.IsNullOrEmpty(o.start_date) && o.start_date.Substring(0, 10) == filter).ToList();
             }
-
+            
 
             var totalCount = orders.Count;
 
@@ -285,17 +285,21 @@ namespace TiffinMate.BLL.Services.OrderService
             };
             return new List<AllOrderByProviderDto> { result };
         }
-       
-       
+
+
 
         //AllOrders
-        public async Task<AllOrderDTO> GetUserOrders(int page, int pageSize, string search = null, string filter = null)
+        //AllOrders
+        public async Task<AllOrderDTO> GetUserOrders(int page, int pageSize, string search = null, string filter = null, Guid? userId = null)
         {
 
-            var orders = await _context.order
+            var orders = _context.order
                  .Include(o => o.provider).Include(o => o.user).Include(o => o.details).ThenInclude(d => d.Category)
-                .Where(o => o.payment_status)
-                .ToListAsync();
+                .Where(o => o.payment_status);
+            if (userId != null)
+            {
+                orders = orders.Where(o => o.user_id == userId);
+            }
 
             var result = orders.Select(order => new OrderDetailsResponseDTO
             {
@@ -315,6 +319,7 @@ namespace TiffinMate.BLL.Services.OrderService
                     UserName = d.user_name,
                     Address = d.address,
                     City = d.city,
+                    ph_no = d.ph_no,
                     Category = d.Category.category_name,
 
 
@@ -361,6 +366,7 @@ namespace TiffinMate.BLL.Services.OrderService
 
             return newResult;
         }
+
 
 
         public async Task<List<AllOrderByProviderDto>> OrdersOfUsers(Guid ProviderId, Guid UserId, int page, int pageSize, string search = null)

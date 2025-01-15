@@ -118,8 +118,9 @@ namespace TiffinMate.BLL.Services.ProviderServices
                 pro.refresh_token = newRefreshToken;
                 pro.refreshtoken_expiryDate = DateTime.UtcNow.AddDays(7);
                 pro.updated_at = DateTime.UtcNow;
-
-                var token = CreateToken(pro);
+                var tokens = new ProviderToken();
+                var token = tokens.CreateTokenProvider(pro);
+                //var token = CreateToken(pro);
                 _providerRepository.Update(pro);
                 await _providerRepository.SaveChangesAsync();
 
@@ -189,50 +190,34 @@ namespace TiffinMate.BLL.Services.ProviderServices
                 {
                     throw new Exception("Invalid or expired refresh token.");
                 }
-                var newAccessToken = CreateToken(provider);
-                var tokenHelper = new TokenHelper();
-                var newRefreshToken = tokenHelper.GenerateRefreshToken(provider);
-
-                //update
-                provider.refresh_token = newRefreshToken;
-                provider.refreshtoken_expiryDate = DateTime.UtcNow.AddDays(7);
-                provider.updated_at = DateTime.UtcNow;
-
-                return new ProviderLoginResponse
+                else
                 {
-                    id = provider.id,
-                    email = provider.email,
-                    token = newAccessToken,
-                    refresh_token = newRefreshToken,
-                };
+                    var tokens = new ProviderToken();
+                    var newAccessToken = tokens.CreateTokenProvider(provider);
+                    var tokenHelper = new TokenHelper();
+                    var newRefreshToken = tokenHelper.GenerateRefreshToken(provider);
+
+                    //update
+                    provider.refresh_token = newRefreshToken;
+                    provider.refreshtoken_expiryDate = DateTime.UtcNow.AddDays(7);
+                    provider.updated_at = DateTime.UtcNow;
+
+                    return new ProviderLoginResponse
+                    {
+                        id = provider.id,
+                        email = provider.email,
+                        token = newAccessToken,
+                        refresh_token = newRefreshToken,
+                    };
+                }
+               
             }
             catch (Exception ex)
             {
                 throw new Exception($"{ex.Message}");
             }
         }
-        //Token
-        private string CreateToken(TiffinMate.DAL.Entities.ProviderEntity.Provider user)
-        {
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtKey));
-            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
-
-            var claims = new[]
-            {
-                new Claim (ClaimTypes.NameIdentifier, user.id.ToString()),
-                new Claim (ClaimTypes.Name,user.user_name),
-                new Claim (ClaimTypes.Role, user.role),
-                new Claim(ClaimTypes.Email, user.email)
-            };
-
-            var token = new JwtSecurityToken(
-                    claims: claims,
-                    signingCredentials: credentials,
-                    expires: DateTime.Now.AddSeconds(2)
-                );
-            return new JwtSecurityTokenHandler().WriteToken(token);
-        }
-
+       
         //get all provider
 
 

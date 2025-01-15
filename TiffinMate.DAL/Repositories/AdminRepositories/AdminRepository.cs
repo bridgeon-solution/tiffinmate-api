@@ -37,7 +37,18 @@ namespace TiffinMate.DAL.Repositories.AdminRepositories
                 .Where(u => u.role == "admin")
                 .ToListAsync();
         }
+        public async Task<Admin> GetUserByRefreshTokenAsync(string refreshToken)
+        {
+            return await _appDbContext.Admins.FirstOrDefaultAsync(u => u.refresh_token == refreshToken);
+        }
+        public async void Update(Admin admin)
+        {
+            _appDbContext.Admins.Update(admin);
 
-
+        }
+        public async Task SaveChangesAsync()
+        {
+            await _appDbContext.SaveChangesAsync();
+        }
     }
 }

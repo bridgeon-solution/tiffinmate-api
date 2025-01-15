@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using Razorpay.Api;
 using Supabase.Gotrue;
 using System;
 using System.Collections.Generic;
@@ -11,6 +12,7 @@ using System.Threading.Tasks;
 using TiffinMate.BLL.DTOs.AdmiDTO;
 using TiffinMate.BLL.DTOs.AdmiDTOs;
 using TiffinMate.BLL.Interfaces.AdminInterface;
+using TiffinMate.BLL.Services.AdminServices;
 using TiffinMate.DAL.Entities;
 using TiffinMate.DAL.Interfaces.AdminInterfaces;
 
@@ -58,7 +60,10 @@ namespace TiffinMate.BLL.Services.AdminService
             user.refresh_token = newRefreshToken;
             user.refreshtoken_expiryDate = DateTime.UtcNow.AddDays(7);
             user.updated_at = DateTime.UtcNow;
-            var token = CreateToken(user);
+            var tokens = new AdminToken();
+            var token = tokens.CreateAdminToken(user);
+            _adminRepository.Update(user);
+            await _adminRepository.SaveChangesAsync();
             return new LoginResponseDTO
             {
                 id = user.id,
@@ -72,25 +77,6 @@ namespace TiffinMate.BLL.Services.AdminService
             
         }
 
-        private string CreateToken(Admin user)
-        {
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtKey));
-            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
-
-            var claims = new[]
-            {
-                new Claim (ClaimTypes.NameIdentifier, user.id.ToString()),
-                new Claim (ClaimTypes.Name,user.user_name),
-                new Claim (ClaimTypes.Role, user.role),
-                new Claim(ClaimTypes.Email, user.email)
-            };
-
-            var token = new JwtSecurityToken(
-                    claims: claims,
-                    signingCredentials: credentials,
-                    expires: DateTime.Now.AddDays(1)
-                );
-            return new JwtSecurityTokenHandler().WriteToken(token);
-        }
+       
     }
 }

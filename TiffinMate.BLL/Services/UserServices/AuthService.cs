@@ -10,6 +10,8 @@ using System.Threading.Tasks;
 using TiffinMate.BLL.DTOs.UserDTOs;
 using TiffinMate.BLL.Interfaces.AuthInterface;
 using TiffinMate.BLL.Interfaces.UserInterfaces;
+using TiffinMate.BLL.Services.AdminServices;
+using TiffinMate.BLL.Services.UserServices;
 using TiffinMate.DAL.Entities;
 using TiffinMate.DAL.Interfaces.UserRepositoryInterface;
 
@@ -116,8 +118,10 @@ namespace TiffinMate.BLL.Services.UserService
             user.refresh_token = newRefreshToken;
             user.refreshtoken_expiryDate = DateTime.UtcNow.AddDays(7);
             user.updated_at = DateTime.UtcNow;
-            var token = GenerateJwtToken(user);
-
+            var tokens = new UserToken();
+            var token = tokens.GenerateJwtToken(user);
+            _authRepository.Update(user);
+            await _authRepository.SaveChangesAsync();
             return new LoginResponseDto
             {
                 id = user.id,
@@ -127,25 +131,7 @@ namespace TiffinMate.BLL.Services.UserService
                 message = "Successful"
             };
         }
-        private string GenerateJwtToken(User user)
-        {
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtKey));
-            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
-
-            var claims = new[]
-            {
-                new Claim (ClaimTypes.NameIdentifier, user.id.ToString()),
-                new Claim (ClaimTypes.Name,user.name),
-                new Claim (ClaimTypes.Email, user.email),
-            };
-
-            var token = new JwtSecurityToken(
-                    claims: claims,
-                    signingCredentials: credentials,
-                    expires: DateTime.Now.AddDays(1)
-                );
-            return new JwtSecurityTokenHandler().WriteToken(token);
-        }
+       
 
         public async Task<string>SendResetOtp(ForgotPasswordDto forgotPasswordDto)
         {

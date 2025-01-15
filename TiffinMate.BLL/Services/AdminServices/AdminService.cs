@@ -46,13 +46,26 @@ namespace TiffinMate.BLL.Services.AdminService
 
                 };
             }
+            var tokenHelper = new TokenHelper();
+
+            var newRefreshToken = tokenHelper.GenerateRefreshTokenAdmin(user);
+
+            if (string.IsNullOrEmpty(newRefreshToken))
+            {
+                throw new Exception("Failed to generate refresh token.");
+            }
+
+            user.refresh_token = newRefreshToken;
+            user.refreshtoken_expiryDate = DateTime.UtcNow.AddDays(7);
+            user.updated_at = DateTime.UtcNow;
             var token = CreateToken(user);
             return new LoginResponseDTO
             {
                 id = user.id,
                 name = user.user_name,
                 token = token,
-                message="success"
+                message="success",
+                refresh_token= newRefreshToken
             };
 
 

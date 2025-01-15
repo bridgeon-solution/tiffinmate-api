@@ -104,7 +104,18 @@ namespace TiffinMate.BLL.Services.UserService
                     message = "Invalid Email"
                 };
             }
+            var tokenHelper = new TokenHelper();
 
+            var newRefreshToken = tokenHelper.GenerateRefreshTokenUser(user);
+
+            if (string.IsNullOrEmpty(newRefreshToken))
+            {
+                throw new Exception("Failed to generate refresh token.");
+            }
+
+            user.refresh_token = newRefreshToken;
+            user.refreshtoken_expiryDate = DateTime.UtcNow.AddDays(7);
+            user.updated_at = DateTime.UtcNow;
             var token = GenerateJwtToken(user);
 
             return new LoginResponseDto
@@ -112,6 +123,7 @@ namespace TiffinMate.BLL.Services.UserService
                 id = user.id,
                 name = user.name,
                 token = token,
+                refresh_token=newRefreshToken,
                 message = "Successful"
             };
         }

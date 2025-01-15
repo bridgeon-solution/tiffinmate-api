@@ -57,6 +57,7 @@ namespace TiffinMate.DAL.DbContexts
 
                 entity.Property(e => e.is_blocked)
                     .HasDefaultValue(false);
+                entity.Property(e => e.role).HasDefaultValue("user");
             });
             modelBuilder.Entity<Provider>(entity =>
             {

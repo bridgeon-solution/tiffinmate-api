@@ -217,6 +217,11 @@ namespace TiffinMate.DAL.DbContexts
                 .WithMany(u => u.rating)
                 .HasForeignKey(r => r.user_id);
             });
+
+                entity.HasOne(r => r.user)
+                .WithMany(u => u.rating)
+                .HasForeignKey(r => r.user_id);
+            });
         }
 
 

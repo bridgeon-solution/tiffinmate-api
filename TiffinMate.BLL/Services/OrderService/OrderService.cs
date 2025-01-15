@@ -134,7 +134,7 @@ namespace TiffinMate.BLL.Services.OrderService
                     var order = await _context.order.FirstOrDefaultAsync(o => o.id == orderId);
                     if (order != null)
                     {
-                        order.order_status = OrderStatus.Processing;
+                        order.order_status = OrderStatus.Confirmed;
                     order.order_string = orderDetailsRequestDto.order_string;
                     order.transaction_id=orderDetailsRequestDto.transaction_string;
                         _context.order.Update(order);
@@ -296,7 +296,7 @@ namespace TiffinMate.BLL.Services.OrderService
 
             var orders = _context.order
                  .Include(o => o.provider).Include(o => o.user).Include(o => o.details).ThenInclude(d => d.Category)
-                .Where(o => o.order_status==OrderStatus.Processing);
+                .Where(o => o.order_status==OrderStatus.Confirmed);
             if (userId != null)
             {
                 orders = orders.Where(o => o.user_id == userId);

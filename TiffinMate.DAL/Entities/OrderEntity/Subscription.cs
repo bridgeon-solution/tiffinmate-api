@@ -18,7 +18,7 @@ namespace TiffinMate.DAL.Entities.OrderEntity
             public decimal total_price { get; set; }
             public string? order_string { get; set; }
             public string? transaction_id { get; set; }
-            public bool payment_status { get; set; } = false;
+            public OrderStatus order_status { get; set; } = OrderStatus.Pending;
             public bool is_active { get; set; }=false;
             public List<SubscriptionDetails> details { get; set; }
             public User user { get; set; }

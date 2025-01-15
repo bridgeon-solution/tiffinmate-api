@@ -14,6 +14,7 @@ namespace TiffinMate.BLL.DTOs.OrderDTOs
         public string City { get; set; }
         public string FoodItemName { get; set; }
         public string FoodItemImage { get; set; }
+        public decimal FoodItemPrice { get; set; }
         public string Category { get; set; }
         public string Menu { get; set; }
         public string ph_no { get; set; }

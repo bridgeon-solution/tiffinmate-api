@@ -131,7 +131,7 @@ namespace TiffinMate.BLL.Services.OrderService
                 var order = await _context.subscriptions.FirstOrDefaultAsync(o => o.id == orderId);
                 if (order != null)
                 {
-                    order.payment_status = true;
+                    order.order_status = OrderStatus.Processing;
                     order.is_active = true;
                     order.order_string = orderDetailsRequestDto.order_string;
                     order.transaction_id = orderDetailsRequestDto.transaction_string;
@@ -282,7 +282,7 @@ namespace TiffinMate.BLL.Services.OrderService
         {
             var orders = await _context.subscriptions
                 .Include(o => o.provider).Include(o => o.user).Include(o => o.details).ThenInclude(d => d.Category)
-               .Where(o => o.payment_status)
+               .Where(o => o.order_status==OrderStatus.Processing)
                .ToListAsync();
 
             var result = orders.Select(order => new OrderDetailsResponseDTO
@@ -294,7 +294,7 @@ namespace TiffinMate.BLL.Services.OrderService
                 user = order.user.name,
                 user_id = order.user_id,
                 total_price = order.total_price,
-                payment_status=order.payment_status,
+                order_status=order.order_status,
                 cancelled_at=order.cancelled_at,
                 details = order.details.Select(d => new OrderDetailsDto
                 {

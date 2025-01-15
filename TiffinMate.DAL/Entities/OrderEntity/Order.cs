@@ -7,6 +7,12 @@ using TiffinMate.DAL.Entities.ProviderEntity;
 
 namespace TiffinMate.DAL.Entities.OrderEntity
 {
+    public enum OrderStatus
+    {
+        Pending = 0,
+        Processing = 1,
+        Delivered = 2,
+    }
     public class Order : AuditableEntity
     {
         public Guid id { get; set; }
@@ -17,8 +23,7 @@ namespace TiffinMate.DAL.Entities.OrderEntity
         public decimal total_price { get; set; }
         public string? order_string { get; set; }
         public string? transaction_id { get; set; }
-        public bool payment_status { get; set; }=false;
-
+        public OrderStatus order_status { get; set; }=OrderStatus.Pending;
         public List<OrderDetails> details { get; set; }
         public User user { get; set; }
 

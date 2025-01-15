@@ -119,6 +119,7 @@ namespace TiffinMate.BLL.Services.OrderService
                             ph_no = orderDetailsRequestDto.ph_no,
                             fooditem_name = foodItem.food_name,
                             fooditem_image = foodItem.image,
+                            fooditem_price = foodItem.price,
                             order_id = orderId,
                             category_id = category.id
                         };
@@ -133,7 +134,7 @@ namespace TiffinMate.BLL.Services.OrderService
                     var order = await _context.order.FirstOrDefaultAsync(o => o.id == orderId);
                     if (order != null)
                     {
-                        order.payment_status = true;
+                        order.order_status = OrderStatus.Processing;
                     order.order_string = orderDetailsRequestDto.order_string;
                     order.transaction_id=orderDetailsRequestDto.transaction_string;
                         _context.order.Update(order);
@@ -328,7 +329,7 @@ namespace TiffinMate.BLL.Services.OrderService
 
             var orders = _context.order
                  .Include(o => o.provider).Include(o => o.user).Include(o => o.details).ThenInclude(d => d.Category)
-                .Where(o => o.payment_status);
+                .Where(o => o.order_status==OrderStatus.Processing);
             if (userId != null)
             {
                 orders = orders.Where(o => o.user_id == userId);
@@ -343,12 +344,13 @@ namespace TiffinMate.BLL.Services.OrderService
                 user = order.user.name,
                 user_id = order.user_id,
                 total_price = order.total_price,
-                payment_status = order.payment_status,
+                order_status = order.order_status,
                 details = order.details.Select(d => new OrderDetailsDto
                 {
                     Id = d.id,
                     FoodItemImage = d.fooditem_image,
                     FoodItemName = d.fooditem_name,
+                    FoodItemPrice = d.fooditem_price,
                     UserName = d.user_name,
                     Address = d.address,
                     City = d.city,

@@ -18,7 +18,6 @@ namespace TiffinMate.DAL.Entities.ProviderEntity
         public string? password { get; set; }
         public string role { get; set; }
         public bool is_blocked { get; set; }
-
         public string? user_name { get; set; }
        
         public string verification_status { get; set; } = "pending";
@@ -30,5 +29,6 @@ namespace TiffinMate.DAL.Entities.ProviderEntity
         public ICollection<Menu> menus { get; set; }
         public ICollection<Order> order { get; set; }
         public ICollection<Subscription> subscription { get; set; }
+        public ICollection<Rating> Rating { get; set; }
     }
 }

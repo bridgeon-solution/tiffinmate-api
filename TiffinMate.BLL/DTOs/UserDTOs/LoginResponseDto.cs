@@ -12,5 +12,6 @@ namespace TiffinMate.BLL.DTOs.UserDTOs
         public string name { get; set; }
         public  string token { get; set; }
         public string message { get; set; }
+        public string refresh_token { get; set; }
     }
 }

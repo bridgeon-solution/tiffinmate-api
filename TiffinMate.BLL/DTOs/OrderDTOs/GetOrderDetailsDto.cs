@@ -17,5 +17,6 @@ namespace TiffinMate.BLL.DTOs.OrderDTOs
         public string menu_name { get; set; }
         public decimal total_price { get; set; }
         public string? start_date { get; set; }
+        public string? fooditem_image { get; set; }
     }
 }

@@ -27,9 +27,6 @@ namespace TiffinMate.BLL.Services.OrderService
 
         }
 
-
-       
-
         public async Task<Guid> SubscriptionCreate(OrderRequestDTO orderRequestDTO)
         {
             var provider = await _context.Providers.FirstOrDefaultAsync(p => p.id == orderRequestDTO.provider_id);

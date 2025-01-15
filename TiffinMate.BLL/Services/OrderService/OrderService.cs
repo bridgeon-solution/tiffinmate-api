@@ -259,7 +259,7 @@ namespace TiffinMate.BLL.Services.OrderService
             {
                 orders = orders.Where(o => !string.IsNullOrEmpty(o.start_date) && o.start_date.Substring(0, 10) == filter).ToList();
             }
-
+            
 
             var totalCount = orders.Count;
 
@@ -273,7 +273,8 @@ namespace TiffinMate.BLL.Services.OrderService
                 menu_name = o.provider.menus.FirstOrDefault().name,
                 category_name = o.provider.food_items.FirstOrDefault().category.category_name,
                 total_price = o.total_price,
-                start_date = o.start_date
+                start_date = o.start_date,
+                fooditem_image=d.fooditem_image
 
             })).ToList();
             var pagedOrders = Allorder.Skip((page - 1) * pageSize).Take(pageSize).ToList();
@@ -285,46 +286,12 @@ namespace TiffinMate.BLL.Services.OrderService
             };
             return new List<AllOrderByProviderDto> { result };
         }
-        //users
-        public async Task<List<AllUserOutputDto>> UsersLists(Guid ProviderId, int page, int pageSize, string search = null)
 
-        {
-            var orders = (await _orderRepository.GetOrdersByProvider(ProviderId)).ToList();
-
-            if (!string.IsNullOrEmpty(search))
-            {
-                orders = orders
-            .Where(u => u.user.name.Contains(search, StringComparison.OrdinalIgnoreCase) ||
-                        u.user.email.Contains(search, StringComparison.OrdinalIgnoreCase)).ToList();
-
-            }
-
-
-
-
-            var Allusers = orders.GroupBy(o => o.user_id).Select(g => g.First()).Select(o => new AllUsersDto
-            {
-                user_name = o.user.name,
-                address = o.user.address,
-                city = o.user.city,
-                ph_no = o.user.phone,
-                image = o.user.image,
-                email = o.user.email
-            }).ToList();
-            var totalCount = Allusers.Count;
-            var pagedOrders = Allusers.Skip((page - 1) * pageSize).Take(pageSize).ToList();
-
-            var result = new AllUserOutputDto
-            {
-                TotalCount = totalCount,
-                AllUsers = pagedOrders
-            };
-            return new List<AllUserOutputDto> { result };
-        }
 
 
         //AllOrders
-        public async Task<AllOrderDTO> GetUserOrders(int page, int pageSize, string search = null, string filter = null,Guid? userId=null)
+        //AllOrders
+        public async Task<AllOrderDTO> GetUserOrders(int page, int pageSize, string search = null, string filter = null, Guid? userId = null)
         {
 
             var orders = _context.order
@@ -354,7 +321,7 @@ namespace TiffinMate.BLL.Services.OrderService
                     UserName = d.user_name,
                     Address = d.address,
                     City = d.city,
-                    ph_no=d.ph_no,
+                    ph_no = d.ph_no,
                     Category = d.Category.category_name,
 
 
@@ -403,6 +370,7 @@ namespace TiffinMate.BLL.Services.OrderService
         }
 
 
+
         public async Task<List<AllOrderByProviderDto>> OrdersOfUsers(Guid ProviderId, Guid UserId, int page, int pageSize, string search = null)
 
         {
@@ -426,7 +394,8 @@ namespace TiffinMate.BLL.Services.OrderService
                 fooditem_name = d.fooditem_name,
                 menu_name = o.provider.menus.FirstOrDefault().name,
                 category_name = o.provider.food_items.FirstOrDefault().category.category_name,
-                total_price = o.total_price
+                total_price = o.total_price,
+                fooditem_image=d.fooditem_image
             })).ToList();
             var pagedOrders = Allorder.Skip((page - 1) * pageSize).Take(pageSize).ToList();
 

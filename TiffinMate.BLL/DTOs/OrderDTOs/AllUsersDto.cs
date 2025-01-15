@@ -9,6 +9,7 @@ namespace TiffinMate.BLL.DTOs.OrderDTOs
     public class AllUsersDto
     {
         public string user_name { get; set; }
+        public Guid user_id { get; set; }
         public string address { get; set; }
         public string city { get; set; }
         public string ph_no { get; set; }

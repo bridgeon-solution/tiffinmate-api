@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Sprache;
 using System.Net;
 using TiffinMate.API.ApiRespons;
+using TiffinMate.BLL.DTOs.OrderDTOs;
 using TiffinMate.BLL.DTOs.ProviderDTOs;
 using TiffinMate.BLL.DTOs.UserDTOs;
 using TiffinMate.BLL.Interfaces.AuthInterface;
@@ -284,12 +285,12 @@ namespace TiffinMate.API.Controllers.UserControllers
         }
 
         [HttpGet]
-    
-        public async Task<IActionResult> GetUsers(int pageSize , int page , string search="", string filter = "")
+
+        public async Task<IActionResult> GetUsers(int pageSize, int page, string search = "", string filter = "")
         {
             try
             {
-                var response = await _userService.GetUsers(page, pageSize,search,filter);
+                var response = await _userService.GetUsers(page, pageSize, search, filter);
                 return Ok(new ApiResponse<UserResultDTO>("success", "provider getted", response, HttpStatusCode.OK, ""));
 
 
@@ -297,6 +298,22 @@ namespace TiffinMate.API.Controllers.UserControllers
             catch (Exception ex)
             {
                 var response = new ApiResponse<string>("failed", "", ex.Message, HttpStatusCode.InternalServerError, "error occured");
+                return StatusCode((int)HttpStatusCode.InternalServerError, response);
+
+            }
+        }
+        [HttpGet("{providerId}")]
+        public async Task<IActionResult> AllUsers(Guid providerId, int page = 1, int pageSize = 10, string search = null)
+        {
+            try
+            {
+                var res = await _userService.UsersLists(providerId, page, pageSize, search);
+                var result = new TiffinMate.API.ApiRespons.ApiResponse<List<AllUserOutputDto>>("succesfull", "Getting Users succesfully", res, HttpStatusCode.OK, "");
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                var response = new TiffinMate.API.ApiRespons.ApiResponse<string>("failed", "", ex.Message, HttpStatusCode.InternalServerError, "error occured");
                 return StatusCode((int)HttpStatusCode.InternalServerError, response);
 
             }

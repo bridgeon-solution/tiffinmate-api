@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TiffinMate.DAL.Entities.OrderEntity;
 
 namespace TiffinMate.BLL.DTOs.OrderDTOs
 {
@@ -17,7 +18,7 @@ namespace TiffinMate.BLL.DTOs.OrderDTOs
         public string user {  get; set; }
 
         public decimal total_price { get; set; }
-        public bool payment_status { get; set; }
+        public OrderStatus order_status { get; set; }
         public string cancelled_at { get; set; }
 
         public List<OrderDetailsDto> details { get; set; }

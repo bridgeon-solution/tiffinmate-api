@@ -13,5 +13,8 @@ namespace TiffinMate.DAL.Interfaces.UserRepositoryInterface
         Task CreateUser(User user);
         Task<User> GetUserByEmail(string email);
         Task<bool> UpdatePassword(User user, string password);
+        void Update(User user);
+        Task SaveChangesAsync();
+        Task<User> GetUserByRefreshTokenAsync(string refreshToken);
     }
 }

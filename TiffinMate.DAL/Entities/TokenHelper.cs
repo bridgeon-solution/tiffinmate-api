@@ -85,5 +85,6 @@ namespace TiffinMate.DAL.Entities
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+
     }
 }

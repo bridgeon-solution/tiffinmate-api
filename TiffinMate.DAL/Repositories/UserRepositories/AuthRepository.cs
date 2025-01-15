@@ -31,16 +31,29 @@ namespace TiffinMate.DAL.Repositories.UserRepositories
         public async Task<User>GetUserByEmail(string email)
         {
             return await _context.users.FirstOrDefaultAsync(e => e.email == email);
-            
+
         }
         public async Task<bool> UpdatePassword(User user, string password)
         {
             user.password = password;
             user.updated_at = DateTime.UtcNow;
 
-            
+
             await _context.SaveChangesAsync();
             return true;
+        }
+        public async Task<User> GetUserByRefreshTokenAsync(string refreshToken)
+        {
+            return await _context.users.FirstOrDefaultAsync(u => u.refresh_token == refreshToken);
+        }
+        public async void Update(User user)
+        {
+            _context.users.Update(user);
+
+        }
+        public async Task SaveChangesAsync()
+        {
+            await _context.SaveChangesAsync();
         }
     }
 }

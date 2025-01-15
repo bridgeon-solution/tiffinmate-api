@@ -12,5 +12,8 @@ namespace TiffinMate.DAL.Interfaces.AdminInterfaces
         Task<Admin> AdminLogin(string email);
         Task AddAsync(NotificationEntity notification);
         Task<List<Admin>> GetAdminAsync();
+        Task<Admin> GetUserByRefreshTokenAsync(string refreshToken);
+        void Update(Admin admin);
+        Task SaveChangesAsync();
     }
 }

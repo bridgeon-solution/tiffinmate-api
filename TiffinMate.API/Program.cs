@@ -43,6 +43,8 @@ using TiffinMate.BLL.Services.OrderService;
 using TiffinMate.DAL.Interfaces.OrderInterface;
 using TiffinMate.DAL.Repositories.OrderRepository;
 using TiffinMate.BLL.Hubs;
+using TiffinMate.BLL.Interfaces;
+using TiffinMate.BLL.Services;
 
 
 namespace TiffinMate.API
@@ -103,9 +105,10 @@ namespace TiffinMate.API
             builder.Services.AddScoped<IOrderRepository, OrderRepository>();
             builder.Services.AddScoped<ISubscriptionRepository, SubscriptionRepository>();
             builder.Services.AddScoped<ISubscriptionService, SubscriptionService>();
-           
+            builder.Services.AddScoped<RefreshInterface, refreshService>();
 
-      
+
+
 
             builder.Services.Configure<BrevoSettings>(options =>
             {

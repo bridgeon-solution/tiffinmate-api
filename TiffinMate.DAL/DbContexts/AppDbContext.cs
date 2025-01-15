@@ -238,6 +238,18 @@ namespace TiffinMate.DAL.DbContexts
                 .HasForeignKey(o => o.category_id);
             });
 
+            modelBuilder.Entity<Rating>(entity =>
+            {
+                entity.HasOne(r => r.provider)
+                .WithMany(p => p.rating)
+                .HasForeignKey(r => r.provider_id);
+
+                entity.HasOne(r => r.user)
+                .WithMany(u => u.rating)
+                .HasForeignKey(r => r.user_id);
+            });
+
+
 
 
 

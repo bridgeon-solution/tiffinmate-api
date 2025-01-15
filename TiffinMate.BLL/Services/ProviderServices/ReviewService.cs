@@ -17,9 +17,9 @@ namespace TiffinMate.BLL.Services.ProviderServices
     {
         private readonly IProviderRepository _providerRepository;
         private readonly IUserRepository _userRepository;
-        private readonly IReviewRepository _reviewRepository;
+        private readonly IReviewRaingRepository _reviewRepository;
 
-        public ReviewService(IProviderRepository providerRepository, IUserRepository userRepository, IReviewRepository reviewRepository)
+        public ReviewService(IProviderRepository providerRepository, IUserRepository userRepository, IReviewRaingRepository reviewRepository)
         {
             _providerRepository = providerRepository;
             _userRepository = userRepository;

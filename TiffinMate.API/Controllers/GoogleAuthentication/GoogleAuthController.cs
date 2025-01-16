@@ -35,8 +35,7 @@ namespace TiffinMate.API.Controllers.GoogleAuthentication
                 var email = claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
                 var name = claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
 
-                // Redirect the user to the desired URL
-                return Redirect("https://tiffinmate.online/"); // Redirect to your main page after successful login
+                return Redirect("https://tiffinmate.online/"); 
             }
             return Unauthorized();
         }

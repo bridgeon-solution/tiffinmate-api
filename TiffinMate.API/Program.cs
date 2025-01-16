@@ -45,6 +45,7 @@ using TiffinMate.DAL.Repositories.OrderRepository;
 using TiffinMate.BLL.Hubs;
 using TiffinMate.BLL.Interfaces;
 using TiffinMate.BLL.Services;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 
 namespace TiffinMate.API
@@ -67,7 +68,11 @@ namespace TiffinMate.API
             var brevoApiKey = Environment.GetEnvironmentVariable("BREVO_API_KEY");
             var brevoApiUrl = Environment.GetEnvironmentVariable("BREVO_API_URL");
             var brevoFromEmail = Environment.GetEnvironmentVariable("BREVO_FROM_EMAIL");
-           
+
+            var googleClientId = Environment.GetEnvironmentVariable("GOOGLE_CLIENT_ID");
+            var googleClientSecret = Environment.GetEnvironmentVariable("GOOGLE_CLIENT_SECRET");
+            var callbackpath = Environment.GetEnvironmentVariable("CALLBACK_PATH");
+
             // Add services to the container.
             builder.Services.AddControllers();
             builder.Services.AddSignalR();
@@ -178,6 +183,19 @@ namespace TiffinMate.API
 
                 return new OtpService(accountSid, authToken, verifySid);
             });
+
+            builder.Services.AddAuthentication(options =>
+            {
+                options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = "Google";
+            })
+             .AddCookie()
+             .AddGoogle("Google", options =>
+{
+    options.ClientId = googleClientId;
+    options.ClientSecret = googleClientSecret;
+    options.CallbackPath = callbackpath;
+});
 
             var app = builder.Build();
             

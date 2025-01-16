@@ -15,6 +15,7 @@ namespace TiffinMate.DAL.Interfaces.UserInterfaces
         Task UpdateUser(User user);
         Task<List<User>> GetUsers();
         Task<List<Order>> GetOrdersByProvider(Guid providerId);
+        Task<List<User>> GetSubscribedUsers();
 
 
     }

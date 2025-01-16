@@ -345,6 +345,11 @@ namespace TiffinMate.BLL.Services.OrderService
 
             return newResult;
         }
+        public async Task SendBillEmail(string email, Invoice invoice)
+        {
+           
+            Console.WriteLine($"Email sent to {email} with invoice amount {invoice.Amount}");
+        }
 
 
 

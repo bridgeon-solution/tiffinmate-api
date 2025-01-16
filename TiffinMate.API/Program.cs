@@ -45,6 +45,8 @@ using TiffinMate.DAL.Repositories.OrderRepository;
 using TiffinMate.BLL.Hubs;
 using TiffinMate.BLL.Interfaces;
 using TiffinMate.BLL.Services;
+using Quartz;
+using TiffinMate.BLL.Jobs;
 
 
 namespace TiffinMate.API
@@ -108,6 +110,25 @@ namespace TiffinMate.API
             builder.Services.AddScoped<ISubscriptionService, SubscriptionService>();
             builder.Services.AddScoped<RefreshInterface, refreshService>();
 
+            //builder.Services.AddQuartz(q =>
+            //{
+            //    q.UseMicrosoftDependencyInjectionJobFactory();
+
+            //    var jobKey = new JobKey("billing-job", "billing");
+
+            //    q.AddJob<BillingJob>(opts => opts.WithIdentity(jobKey));
+
+            //    q.AddTrigger(opts => opts
+            //        .ForJob(jobKey)
+            //        .WithIdentity("billing-trigger", "billing")
+            //        .WithCronSchedule("0 0 1 * *")); // Midnight on 1st of every month
+            //});
+
+            // Add the Quartz hosted service
+            //builder.Services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
+
+            // Register your billing service
+            builder.Services.AddScoped<IBillingService, BillingService>();
 
 
 

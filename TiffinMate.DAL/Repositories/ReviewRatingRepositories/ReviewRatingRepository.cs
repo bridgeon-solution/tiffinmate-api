@@ -12,10 +12,10 @@ using TiffinMate.DAL.Interfaces.ReviewInterface;
 namespace TiffinMate.DAL.Repositories.ReviewRepository
 {
    
-    public class ReviewRepository:IReviewRepository
+    public class ReviewRatingRepository:IReviewRaingRepository
     {
         private readonly AppDbContext _context;
-        public ReviewRepository(AppDbContext context)
+        public ReviewRatingRepository(AppDbContext context)
         {
             _context = context;
         }
@@ -48,6 +48,11 @@ namespace TiffinMate.DAL.Repositories.ReviewRepository
             _context.Reviews.Add(review);
             int changes = await _context.SaveChangesAsync();
             return changes > 0;
+        }
+        public async Task AddRating(Rating rating)
+        {
+            await _context.Ratings.AddAsync(rating);
+            await _context.SaveChangesAsync();
         }
 
     }

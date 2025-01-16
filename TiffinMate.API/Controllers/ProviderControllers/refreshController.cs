@@ -5,6 +5,7 @@ using TiffinMate.BLL.DTOs.ProviderDTOs;
 using TiffinMate.BLL.Interfaces.ProviderServiceInterafce;
 using TiffinMate.API.ApiRespons;
 using Asp.Versioning;
+using TiffinMate.BLL.Interfaces;
 
 namespace TiffinMate.API.Controllers.ProviderControllers
 {
@@ -13,11 +14,11 @@ namespace TiffinMate.API.Controllers.ProviderControllers
     [ApiController]
     public class RefreshController : ControllerBase
     {
-        private readonly IProviderService _providerService;
+        private readonly RefreshInterface _refreshService;
 
-        public RefreshController(IProviderService providerService)
+        public RefreshController(RefreshInterface providerService)
         {
-            _providerService = providerService;
+            _refreshService = providerService;
         }
 
         [HttpPost]
@@ -38,7 +39,7 @@ namespace TiffinMate.API.Controllers.ProviderControllers
             try
             {
                 
-                var result = await _providerService.GetRefreshToken(request.refresh_token);
+                var result = await _refreshService.GetRefreshToken(request.refresh_token);
 
               
                 return Ok(new ApiResponse<ProviderLoginResponse>(   

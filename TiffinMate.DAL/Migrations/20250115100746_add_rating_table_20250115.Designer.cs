@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TiffinMate.DAL.DbContexts;
@@ -11,9 +12,11 @@ using TiffinMate.DAL.DbContexts;
 namespace TiffinMate.DAL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250115100746_add_rating_table_20250115")]
+    partial class add_rating_table_20250115
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -622,6 +625,9 @@ namespace TiffinMate.DAL.Migrations
                     b.Property<Guid>("provider_id")
                         .HasColumnType("uuid");
 
+                    b.Property<Guid>("providerid")
+                        .HasColumnType("uuid");
+
                     b.Property<int>("rating")
                         .HasColumnType("integer");
 
@@ -631,13 +637,16 @@ namespace TiffinMate.DAL.Migrations
                     b.Property<Guid>("user_id")
                         .HasColumnType("uuid");
 
+                    b.Property<Guid>("userid")
+                        .HasColumnType("uuid");
+
                     b.HasKey("id");
 
-                    b.HasIndex("provider_id");
+                    b.HasIndex("providerid");
 
-                    b.HasIndex("user_id");
+                    b.HasIndex("userid");
 
-                    b.ToTable("Ratings");
+                    b.ToTable("Rating");
                 });
 
             modelBuilder.Entity("TiffinMate.DAL.Entities.Review", b =>
@@ -877,14 +886,14 @@ namespace TiffinMate.DAL.Migrations
             modelBuilder.Entity("TiffinMate.DAL.Entities.Rating", b =>
                 {
                     b.HasOne("TiffinMate.DAL.Entities.ProviderEntity.Provider", "provider")
-                        .WithMany("rating")
-                        .HasForeignKey("provider_id")
+                        .WithMany("Rating")
+                        .HasForeignKey("providerid")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("TiffinMate.DAL.Entities.User", "user")
                         .WithMany("rating")
-                        .HasForeignKey("user_id")
+                        .HasForeignKey("userid")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -942,6 +951,8 @@ namespace TiffinMate.DAL.Migrations
 
             modelBuilder.Entity("TiffinMate.DAL.Entities.ProviderEntity.Provider", b =>
                 {
+                    b.Navigation("Rating");
+
                     b.Navigation("food_items");
 
                     b.Navigation("menus");
@@ -950,8 +961,6 @@ namespace TiffinMate.DAL.Migrations
 
                     b.Navigation("provider_details")
                         .IsRequired();
-
-                    b.Navigation("rating");
 
                     b.Navigation("review");
 

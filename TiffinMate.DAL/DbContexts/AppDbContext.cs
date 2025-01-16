@@ -27,7 +27,7 @@ namespace TiffinMate.DAL.DbContexts
 
         public DbSet<User> users { get; set; }
         public DbSet<Review> Reviews { get; set; }
-
+        public DbSet<Rating> Ratings { get; set; }
         public DbSet<Menu> menus { get; set; }
         public DbSet<Notification> notifications { get; set; }
         public DbSet<Order> order { get; set; }
@@ -237,6 +237,18 @@ namespace TiffinMate.DAL.DbContexts
                 .WithMany(c => c.subscription_details)
                 .HasForeignKey(o => o.category_id);
             });
+
+            modelBuilder.Entity<Rating>(entity =>
+            {
+                entity.HasOne(r => r.provider)
+                .WithMany(p => p.rating)
+                .HasForeignKey(r => r.provider_id);
+
+                entity.HasOne(r => r.user)
+                .WithMany(u => u.rating)
+                .HasForeignKey(r => r.user_id);
+            });
+
 
 
 

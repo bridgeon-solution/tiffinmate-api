@@ -43,6 +43,8 @@ using TiffinMate.BLL.Services.OrderService;
 using TiffinMate.DAL.Interfaces.OrderInterface;
 using TiffinMate.DAL.Repositories.OrderRepository;
 using TiffinMate.BLL.Hubs;
+using TiffinMate.BLL.Interfaces;
+using TiffinMate.BLL.Services;
 
 
 namespace TiffinMate.API
@@ -95,17 +97,19 @@ namespace TiffinMate.API
             builder.Services.AddScoped<IUserRepository, UserRepository>();
             builder.Services.AddScoped<ICloudinaryService, CloudinaryServices>();
             builder.Services.AddScoped<IProviderVerificationService, ProviderVerificationService>();
+            builder.Services.AddScoped<IRatingService, RatingService>();
             builder.Services.AddScoped<IReviewService, ReviewService>();
-            builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
+            builder.Services.AddScoped<IReviewRaingRepository, ReviewRatingRepository>();
             builder.Services.AddScoped<INotificationRepository,NotificationRepository>();
             builder.Services.AddScoped<INotificationService, NotificationService>();
             builder.Services.AddScoped<IOrderService, OrderService>();
             builder.Services.AddScoped<IOrderRepository, OrderRepository>();
             builder.Services.AddScoped<ISubscriptionRepository, SubscriptionRepository>();
             builder.Services.AddScoped<ISubscriptionService, SubscriptionService>();
-           
+            builder.Services.AddScoped<RefreshInterface, refreshService>();
 
-      
+
+
 
             builder.Services.Configure<BrevoSettings>(options =>
             {

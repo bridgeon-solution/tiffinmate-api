@@ -33,14 +33,16 @@ namespace TiffinMate.API.Controllers.ControllerProvider
     {
         private readonly IProviderService _providerService;
         private readonly IReviewService _reviewService;
+        private readonly IRatingService _ratingService;
         private readonly IProviderVerificationService _verificationService;
 
-        public ProviderController(IProviderService providerService, IReviewService reviewService, IProviderVerificationService verificationService)
+        public ProviderController(IProviderService providerService, IReviewService reviewService, IProviderVerificationService verificationService, IRatingService ratingService)
         {
 
             _providerService = providerService;
             _reviewService = reviewService;
             _verificationService = verificationService;
+            _ratingService = ratingService;
         }
 
         [HttpPost("register")]
@@ -201,6 +203,33 @@ namespace TiffinMate.API.Controllers.ControllerProvider
             catch (Exception ex)
             {
                 return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse<List<AllReview>>("failure", "Error Occurred", null, HttpStatusCode.InternalServerError, ex.Message));
+            }
+        }
+
+        [HttpPost("rating")]
+        public async Task<IActionResult> AddRating(RatingRequestDto ratingDto)
+        {
+            if (ratingDto == null)
+            {
+                return BadRequest(new ApiResponse<string>("failure", "Invalid Input", null, HttpStatusCode.BadRequest, "Rating data is required."));
+            }
+
+            try
+            {
+                var result = await _ratingService.PostRating(ratingDto);
+
+                if (result)
+                {
+                    return Ok(new ApiResponse<string>("success", "Rating Added", "Rating added successfully.", HttpStatusCode.OK, ""));
+                }
+                else
+                {
+                    return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse<string>("failure", "Operation Failed", null, HttpStatusCode.InternalServerError, "Failed to add rating."));
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse<string>("failure", "Error Occurred", null, HttpStatusCode.InternalServerError, ex.Message));
             }
         }
 

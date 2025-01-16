@@ -79,7 +79,7 @@ namespace TiffinMate.DAL.Repositories.ProviderRepositories
         {
             return await _context.Set<Provider>().Where(r => r.id == id)
          .Include(r => r.provider_details)
-         .Include(r => r.review)
+         .Include(r => r.review).Include(r=>r.rating)
          .ToListAsync();
         }
 

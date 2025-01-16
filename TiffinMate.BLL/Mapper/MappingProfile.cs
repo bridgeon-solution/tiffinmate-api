@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TiffinMate.BLL.DTOs.NotificationDTOs;
 using TiffinMate.BLL.DTOs.OrderDTOs;
 using TiffinMate.BLL.DTOs.ProviderDTOs;
 using TiffinMate.BLL.DTOs.UserDTOs;
@@ -34,6 +35,7 @@ namespace TiffinMate.BLL.Mapper
             CreateMap<MenuRequestDto, Menu>().ReverseMap();
             CreateMap<Order,OrderRequestDTO>().ReverseMap();
             CreateMap<Subscription, OrderRequestDTO>();
+            CreateMap<Notification,NotificationAdminResponceDto>().ReverseMap();
             
         }
     }

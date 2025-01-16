@@ -127,6 +127,15 @@ namespace TiffinMate.DAL.Repositories.ProviderRepositories
 
         }
 
+        public async Task<List<FoodItem>> GetAllFoodItem(Guid? menuId, List<Guid> category_id)
+        {
+            return await _context.FoodItems
+                .Include(f => f.category)
+                .Include(f => f.menu)
+                .Where(f => f.menu_id == menuId && category_id.Contains(f.category_id))
+                .ToListAsync();
+        }
+
 
     } 
 }

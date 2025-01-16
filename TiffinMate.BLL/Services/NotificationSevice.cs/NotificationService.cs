@@ -5,6 +5,8 @@ using TiffinMate.DAL.Entities.ProviderEntity;
 using TiffinMate.DAL.Interfaces.NotificationInterfaces;
 using TiffinMate.BLL.Hubs;
 using Org.BouncyCastle.Cms;
+using TiffinMate.BLL.DTOs.NotificationDTOs;
+using AutoMapper;
 
 namespace TiffinMate.BLL.Services.NotificationService
 {
@@ -12,11 +14,13 @@ namespace TiffinMate.BLL.Services.NotificationService
     {
         private readonly IHubContext<NotificationHub> _hubContext;
         private readonly INotificationRepository _notificationRepository;
+        private readonly IMapper _mapper;
 
-        public NotificationService(IHubContext<NotificationHub> hubContext, INotificationRepository notificationRepository)
+        public NotificationService(IHubContext<NotificationHub> hubContext, INotificationRepository notificationRepository,IMapper mapper)
         {
             _hubContext = hubContext;
             _notificationRepository = notificationRepository;
+            _mapper = mapper;
         }
 
         public async Task NotifyAdminsAsync(string recipient_type, string title, string message, string notification_type, string? recipient_id = null)
@@ -35,6 +39,15 @@ namespace TiffinMate.BLL.Services.NotificationService
             await _hubContext.Clients.All.SendAsync("ReceiveMessage", recipient_type,title, message);
         }
 
+        public async Task<List<NotificationAdminResponceDto>> getnotification(string recipientType)
+        {
+            var result = await _notificationRepository.GetAdminNotification(recipientType);
+            if (result == null)
+            {
+                return null;
+            }
+            return _mapper.Map<List<NotificationAdminResponceDto>>(result); 
+        }
     }
 
 

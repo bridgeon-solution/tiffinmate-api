@@ -13,6 +13,7 @@ namespace TiffinMate.BLL.DTOs.OrderDTOs
         public Guid order_id { get; set; }
 
         public Guid menu_id { get; set; }
+        public Guid provider_id { get; set; }
         public string provider { get; set; }
         public Guid user_id { get; set; }
         public string user {  get; set; }

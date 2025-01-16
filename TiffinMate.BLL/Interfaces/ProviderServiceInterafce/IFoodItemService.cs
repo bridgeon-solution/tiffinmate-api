@@ -26,6 +26,7 @@ namespace TiffinMate.BLL.Interfaces.ProviderServiceInterafce
 
         Task<List<MenuDto>> ByProvider(Guid id);
         Task<decimal> CalculateTotal(PlanRequest request,bool is_subscription);
+        Task<List<AllFoodItemResponseDTO>> GetAllFoodItems(Guid? menuId, List<Guid> category_id);
 
 
 

@@ -132,7 +132,6 @@ namespace TiffinMate.BLL.Services.ProviderServices
 
 
         }
-
         public async Task<List<MenuDto>> ByProvider(Guid id)
         {
             var result = await _foodItemRepository.GetMenuByProviderAsync(id);
@@ -157,6 +156,7 @@ namespace TiffinMate.BLL.Services.ProviderServices
             }
 
             var menuitem = _mapper.Map<Menu>(menu);
+            
             menuitem.image = imageUrl;
 
            var menuResponce= await _foodItemRepository.AddMenuAsync(menuitem);
@@ -187,7 +187,28 @@ namespace TiffinMate.BLL.Services.ProviderServices
             return Math.Ceiling(totalAmount);
         }
 
-       
+        public async Task<List<AllFoodItemResponseDTO>> GetAllFoodItems(Guid? menuId, List<Guid> category_id)
+        {
+            var fooditems = await _foodItemRepository.GetAllFoodItem(menuId, category_id);
+
+            var foodItemResponses = fooditems.Select(f => new AllFoodItemResponseDTO
+            {
+                category_id = f.category_id,
+                menu_id = f.menu_id,
+                food_name = f.food_name,
+                price = f.price,
+                description = f.description,
+                day = f.day,
+                image = f.image,
+                category_name=f.category.category_name
+                
+            }).ToList();
+
+            return foodItemResponses;
+        }
+
+
+
 
 
 

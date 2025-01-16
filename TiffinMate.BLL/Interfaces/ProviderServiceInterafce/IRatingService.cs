@@ -5,10 +5,10 @@ using System.Text;
 using System.Threading.Tasks;
 using TiffinMate.BLL.DTOs.ProviderDTOs;
 
-namespace TiffinMate.BLL.DTOs.OrderDTOs
+namespace TiffinMate.BLL.Interfaces.ProviderServiceInterafce
 {
-    public class OrderInputDTO
+    public interface IRatingService
     {
-        
+        Task<bool> PostRating(RatingRequestDto ratingDto);
     }
 }

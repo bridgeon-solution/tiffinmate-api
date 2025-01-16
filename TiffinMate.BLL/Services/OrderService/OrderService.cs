@@ -307,6 +307,7 @@ namespace TiffinMate.BLL.Services.OrderService
                 date = order.start_date,
                 menu_id = order.menu_id,
                 order_id = order.id,
+                provider_id=order.provider_id,
                 provider = order.provider.user_name,
                 user = order.user.name,
                 user_id = order.user_id,

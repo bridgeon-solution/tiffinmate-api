@@ -11,20 +11,16 @@ using TiffinMate.DAL.Entities.OrderEntity;
 using TiffinMate.DAL.Entities.ProviderEntity;
 using User = TiffinMate.DAL.Entities.User;
 
-
 namespace TiffinMate.DAL.DbContexts
 {
     public class AppDbContext:DbContext
     {
-
         public DbSet<ApiLog> ApiLogs { get; set; }
         public DbSet<Admin> Admins { get; set; }
-
         public DbSet<Provider> Providers { get; set; }
         public DbSet<ProviderDetails> ProvidersDetails { get; set; }
         public DbSet<Categories> Categories { get; set; }
         public DbSet<FoodItem> FoodItems { get; set; }
-
         public DbSet<User> users { get; set; }
         public DbSet<Review> Reviews { get; set; }
         public DbSet<Rating> Ratings { get; set; }
@@ -34,9 +30,7 @@ namespace TiffinMate.DAL.DbContexts
         public DbSet<OrderDetails> orderDetails { get; set; }
         public DbSet<Subscription> subscriptions { get; set; }
         public DbSet<SubscriptionDetails> subscriptionDetails { get; set; }
-        //public DbSet<OrderCategory> orderCategory { get; set; }
-
-
+        public DbSet<PaymentHistory> paymentHistory { get; set; }
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -76,20 +70,6 @@ namespace TiffinMate.DAL.DbContexts
                 entity.Property(e => e.role).HasDefaultValue("provider");
                
             });
-
-
-
-
-            //modelBuilder.Entity<ProviderDetails>(entity =>
-            //{
-            //    entity.HasKey(pd => pd.id);
-            //    entity.Property(pd => pd.id)
-            //          .HasColumnType("uuid")
-            //          .IsRequired()
-            //          .HasDefaultValueSql("gen_random_uuid()");
-            //    entity.Property(pd => pd.ProviderId)
-            //          .IsRequired();
-            //});
 
             modelBuilder.Entity<ProviderDetails>(entity =>
             {
@@ -164,7 +144,6 @@ namespace TiffinMate.DAL.DbContexts
                 entity.Property(m => m.monthly_plan_amount)
                 .HasPrecision(18, 2)
                 .HasDefaultValue(0);
-
             });
 
             modelBuilder.Entity<Order>(entity =>
@@ -189,11 +168,7 @@ namespace TiffinMate.DAL.DbContexts
                 .WithOne(od => od.order)
                 .HasForeignKey(od => od.order_id)
                 .OnDelete(DeleteBehavior.Cascade);
-
-               
-
             });
-
 
             modelBuilder.Entity<Subscription>(entity =>
             {
@@ -201,7 +176,6 @@ namespace TiffinMate.DAL.DbContexts
                 .WithMany(m => m.subscription)
                 .HasForeignKey(f => f.user_id)
                 .OnDelete(DeleteBehavior.Cascade);
-
 
                 entity.HasMany(m => m.details)
                 .WithOne(c => c.subscription)
@@ -217,10 +191,6 @@ namespace TiffinMate.DAL.DbContexts
                 .WithOne(od => od.subscription)
                 .HasForeignKey(od => od.subscription_id)
                 .OnDelete(DeleteBehavior.Cascade);
-
-               
-
-
 
             });
             modelBuilder.Entity<OrderDetails>(entity =>
@@ -247,12 +217,18 @@ namespace TiffinMate.DAL.DbContexts
                 entity.HasOne(r => r.user)
                 .WithMany(u => u.rating)
                 .HasForeignKey(r => r.user_id);
+
             });
+            modelBuilder.Entity<PaymentHistory>(entity =>
+            {
+                entity.HasOne(p => p.subscription)
+                .WithMany(s => s.payment_history)
+                .HasForeignKey(p => p.subscription_id);
 
-
-
-
-
+                entity.HasOne(p => p.user)
+               .WithMany(s => s.payment_history)
+               .HasForeignKey(p => p.user_id);
+            });
         }
 
 

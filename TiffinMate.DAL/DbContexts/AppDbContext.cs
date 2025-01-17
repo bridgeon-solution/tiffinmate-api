@@ -228,9 +228,6 @@ namespace TiffinMate.DAL.DbContexts
                 .WithMany(s => s.payment_history)
                 .HasForeignKey(p => p.subscription_id);
             });
-
-                
-            
         }
 
 

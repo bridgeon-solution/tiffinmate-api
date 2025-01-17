@@ -25,6 +25,17 @@ namespace TiffinMate.DAL.Repositories.NotificationRepository
             await _context.SaveChangesAsync();
         }
 
-        
+        //getadminnotification
+        public async Task<List<Notification>> GetAdminNotification(string recipienttype)
+        {
+            if (recipienttype != null)
+            {
+                return await _context.notifications.Where(e=>e.recipient_type==recipienttype).ToListAsync();
+            }
+            else
+            {
+                return await _context.notifications.ToListAsync();
+            }
+        }
     }
 }

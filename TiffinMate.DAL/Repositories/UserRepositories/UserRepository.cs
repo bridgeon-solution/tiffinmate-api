@@ -51,11 +51,12 @@ namespace TiffinMate.DAL.Repositories.UserRepositories
                 .ThenInclude(p => p.food_items).ThenInclude(f => f.category).ToListAsync();
 
         }
-        public async Task<List<User>> GetSubscribedUsers()
+        public async Task<List<Subscription>> GetSubscribedUsers()
         {
-            return await _context.users
-                .Include(u => u.subscription)
-                .Where(u => u.subscription_status)
+            return await _context.subscriptions
+                .Include(s => s.details)
+                .Include(s=>s.user)
+                .Where(s=>s.is_active)
                 .ToListAsync();
         }
 

@@ -16,6 +16,5 @@ namespace TiffinMate.BLL.Interfaces.OrderServiceInterface
         Task<OrderRequestDTO> SubscriptionGetedById(Guid OrderId);
         Task<OrderResponceDto> SubscriptionDetailsCreate(OrderDetailsRequestDto orderDetailsRequestDto, Guid orderId);
         Task<Guid> SubscriptionCreate(OrderRequestDTO orderRequestDTO);
-        Task SendBillEmail(string email, Invoice invoice);
     }
 }

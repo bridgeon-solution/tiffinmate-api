@@ -30,6 +30,7 @@ namespace TiffinMate.DAL.DbContexts
         public DbSet<OrderDetails> orderDetails { get; set; }
         public DbSet<Subscription> subscriptions { get; set; }
         public DbSet<SubscriptionDetails> subscriptionDetails { get; set; }
+        public DbSet<PaymentHistory> paymentHistories { get; set; }
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -216,12 +217,20 @@ namespace TiffinMate.DAL.DbContexts
                 entity.HasOne(r => r.user)
                 .WithMany(u => u.rating)
                 .HasForeignKey(r => r.user_id);
-            });
 
                 entity.HasOne(r => r.user)
                 .WithMany(u => u.rating)
                 .HasForeignKey(r => r.user_id);
             });
+            modelBuilder.Entity<PaymentHistory>(entity =>
+            {
+                entity.HasOne(p => p.subscription)
+                .WithMany(s => s.payment_history)
+                .HasForeignKey(p => p.subscription_id);
+            });
+
+                
+            
         }
 
 

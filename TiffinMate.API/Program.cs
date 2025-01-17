@@ -122,7 +122,7 @@ namespace TiffinMate.API
                 q.AddTrigger(opts => opts
                     .ForJob(jobKey)
                     .WithIdentity("billing-trigger", "billing")
-                    .WithCronSchedule("0/30 * * * * ?")); // Run at 1 AM every day
+                    .WithCronSchedule("0 0 1 1 * ?"));
             });
 
             builder.Services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);

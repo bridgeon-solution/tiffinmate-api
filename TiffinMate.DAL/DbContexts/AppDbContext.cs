@@ -30,7 +30,7 @@ namespace TiffinMate.DAL.DbContexts
         public DbSet<OrderDetails> orderDetails { get; set; }
         public DbSet<Subscription> subscriptions { get; set; }
         public DbSet<SubscriptionDetails> subscriptionDetails { get; set; }
-        public DbSet<PaymentHistory> paymentHistories { get; set; }
+        public DbSet<PaymentHistory> paymentHistory { get; set; }
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

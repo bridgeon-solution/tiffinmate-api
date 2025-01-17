@@ -46,6 +46,8 @@ using TiffinMate.BLL.Hubs;
 using TiffinMate.BLL.Interfaces;
 using TiffinMate.BLL.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Quartz;
+using TiffinMate.BLL.Jobs;
 
 
 namespace TiffinMate.API
@@ -112,7 +114,19 @@ namespace TiffinMate.API
             builder.Services.AddScoped<ISubscriptionRepository, SubscriptionRepository>();
             builder.Services.AddScoped<ISubscriptionService, SubscriptionService>();
             builder.Services.AddScoped<RefreshInterface, refreshService>();
+            builder.Services.AddQuartz(q =>
+            {
+                q.UseMicrosoftDependencyInjectionJobFactory();
+                var jobKey = new JobKey("billing-job", "billing");
+                q.AddJob<BillingJob>(opts => opts.WithIdentity(jobKey));
+                q.AddTrigger(opts => opts
+                    .ForJob(jobKey)
+                    .WithIdentity("billing-trigger", "billing")
+                    .WithCronSchedule("0 0 1 1 * ?"));
+            });
 
+            builder.Services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
+            builder.Services.AddScoped<IBillingService, BillingService>();
 
 
 

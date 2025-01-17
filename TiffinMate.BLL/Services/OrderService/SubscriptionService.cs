@@ -39,6 +39,7 @@ namespace TiffinMate.BLL.Services.OrderService
             var isoStartDate = parsedDate.ToString("o");
 
             var orderId = Guid.NewGuid();
+            var paymentHistoryId = Guid.NewGuid();
             var newSubscription = new DAL.Entities.OrderEntity.Subscription
             {
                 id = orderId,
@@ -49,6 +50,16 @@ namespace TiffinMate.BLL.Services.OrderService
                 total_price = orderRequestDTO.total_price,
             };
             await _context.subscriptions.AddAsync(newSubscription);
+            var newPaymentHistory=new PaymentHistory
+            {
+                id = paymentHistoryId,
+                subscription_id = orderId,
+                amount = orderRequestDTO.total_price,
+                payment_date = DateTime.UtcNow,
+                user_id = orderRequestDTO.user_id,
+                
+            };
+            await _context.paymentHistory.AddAsync(newPaymentHistory);
             try
             {
                 await _context.SaveChangesAsync();
@@ -133,6 +144,13 @@ namespace TiffinMate.BLL.Services.OrderService
                     order.order_string = orderDetailsRequestDto.order_string;
                     order.transaction_id = orderDetailsRequestDto.transaction_string;
                     _context.subscriptions.Update(order);
+                    await _context.SaveChangesAsync();
+                }
+                var paymentHistory = await _context.paymentHistory.FirstOrDefaultAsync(p => p.subscription_id == orderId);
+                if(paymentHistory != null)
+                {
+                    paymentHistory.is_paid = true;
+                    _context.paymentHistory.Update(paymentHistory);
                     await _context.SaveChangesAsync();
                 }
 

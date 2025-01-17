@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Razorpay.Api;
 using System;
 using System.Collections.Generic;
@@ -7,8 +8,8 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using TiffinMate.BLL.Interfaces;
-using TiffinMate.BLL.Interfaces.OrderServiceInterface;
 using TiffinMate.BLL.Interfaces.UserInterfaces;
+using TiffinMate.DAL.DbContexts;
 using TiffinMate.DAL.Entities;
 using TiffinMate.DAL.Entities.OrderEntity;
 using TiffinMate.DAL.Interfaces.OrderInterface;
@@ -24,13 +25,15 @@ namespace TiffinMate.BLL.Services
         private readonly IFoodItemRepository _foodItemRepository;
         private readonly IBrevoMailService _brevoMailService;
         private readonly BrevoSettings _brevoSettings;
+        private readonly AppDbContext _context;
 
-        public BillingService(IUserRepository userRepository,ISubscriptionRepository subscriptionRepository,IFoodItemRepository foodItemRepository, IOptions<BrevoSettings> brevoSettings)
+        public BillingService(IUserRepository userRepository,ISubscriptionRepository subscriptionRepository,IFoodItemRepository foodItemRepository, IOptions<BrevoSettings> brevoSettings, AppDbContext context)
         {
             _subscriptionRepository = subscriptionRepository;
             _userRepository = userRepository;
             _foodItemRepository = foodItemRepository;
             _brevoSettings = brevoSettings.Value;
+            _context = context;
 
         }
         public async Task SendMonthlyBills()
@@ -49,6 +52,17 @@ namespace TiffinMate.BLL.Services
                     decimal total_amount = monthly_amount/totalCategories;
 
                     var invoice = await GeneratePaymentHistory(subscription, total_amount);
+                    var newPaymentHistory = new PaymentHistory
+                    {
+                       
+                        subscription_id = subscription.id,
+                        amount = total_amount,
+                        payment_date = DateTime.UtcNow,
+                        user_id = subscription.user_id,
+
+                    };
+                    await _context.paymentHistory.AddAsync(newPaymentHistory);
+                    await _context.SaveChangesAsync();
                     await SendBillEmail(subscription.user.email, invoice);
 
                 }
@@ -74,7 +88,7 @@ namespace TiffinMate.BLL.Services
 
         public async Task<bool> SendBillEmail(string to, PaymentHistory invoice)
         {
-            string paymentLink = $"/pay/{invoice.subscription_id}";
+            string paymentLink = $"http://localhost:5174/subscriptionpayment/{invoice.subscription_id}";
             var emailData = new
                 {
                     sender = new { email = _brevoSettings.FromEmail },

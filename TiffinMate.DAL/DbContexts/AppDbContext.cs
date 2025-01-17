@@ -224,6 +224,10 @@ namespace TiffinMate.DAL.DbContexts
                 entity.HasOne(p => p.subscription)
                 .WithMany(s => s.payment_history)
                 .HasForeignKey(p => p.subscription_id);
+
+                entity.HasOne(p => p.user)
+               .WithMany(s => s.payment_history)
+               .HasForeignKey(p => p.user_id);
             });
         }
 

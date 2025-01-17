@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Asp.Versioning;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using TiffinMate.API.ApiRespons;
@@ -8,7 +9,8 @@ using TiffinMate.BLL.Interfaces.NotificationInterface;
 
 namespace TiffinMate.API.Controllers.NotificationController
 {
-    [Route("api/[controller]")]
+    [Route("api/v{version:apiVersion}/[controller]")]
+    [ApiVersion("1.0")]
     [ApiController]
     public class NotificationController : ControllerBase
     {
@@ -19,10 +21,8 @@ namespace TiffinMate.API.Controllers.NotificationController
             _notificationService = notificationService;
         }
 
-
-
         [HttpGet("notification")]
-        public async Task<IActionResult> GetNotificationadmin([FromQuery] string recipienttype)
+        public async Task<IActionResult> GetNotificationadmin( string recipienttype)
         {
             var result = await _notificationService.getnotification(recipienttype);
             if (result == null || !result.Any())

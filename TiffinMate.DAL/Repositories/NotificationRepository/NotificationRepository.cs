@@ -30,7 +30,7 @@ namespace TiffinMate.DAL.Repositories.NotificationRepository
         {
             if (recipienttype != null)
             {
-                return await _context.notifications.Where(e=>e.recipient_type==recipienttype).ToListAsync();
+                return await _context.notifications.Where(e=>e.recipient_type==recipienttype & e.is_delete==false).ToListAsync();
             }
             else
             {

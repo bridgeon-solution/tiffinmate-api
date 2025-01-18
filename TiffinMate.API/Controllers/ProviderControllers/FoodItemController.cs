@@ -194,16 +194,13 @@ namespace TiffinMate.API.Controllers.ProviderControllers
                     return BadRequest(new ApiResponse<string>("failed", "menuId is required", null, HttpStatusCode.BadRequest, "Invalid input"));
                 }
 
-                // Validate categoryIds
                 if (categoryIds == null || !categoryIds.Any())
                 {
                     return BadRequest(new ApiResponse<string>("failed", "categoryIds list is required", null, HttpStatusCode.BadRequest, "Invalid input"));
                 }
 
-                // Retrieve food items
                 var res = await _foodItemService.GetAllFoodItems(menuId.Value, categoryIds);
 
-                // Check if result is null or empty
                 if (res == null || !res.Any())
                 {
                     return NotFound(new ApiResponse<string>("failed", "No food items found for the given menu and categories", null, HttpStatusCode.NotFound, ""));
@@ -213,8 +210,7 @@ namespace TiffinMate.API.Controllers.ProviderControllers
             }
             catch (Exception ex)
             {
-                // Log the exception details (consider using a logging framework)
-                // e.g., _logger.LogError(ex, "An error occurred while fetching food items");
+               
 
                 var response = new ApiResponse<string>("failed", "An error occurred", ex.Message, HttpStatusCode.InternalServerError, "Error occurred");
                 return StatusCode((int)HttpStatusCode.InternalServerError, response);

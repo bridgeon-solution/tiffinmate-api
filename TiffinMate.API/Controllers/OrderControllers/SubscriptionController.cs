@@ -146,7 +146,7 @@ namespace TiffinMate.API.Controllers.OrderControllers
 
             }
         }
-        [HttpPut("subscription")]
+        [HttpPut]
         public async Task<IActionResult> UpdateSubscription(PaymentHistoryRequestDto requestDto)
         {
             try

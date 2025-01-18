@@ -46,6 +46,9 @@ using TiffinMate.BLL.Hubs;
 using TiffinMate.BLL.Interfaces;
 using TiffinMate.BLL.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.SignalR;
+using TiffinMate.BLL.Custom;
+
 
 
 namespace TiffinMate.API
@@ -112,7 +115,7 @@ namespace TiffinMate.API
             builder.Services.AddScoped<ISubscriptionRepository, SubscriptionRepository>();
             builder.Services.AddScoped<ISubscriptionService, SubscriptionService>();
             builder.Services.AddScoped<RefreshInterface, refreshService>();
-
+            builder.Services.AddSingleton<IUserIdProvider, CustomUserIdProvider>();
 
 
 

@@ -34,5 +34,19 @@ namespace TiffinMate.API.Controllers.NotificationController
             var responce = new ApiResponse<List<NotificationAdminResponceDto>>("success", " admin notifiaction retrieved successfully", result, HttpStatusCode.OK, "");
             return Ok(responce);
         }
+
+        [HttpPut("clear")]
+        public async Task<IActionResult> ClearAllNotification()
+        {
+            var result = await _notificationService.MarkAsDeleted();
+            if (!result)
+            {
+                return NotFound(new ApiResponse<bool>("failure", "something went wrong on delete", result, HttpStatusCode.NotFound, "something went wrong on delete"
+            ));
+
+            }
+            var responce = new ApiResponse<bool>("success", " admin notifiaction deleted successfully", result, HttpStatusCode.OK, "");
+            return Ok(responce);
+        }
     }
 }

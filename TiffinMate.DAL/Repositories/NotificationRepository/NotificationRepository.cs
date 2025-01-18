@@ -30,12 +30,24 @@ namespace TiffinMate.DAL.Repositories.NotificationRepository
         {
             if (recipienttype != null)
             {
-                return await _context.notifications.Where(e=>e.recipient_type==recipienttype & e.is_delete==false).ToListAsync();
+                return await _context.notifications.Where(e=>e.recipient_type==recipienttype && e.is_delete==false).ToListAsync();
             }
             else
             {
                 return await _context.notifications.ToListAsync();
             }
+        }
+
+        //markallnotificationdeleted
+
+        public async Task MarkAllNotificationsDeleted()
+        {
+            var notifications = await _context.notifications.Where(n => n.is_delete == false).ToListAsync();
+            foreach(var notification in notifications)
+            {
+                notification.is_delete = true;
+            }
+            await _context.SaveChangesAsync();
         }
     }
 }

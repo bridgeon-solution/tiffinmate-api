@@ -9,8 +9,10 @@ namespace TiffinMate.BLL.DTOs.NotificationDTOs
 {
     public class NotificationAdminResponceDto
     {
+        
         public string title { get; set; }
         public string message { get; set; }
         public bool isread { get; set; }
+        
     }
 }

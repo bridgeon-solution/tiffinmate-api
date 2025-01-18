@@ -11,6 +11,7 @@ namespace TiffinMate.DAL.Interfaces.NotificationInterfaces
     {
         Task AddAsync(Notification notification);
         Task<List<Notification>> GetAdminNotification(string recipienttype);
+        Task MarkAllNotificationsDeleted();
 
 
     }

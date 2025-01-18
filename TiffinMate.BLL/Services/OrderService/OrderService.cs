@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TiffinMate.BLL.DTOs.OrderDTOs;
 using TiffinMate.BLL.DTOs.ProviderDTOs;
+using TiffinMate.BLL.Interfaces.NotificationInterface;
 using TiffinMate.BLL.Interfaces.OrderServiceInterface;
 using TiffinMate.DAL.DbContexts;
 using TiffinMate.DAL.Entities.OrderEntity;
@@ -25,14 +26,16 @@ namespace TiffinMate.BLL.Services.OrderService
         private readonly string _KeyId;
         private readonly string _KeySecret;
         private readonly IMapper _mapper;
+        private readonly INotificationService _notificationService;
 
-        public OrderService( IOrderRepository  orderRepository,AppDbContext appDbContext,IMapper mapper) {
+        public OrderService( IOrderRepository  orderRepository,AppDbContext appDbContext,IMapper mapper,INotificationService notificationService) {
 
             _orderRepository = orderRepository;
             _context = appDbContext;
             _KeyId = Environment.GetEnvironmentVariable("RazorPay_KeyId");
             _KeySecret = Environment.GetEnvironmentVariable("RazorPay_KeySecret");
             _mapper = mapper;
+            _notificationService= notificationService;
         }
 
         //post order details
@@ -139,14 +142,17 @@ namespace TiffinMate.BLL.Services.OrderService
                     order.transaction_id=orderDetailsRequestDto.transaction_string;
                         _context.order.Update(order);
                         await _context.SaveChangesAsync();
-                    }
+
+                    await _notificationService.NotifyProviderAsync(orderDetailsRequestDto.provider_id.ToString(),"New Order",$"You have a new order from {orderDetailsRequestDto.user_name}.","Order");
+                    await _notificationService.NotifyUserAsync(order.user_id.ToString(),"Order Delivered",$"Your order #{order.id} placed. Thank you for choosing us!","Order");
+                }
                 
                 else
                 {
                     throw new Exception("Payment failed. Cannot complete the order.");
                 }
-
                 
+
                 await transaction.CommitAsync();
 
                 return new OrderResponceDto
@@ -164,12 +170,6 @@ namespace TiffinMate.BLL.Services.OrderService
                 throw new Exception($"Order creation failed: {ex.Message}", ex);
             }
         }
-
-       
-
-
-
-
 
         //razaorpay id create
 
@@ -239,8 +239,6 @@ namespace TiffinMate.BLL.Services.OrderService
         }
 
 
-
-
         //orders
         public async Task<List<AllOrderByProviderDto>> OrderLists(Guid ProviderId, int page, int pageSize, string search = null, string? filter = null)
 
@@ -288,8 +286,6 @@ namespace TiffinMate.BLL.Services.OrderService
         }
 
 
-
-        //AllOrders
         //AllOrders
         public async Task<AllOrderDTO> GetUserOrders(int page, int pageSize, string search = null, string filter = null, Guid? userId = null)
         {

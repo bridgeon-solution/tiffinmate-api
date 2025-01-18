@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TiffinMate.BLL.DTOs.OrderDTOs;
+using TiffinMate.BLL.Interfaces.NotificationInterface;
 using TiffinMate.BLL.Interfaces.OrderServiceInterface;
 using TiffinMate.DAL.DbContexts;
 using TiffinMate.DAL.Entities.OrderEntity;
@@ -19,11 +20,13 @@ namespace TiffinMate.BLL.Services.OrderService
         private readonly ISubscriptionRepository _subscriptionRepository;
         private readonly AppDbContext _context;
         private readonly IMapper _mapper;
-        public SubscriptionService(ISubscriptionRepository subscription, AppDbContext appDbContext, IMapper mapper)
+        private readonly INotificationService _notificationService;
+        public SubscriptionService(ISubscriptionRepository subscription, AppDbContext appDbContext, IMapper mapper,INotificationService notificationService)
         {
             _subscriptionRepository = subscription;
             _context = appDbContext;
             _mapper = mapper;
+            _notificationService = notificationService;
 
         }
 
@@ -72,10 +75,6 @@ namespace TiffinMate.BLL.Services.OrderService
             return orderId;
 
         }
-
-      
-
-
 
         //Subscription details adding
         public async Task<OrderResponceDto> SubscriptionDetailsCreate(OrderDetailsRequestDto orderDetailsRequestDto, Guid orderId)
@@ -145,6 +144,10 @@ namespace TiffinMate.BLL.Services.OrderService
                     order.transaction_id = orderDetailsRequestDto.transaction_string;
                     _context.subscriptions.Update(order);
                     await _context.SaveChangesAsync();
+
+                    await _notificationService.NotifyProviderAsync(orderDetailsRequestDto.provider_id.ToString(),
+                                                           "New subscription",
+                                                           $"You have a new subscription from {orderDetailsRequestDto.user_name}.","Subscription");
                 }
                 var paymentHistory = await _context.paymentHistory.FirstOrDefaultAsync(p => p.subscription_id == orderId);
                 if(paymentHistory != null)
@@ -158,8 +161,6 @@ namespace TiffinMate.BLL.Services.OrderService
                 {
                     throw new Exception("Payment failed. Cannot complete the order.");
                 }
-
-
                 await transaction.CommitAsync();
 
                 return new OrderResponceDto
@@ -289,8 +290,6 @@ namespace TiffinMate.BLL.Services.OrderService
         }
        
 
-
-
         //All_Subsribtion_Orders
 
         public async Task<AllOrderDTO> GetSubscribtionOrders(int page, int pageSize, string search = null, string filter = null)
@@ -329,9 +328,6 @@ namespace TiffinMate.BLL.Services.OrderService
                    u.provider.Contains(search, StringComparison.OrdinalIgnoreCase)
                 ).ToList();
             }
-
-          
-
 
             if (!string.IsNullOrEmpty(filter))
             {
@@ -381,7 +377,7 @@ namespace TiffinMate.BLL.Services.OrderService
                 {
                     payment.is_paid = true;
                     await _subscriptionRepository.UpdatePaymentHistoryAsync(payment);
-                   
+
                 }
                 return true;
             }

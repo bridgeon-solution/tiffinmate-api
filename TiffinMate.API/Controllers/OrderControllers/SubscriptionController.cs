@@ -5,6 +5,7 @@ using System.Net;
 using TiffinMate.BLL.DTOs.OrderDTOs;
 using TiffinMate.BLL.Interfaces.OrderServiceInterface;
 using TiffinMate.BLL.Services.OrderService;
+using TiffinMate.DAL.Entities.OrderEntity;
 
 namespace TiffinMate.API.Controllers.OrderControllers
 {
@@ -59,7 +60,7 @@ namespace TiffinMate.API.Controllers.OrderControllers
             }
         }
 
-        [HttpGet("{subscriptionid}")]
+        [HttpGet("id")]
         public async Task<IActionResult> GetOrderById(Guid subscriptionid)
         {
             try
@@ -127,6 +128,43 @@ namespace TiffinMate.API.Controllers.OrderControllers
 
             }
 
+        }
+        [HttpGet("payment-history")]
+        public async Task<IActionResult> GetPaymentHistory(Guid?id)
+        {
+            try
+            {
+                var res = await _subscriptionService.GetPaymentHistory(id);
+                var result = new TiffinMate.API.ApiRespons.ApiResponse<List<PaymentHistory>>("succesfull", "payment history getted succesfully", res, HttpStatusCode.OK, "");
+                return Ok(result);
+
+            }
+            catch (Exception ex)
+            {
+                var response = new TiffinMate.API.ApiRespons.ApiResponse<string>("failed", "", ex.Message, HttpStatusCode.InternalServerError, "error occured");
+                return StatusCode((int)HttpStatusCode.InternalServerError, response);
+
+            }
+        }
+        [HttpPut("subscription")]
+        public async Task<IActionResult> UpdateSubscription(PaymentHistoryRequestDto requestDto)
+        {
+            try
+            {
+                var res = await _subscriptionService.HandleSubscription(requestDto);
+                if (!res)
+                {
+                    return BadRequest(new TiffinMate.API.ApiRespons.ApiResponse<string>("failure", "failed handle subscription", null, HttpStatusCode.BadRequest, "payment details are necessary"));
+                }
+                var result = new TiffinMate.API.ApiRespons.ApiResponse<bool>("success", "subscription updated successfully", res, HttpStatusCode.OK, "");
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                var response = new TiffinMate.API.ApiRespons.ApiResponse<string>("failed", "", ex.Message, HttpStatusCode.InternalServerError, "error occured");
+                return StatusCode((int)HttpStatusCode.InternalServerError, response);
+
+            }
         }
 
     }

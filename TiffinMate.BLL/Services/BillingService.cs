@@ -88,7 +88,7 @@ namespace TiffinMate.BLL.Services
 
         public async Task<bool> SendBillEmail(string to, PaymentHistory invoice)
         {
-            string paymentLink = $"http://localhost:5174/subscriptionpayment/{invoice.subscription_id}";
+            string paymentLink = $"http://localhost:5174/?paymentId={invoice.id}";
             var emailData = new
                 {
                     sender = new { email = _brevoSettings.FromEmail },

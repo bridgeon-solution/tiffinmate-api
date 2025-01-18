@@ -48,6 +48,8 @@ using TiffinMate.BLL.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Quartz;
 using TiffinMate.BLL.Jobs;
+using Microsoft.AspNetCore.SignalR;
+using TiffinMate.BLL.Custom;
 
 
 namespace TiffinMate.API
@@ -127,6 +129,7 @@ namespace TiffinMate.API
 
             builder.Services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
             builder.Services.AddScoped<IBillingService, BillingService>();
+
 
 
 

@@ -59,7 +59,7 @@ namespace TiffinMate.API.Controllers.OrderControllers
             }
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("id")]
         public async Task<IActionResult> GetOrderById(Guid subscriptionid)
         {
             try

@@ -34,6 +34,7 @@ namespace TiffinMate.DAL.Entities
         public ICollection<Order> order { get; set; }
         public ICollection<Subscription> subscription { get; set; }
         public ICollection<Rating> rating { get; set; }
+        public ICollection<PaymentHistory> payment_history { get; set; }
 
     }
 }

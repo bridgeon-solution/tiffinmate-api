@@ -42,5 +42,12 @@ namespace TiffinMate.DAL.Repositories.OrderRepository
             return category?.category_name;
 
         }
+        public async Task<List<Subscription>> GetUserSubscriptions(Guid userId)
+        {
+            return await _context.subscriptions
+                .Where(s => s.user_id == userId)
+                .ToListAsync();
+        }
+
     }
 }

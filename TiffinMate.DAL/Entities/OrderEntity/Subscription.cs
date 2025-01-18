@@ -23,6 +23,7 @@ namespace TiffinMate.DAL.Entities.OrderEntity
             public List<SubscriptionDetails> details { get; set; }
             public User user { get; set; }
             public Provider provider { get; set; }
-        
+            public List<PaymentHistory> payment_history { get; set; }
+
     }
 }

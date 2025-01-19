@@ -359,6 +359,47 @@ namespace TiffinMate.BLL.Services.OrderService
 
             return newResult;
         }
+        public async Task<List<PaymentHistory>> GetPaymentHistory(Guid? id)
+        {
+            return await _subscriptionRepository.GetPaymentHistory(id);
+        }
+        public async Task<bool> HandleSubscription(PaymentHistoryRequestDto dto)
+        {
+            var paymentHistory = await _subscriptionRepository.GetPaymentHistory(dto.payment_id);
+            if (paymentHistory == null)
+            {
+                return false;
+            }
+
+            if (dto.action == "renew")
+            {
+                foreach (var payment in paymentHistory)
+                {
+                    payment.is_paid = true;
+                    payment.payment_date = DateTime.UtcNow;
+                    payment.updated_at = DateTime.UtcNow;
+                    await _subscriptionRepository.UpdatePaymentHistoryAsync(payment);
+
+                }
+                return true;
+            }
+            if (dto.action == "cancel")
+            {
+                var subscription = await _subscriptionRepository.GetSubscriptionByid(paymentHistory.First().subscription_id);
+                if (subscription != null)
+                {
+                    subscription.is_active = false;
+                    subscription.cancelled_at = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss");
+                    subscription.updated_at = DateTime.UtcNow;
+                    await _subscriptionRepository.UpdateSubscriptionAsync(subscription);
+                    return true;
+                }
+            }
+            return false;
+        }
+
+
+
     }
 
 

@@ -129,10 +129,6 @@ namespace TiffinMate.API
 
             builder.Services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
             builder.Services.AddScoped<IBillingService, BillingService>();
-
-
-
-
             builder.Services.Configure<BrevoSettings>(options =>
             {
                 options.ApiKey = brevoApiKey;
@@ -144,8 +140,7 @@ namespace TiffinMate.API
             {
                 options.AddPolicy("AllowSpecificOrigin", builder =>
                     builder
-                        .WithOrigins("http://localhost:5175", "http://localhost:5174", "http://localhost:5180", "https://beta.tiffinmate.online", "https://betaprovider.tiffinmate.online", "https://betaadmin.tiffinmate.online", "https://tiffinmate.online", "https://tiffinmate-api.onrender.com") 
-
+                                    .WithOrigins("http://localhost:5175", "http://localhost:5174", "http://localhost:5180", "https://beta.tiffinmate.online", "https://betaprovider.tiffinmate.online", "https://betaadmin.tiffinmate.online", "https://tiffinmate.online", "https://tiffinmate-api.onrender.com")
                         .AllowAnyMethod()
                         .AllowAnyHeader()
                         .AllowCredentials());
@@ -215,11 +210,8 @@ namespace TiffinMate.API
     options.CallbackPath = callbackpath;
 });
 
-            var app = builder.Build();
-            
-          
+            var app = builder.Build();                     
 
-           
             if (env == "Development")
             {
                 app.UseSwagger();

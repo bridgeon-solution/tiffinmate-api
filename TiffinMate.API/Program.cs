@@ -144,7 +144,7 @@ namespace TiffinMate.API
             {
                 options.AddPolicy("AllowSpecificOrigin", builder =>
                     builder
-                        .WithOrigins("http://localhost:5175", "http://localhost:5174", "http://localhost:5180", "https://beta.tiffinmate.online", "https://betaprovider.tiffinmate.online", "https://betaadmin.tiffinmate.online", "https://tiffinmate.online") 
+                        .WithOrigins("http://localhost:5175", "http://localhost:5174", "http://localhost:5180", "https://beta.tiffinmate.online", "https://betaprovider.tiffinmate.online", "https://betaadmin.tiffinmate.online", "https://tiffinmate.online", "https://admin.tiffinmate.online/", "https://admin.tiffinmate.online/") 
 
                         .AllowAnyMethod()
                         .AllowAnyHeader()

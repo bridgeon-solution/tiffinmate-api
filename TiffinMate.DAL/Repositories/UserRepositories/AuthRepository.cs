@@ -16,12 +16,16 @@ namespace TiffinMate.DAL.Repositories.UserRepositories
         public AuthRepository(AppDbContext context)
         {
             _context = context;
-            
+
         }
 
-        public async Task<bool>UserExists(string email)
+        public async Task<bool> UserExists(string email)
         {
-           return await _context.users.AnyAsync(x => x.email == email);
+            return await _context.users.AnyAsync(x => x.email == email);
+        }
+        public async Task<User> HaveAUser(string email)
+        {
+            return await _context.users.FirstOrDefaultAsync(x => x.email == email);
         }
         public async Task CreateUser(User user)
         {

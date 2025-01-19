@@ -427,16 +427,16 @@ namespace TiffinMate.API.Controllers.ControllerProvider
         {
             try
             {
-                // Fetch paginated reviews list
+
                 var response = await _reviewService.ReviewsList(providerId, page, pageSize, search, filter);
 
-                // Check if the response is null or empty
+
                 if (response == null)
                 {
                     return NotFound(new ApiResponse<string>("failure", "No reviews found", null, HttpStatusCode.NotFound, "No reviews available for the given provider."));
                 }
 
-                // Wrap the PaginationReview response in a list
+
                 var paginationReviewsList = new List<PaginationReview> { response };
 
                 return Ok(new ApiResponse<List<PaginationReview>>("success", "Reviews retrieved successfully", paginationReviewsList, HttpStatusCode.OK, ""));
@@ -446,6 +446,26 @@ namespace TiffinMate.API.Controllers.ControllerProvider
                 return StatusCode((int)HttpStatusCode.InternalServerError, new ApiResponse<string>("failure", "Error occurred", ex.Message, HttpStatusCode.InternalServerError, "An error occurred while fetching reviews."));
             }
         }
+        [HttpGet("CheckDetail")]
+        public async Task<IActionResult> ExistDetail(Guid providerId)
+        {
+
+            try
+            {
+                var response = await _providerService.DetailsExist(providerId);
+               
+                var result = new ApiResponse<bool>("success", "Added details", response, HttpStatusCode.OK, "");
+                return Ok(result);
+
+            }
+            catch (Exception ex)
+            {
+                var response = new ApiResponse<string>("failed", "", ex.Message, HttpStatusCode.InternalServerError, "error occured");
+                return StatusCode((int)HttpStatusCode.InternalServerError, response);
+
+            }
+        }
+
     }
 }
 

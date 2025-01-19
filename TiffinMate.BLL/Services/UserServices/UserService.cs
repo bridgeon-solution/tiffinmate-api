@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TiffinMate.BLL.DTOs.OrderDTOs;
 using TiffinMate.BLL.DTOs.ProviderDTOs;
 using TiffinMate.BLL.DTOs.UserDTOs;
 using TiffinMate.BLL.Interfaces.CloudinaryInterface;
@@ -164,6 +165,42 @@ namespace TiffinMate.BLL.Services.UserServices
             };
         }
 
+        public async Task<List<AllUserOutputDto>> UsersLists(Guid ProviderId, int page, int pageSize, string search = null)
+
+        {
+            var orders = (await _userRepository.GetOrdersByProvider(ProviderId)).ToList();
+
+            if (!string.IsNullOrEmpty(search))
+            {
+                orders = orders
+            .Where(u => u.user.name.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                        u.user.email.Contains(search, StringComparison.OrdinalIgnoreCase)).ToList();
+
+            }
+
+
+
+
+            var Allusers = orders.GroupBy(o => o.user_id).Select(g => g.First()).Select(o => new AllUsersDto
+            {
+                user_name = o.user.name,
+                address = o.user.address,
+                city = o.user.city,
+                ph_no = o.user.phone,
+                image = o.user.image,
+                email = o.user.email,
+                user_id=o.user_id
+            }).ToList();
+            var totalCount = Allusers.Count;
+            var pagedOrders = Allusers.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+
+            var result = new AllUserOutputDto
+            {
+                TotalCount = totalCount,
+                AllUsers = pagedOrders
+            };
+            return new List<AllUserOutputDto> { result };
+        }
 
 
 

@@ -160,11 +160,12 @@ namespace TiffinMate.API.Controllers.ProviderControllers
             var response = await _foodItemService.AddMenuAsync(menu, image);
             if (!response)
             {
-                return BadRequest(new ApiResponse<string>("failure", "Addition failed", null, HttpStatusCode.BadRequest, "Image is not uploaded"));
+                return BadRequest(new ApiResponse<string>("failure", "Addition failed", null, HttpStatusCode.BadRequest, "Menu with the same name already exists under this provider or image upload failed."));
             }
             var result = new ApiResponse<bool>("success", "Addition Successful", response, HttpStatusCode.OK, "");
             return Ok(result);
         }
+
         [HttpPost("total-amount")]
         public async Task<IActionResult> CalculateTotal([FromBody] PlanRequest request,bool is_subscription)
         {
@@ -177,6 +178,41 @@ namespace TiffinMate.API.Controllers.ProviderControllers
             catch (Exception ex)
             {
                 var response = new ApiResponse<string>("failed", "", ex.Message, HttpStatusCode.InternalServerError, "error occured");
+                return StatusCode((int)HttpStatusCode.InternalServerError, response);
+            }
+        }
+
+
+        [HttpPost("menu-category")]
+        public async Task<IActionResult> GetAllFoodItem(Guid? menuId, [FromBody] List<Guid> categoryIds)
+        {
+            try
+            {
+               
+                if (!menuId.HasValue)
+                {
+                    return BadRequest(new ApiResponse<string>("failed", "menuId is required", null, HttpStatusCode.BadRequest, "Invalid input"));
+                }
+
+                if (categoryIds == null || !categoryIds.Any())
+                {
+                    return BadRequest(new ApiResponse<string>("failed", "categoryIds list is required", null, HttpStatusCode.BadRequest, "Invalid input"));
+                }
+
+                var res = await _foodItemService.GetAllFoodItems(menuId.Value, categoryIds);
+
+                if (res == null || !res.Any())
+                {
+                    return NotFound(new ApiResponse<string>("failed", "No food items found for the given menu and categories", null, HttpStatusCode.NotFound, ""));
+                }
+
+                return Ok(new ApiResponse<List<AllFoodItemResponseDTO>>("success", "Food items retrieved successfully", res, HttpStatusCode.OK, ""));
+            }
+            catch (Exception ex)
+            {
+               
+
+                var response = new ApiResponse<string>("failed", "An error occurred", ex.Message, HttpStatusCode.InternalServerError, "Error occurred");
                 return StatusCode((int)HttpStatusCode.InternalServerError, response);
             }
         }

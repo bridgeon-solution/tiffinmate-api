@@ -95,10 +95,10 @@ namespace TiffinMate.DAL.Repositories.ProviderRepositories
                 return await _context.menus.ToListAsync();
             }
         }
-
+        //add menu
         public async Task<string> AddMenuAsync(Menu menus)
         {
-            var existingcategory = await _context.menus.FirstOrDefaultAsync(c => c.name == menus.name);
+            var existingcategory = await _context.menus.FirstOrDefaultAsync(c => c.name == menus.name && c.provider_id==menus.provider_id);
             if (existingcategory != null)
             {
                 return "menu with same name already exists.";
@@ -125,6 +125,15 @@ namespace TiffinMate.DAL.Repositories.ProviderRepositories
         {
             return await _context.menus.Where(m => m.id == menuId).Select(m => m.monthly_plan_amount).FirstOrDefaultAsync();
 
+        }
+
+        public async Task<List<FoodItem>> GetAllFoodItem(Guid? menuId, List<Guid> category_id)
+        {
+            return await _context.FoodItems
+                .Include(f => f.category)
+                .Include(f => f.menu)
+                .Where(f => f.menu_id == menuId && category_id.Contains(f.category_id))
+                .ToListAsync();
         }
 
 

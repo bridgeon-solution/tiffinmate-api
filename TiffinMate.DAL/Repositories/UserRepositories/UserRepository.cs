@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TiffinMate.DAL.DbContexts;
 using TiffinMate.DAL.Entities;
+using TiffinMate.DAL.Entities.OrderEntity;
 using TiffinMate.DAL.Interfaces.UserInterfaces;
 
 namespace TiffinMate.DAL.Repositories.UserRepositories
@@ -42,7 +43,13 @@ namespace TiffinMate.DAL.Repositories.UserRepositories
             return await _context.users.ToListAsync();
 
         }
+        public async Task<List<Order>> GetOrdersByProvider(Guid providerId)
+        {
+            return await _context.order.Where(u => u.provider_id == providerId).Include(o => o.details)
+                .Include(o => o.user).
+                Include(o => o.provider).ThenInclude(p => p.menus).Include(o => o.provider)
+                .ThenInclude(p => p.food_items).ThenInclude(f => f.category).ToListAsync();
 
-
+        }
     }
 }

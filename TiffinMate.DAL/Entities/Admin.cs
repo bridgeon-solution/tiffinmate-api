@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace TiffinMate.DAL.Entities
 {
-    public class Admin
+    public class Admin:AuditableEntity
     {
         public Guid id { get; set; }
         [Required]
@@ -20,6 +20,8 @@ namespace TiffinMate.DAL.Entities
         public string role { get; set; }
 
         public DateTime created_at { get; set; }
-       
+        public string refresh_token { get; set; } = string.Empty;
+        public DateTime refreshtoken_expiryDate { get; set; }
+
     }
 }

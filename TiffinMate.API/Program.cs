@@ -42,6 +42,15 @@ using TiffinMate.BLL.Interfaces.OrderServiceInterface;
 using TiffinMate.BLL.Services.OrderService;
 using TiffinMate.DAL.Interfaces.OrderInterface;
 using TiffinMate.DAL.Repositories.OrderRepository;
+using TiffinMate.BLL.Hubs;
+using TiffinMate.BLL.Interfaces;
+using TiffinMate.BLL.Services;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Quartz;
+using TiffinMate.BLL.Jobs;
+using Microsoft.AspNetCore.SignalR;
+using TiffinMate.BLL.Custom;
+
 
 namespace TiffinMate.API
 {
@@ -63,9 +72,14 @@ namespace TiffinMate.API
             var brevoApiKey = Environment.GetEnvironmentVariable("BREVO_API_KEY");
             var brevoApiUrl = Environment.GetEnvironmentVariable("BREVO_API_URL");
             var brevoFromEmail = Environment.GetEnvironmentVariable("BREVO_FROM_EMAIL");
-           
+
+            var googleClientId = Environment.GetEnvironmentVariable("GOOGLE_CLIENT_ID");
+            var googleClientSecret = Environment.GetEnvironmentVariable("GOOGLE_CLIENT_SECRET");
+            var callbackpath = Environment.GetEnvironmentVariable("CALLBACK_PATH");
+
             // Add services to the container.
             builder.Services.AddControllers();
+            builder.Services.AddSignalR();
 
             builder.Services.AddApiVersioning(options =>
             {
@@ -92,17 +106,32 @@ namespace TiffinMate.API
             builder.Services.AddScoped<IUserRepository, UserRepository>();
             builder.Services.AddScoped<ICloudinaryService, CloudinaryServices>();
             builder.Services.AddScoped<IProviderVerificationService, ProviderVerificationService>();
+            builder.Services.AddScoped<IRatingService, RatingService>();
             builder.Services.AddScoped<IReviewService, ReviewService>();
-            builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
+            builder.Services.AddScoped<IReviewRaingRepository, ReviewRatingRepository>();
             builder.Services.AddScoped<INotificationRepository,NotificationRepository>();
             builder.Services.AddScoped<INotificationService, NotificationService>();
             builder.Services.AddScoped<IOrderService, OrderService>();
             builder.Services.AddScoped<IOrderRepository, OrderRepository>();
             builder.Services.AddScoped<ISubscriptionRepository, SubscriptionRepository>();
             builder.Services.AddScoped<ISubscriptionService, SubscriptionService>();
-           
+            builder.Services.AddScoped<RefreshInterface, refreshService>();
+            builder.Services.AddQuartz(q =>
+            {
+                q.UseMicrosoftDependencyInjectionJobFactory();
+                var jobKey = new JobKey("billing-job", "billing");
+                q.AddJob<BillingJob>(opts => opts.WithIdentity(jobKey));
+                q.AddTrigger(opts => opts
+                    .ForJob(jobKey)
+                    .WithIdentity("billing-trigger", "billing")
+                    .WithCronSchedule("0 0 1 1 * ?"));
+            });
 
-      
+            builder.Services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
+            builder.Services.AddScoped<IBillingService, BillingService>();
+
+
+
 
             builder.Services.Configure<BrevoSettings>(options =>
             {
@@ -111,13 +140,15 @@ namespace TiffinMate.API
                 options.FromEmail = brevoFromEmail;
             });
 
-
             builder.Services.AddCors(options =>
             {
-                options.AddPolicy("AllowAllOrigins", builder => builder
-                    .AllowAnyOrigin()
-                    .AllowAnyMethod()
-                    .AllowAnyHeader());
+                options.AddPolicy("AllowSpecificOrigin", builder =>
+                    builder
+                        .WithOrigins("http://localhost:5175", "http://localhost:5174", "http://localhost:5180", "https://beta.tiffinmate.online", "https://betaprovider.tiffinmate.online", "https://betaadmin.tiffinmate.online", "https://tiffinmate.online") 
+
+                        .AllowAnyMethod()
+                        .AllowAnyHeader()
+                        .AllowCredentials());
             });
 
 
@@ -171,62 +202,37 @@ namespace TiffinMate.API
                 return new OtpService(accountSid, authToken, verifySid);
             });
 
-            var app = builder.Build();
+            builder.Services.AddAuthentication(options =>
+            {
+                options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = "Google";
+            })
+             .AddCookie()
+             .AddGoogle("Google", options =>
+{
+    options.ClientId = googleClientId;
+    options.ClientSecret = googleClientSecret;
+    options.CallbackPath = callbackpath;
+});
 
+            var app = builder.Build();
+            
           
 
-            app.UseWebSockets(new WebSocketOptions
-            {
-                KeepAliveInterval = TimeSpan.FromMinutes(2)
-            });
-
-            app.UseWebSockets(new WebSocketOptions
-            {
-                KeepAliveInterval = TimeSpan.FromMinutes(2)
-            });
-
-            app.Map("/ws", async context =>
-            {
-                if (context.WebSockets.IsWebSocketRequest)
-                {
-                    var socket = await context.WebSockets.AcceptWebSocketAsync();
-                    var socketId = Guid.NewGuid().ToString();
-                    WebSocketManager.AddSocket(socketId, socket);
-
-                    try
-                    {
-                        var buffer = new byte[1024 * 4];
-                        WebSocketReceiveResult result;
-                        do
-                        {
-                            result = await socket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
-                        } while (!result.CloseStatus.HasValue);
-
-                        WebSocketManager.RemoveSocket(socketId);
-                        await socket.CloseAsync(result.CloseStatus.Value, result.CloseStatusDescription, CancellationToken.None);
-                    }
-                    catch (Exception ex)
-                    {
-                        WebSocketManager.RemoveSocket(socketId);
-                    }
-                }
-                else
-                {
-                    context.Response.StatusCode = 400;
-                }
-            });
-
+           
             if (env == "Development")
             {
                 app.UseSwagger();
                 app.UseSwaggerUI();
                 app.UseHttpsRedirection();
             }
+            app.UseCors("AllowSpecificOrigin");
             //app.UseMiddleware<LoggingMiddleware>();          
-            app.UseCors("AllowAllOrigins");
             app.UseAuthentication();
             app.UseAuthorization();
             app.MapControllers();
+            app.MapHub<NotificationHub>("/adminHub");
+
             app.MapGet("/ping", () => "ping");
             app.Run();
         }

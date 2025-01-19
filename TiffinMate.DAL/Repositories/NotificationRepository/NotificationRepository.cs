@@ -22,10 +22,31 @@ namespace TiffinMate.DAL.Repositories.NotificationRepository
         public async Task AddAsync(Notification notification)
         {
             await _context.notifications.AddAsync(notification);
+            await _context.SaveChangesAsync();
         }
 
-        public async Task SaveChangesAsync()
+        //getadminnotification
+        public async Task<List<Notification>> GetAdminNotification(string recipienttype)
         {
+            if (recipienttype != null)
+            {
+                return await _context.notifications.Where(e=>e.recipient_type==recipienttype && e.is_delete==false).ToListAsync();
+            }
+            else
+            {
+                return await _context.notifications.ToListAsync();
+            }
+        }
+
+        //markallnotificationdeleted
+
+        public async Task MarkAllNotificationsDeleted()
+        {
+            var notifications = await _context.notifications.Where(n => n.is_delete == false).ToListAsync();
+            foreach(var notification in notifications)
+            {
+                notification.is_delete = true;
+            }
             await _context.SaveChangesAsync();
         }
     }

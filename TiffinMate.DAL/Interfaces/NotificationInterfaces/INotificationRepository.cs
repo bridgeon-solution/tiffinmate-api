@@ -10,6 +10,9 @@ namespace TiffinMate.DAL.Interfaces.NotificationInterfaces
     public interface INotificationRepository
     {
         Task AddAsync(Notification notification);
-        Task SaveChangesAsync();
+        Task<List<Notification>> GetAdminNotification(string recipienttype);
+        Task MarkAllNotificationsDeleted();
+
+
     }
 }

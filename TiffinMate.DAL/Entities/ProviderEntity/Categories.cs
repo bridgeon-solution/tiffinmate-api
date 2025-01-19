@@ -17,6 +17,7 @@ namespace TiffinMate.DAL.Entities.ProviderEntity
 
         public List<FoodItem> food_items { get; set; }
         public ICollection<OrderDetails> order_details { get; set; }
+        public ICollection<SubscriptionDetails> subscription_details { get; set; }
 
 
         

@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TiffinMate.BLL.DTOs.ProviderDTOs;
 
 namespace TiffinMate.BLL.DTOs.OrderDTOs
 {
-    public class OrderInputDTO
+    public class PaymentHistoryRequestDto
     {
-        
+        public Guid payment_id { get; set; }
+        public string action { get; set; }
     }
 }

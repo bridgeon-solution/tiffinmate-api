@@ -24,11 +24,15 @@ namespace TiffinMate.DAL.Repositories.ProviderRepositories
             await _context.SaveChangesAsync();
             return provider;
         }
-        public async Task <string>AddProviderDetailsAsync(ProviderDetails proDetails)
+        public async Task<string> AddProviderDetailsAsync(ProviderDetails proDetails)
         {
             _context.ProvidersDetails.Add(proDetails);
             await _context.SaveChangesAsync();
             return "ok";
+        }
+        public async Task<bool>EmailExistOrNot(string email)
+        {
+            return await _context.Providers.AnyAsync(o => o.email == email);
         }
         public async Task<Provider> Login(string email)
         {
@@ -75,7 +79,7 @@ namespace TiffinMate.DAL.Repositories.ProviderRepositories
         {
             return await _context.Set<Provider>().Where(r => r.id == id)
          .Include(r => r.provider_details)
-         .Include(r => r.review)
+         .Include(r => r.review).Include(r=>r.rating)
          .ToListAsync();
         }
 

@@ -22,15 +22,19 @@ namespace TiffinMate.DAL.Entities
         [Required]
         [EmailAddress]
         public string email { get; set; }
-
+        public string role { get; set; }
         public bool subscription_status { get; set; }
         public string? address { get; set; }
         public string? city { get; set; }
         public string? image { get; set; }
         public bool is_blocked { get; set; }
+        public string refresh_token { get; set; } = string.Empty;
+        public DateTime refreshtoken_expiryDate { get; set; }
         public ICollection<Review> review { get; set; }
         public ICollection<Order> order { get; set; }
         public ICollection<Subscription> subscription { get; set; }
+        public ICollection<Rating> rating { get; set; }
+        public ICollection<PaymentHistory> payment_history { get; set; }
 
     }
 }

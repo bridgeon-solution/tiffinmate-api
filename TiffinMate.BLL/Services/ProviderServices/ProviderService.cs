@@ -61,7 +61,11 @@ namespace TiffinMate.BLL.Services.ProviderServices
                     return false;
                 }
 
-
+                var providerss = await _providerRepository.EmailExistOrNot(provider.email);
+                if (providerss)
+                {
+                    throw new Exception("Email already exist" );
+                }
                 var certificateUrl = await _cloudinary.UploadDocumentAsync(certificateFile);
 
                 var prd = _mapper.Map<TiffinMate.DAL.Entities.ProviderEntity.Provider>(provider);

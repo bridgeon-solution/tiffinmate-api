@@ -376,6 +376,8 @@ namespace TiffinMate.BLL.Services.OrderService
                 foreach (var payment in paymentHistory)
                 {
                     payment.is_paid = true;
+                    payment.payment_date = DateTime.UtcNow;
+                    payment.updated_at = DateTime.UtcNow;
                     await _subscriptionRepository.UpdatePaymentHistoryAsync(payment);
 
                 }
@@ -387,6 +389,8 @@ namespace TiffinMate.BLL.Services.OrderService
                 if (subscription != null)
                 {
                     subscription.is_active = false;
+                    subscription.cancelled_at = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss");
+                    subscription.updated_at = DateTime.UtcNow;
                     await _subscriptionRepository.UpdateSubscriptionAsync(subscription);
                     return true;
                 }

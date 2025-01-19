@@ -48,6 +48,14 @@ namespace TiffinMate.DAL.Repositories.OrderRepository
                 .Where(s => s.user_id == userId)
                 .ToListAsync();
         }
+        public async Task<List<Subscription>> GetSubscribedUsers()
+        {
+            return await _context.subscriptions
+                .Include(s => s.details)
+                .Include(s => s.user)
+                .Where(s => s.is_active)
+                .ToListAsync() ?? new List<Subscription>();
+        }
         public async Task UpdateSubscriptionAsync(Subscription subscription)
         {
             _context.subscriptions.Update(subscription);

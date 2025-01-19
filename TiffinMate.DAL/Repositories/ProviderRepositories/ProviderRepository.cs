@@ -30,6 +30,10 @@ namespace TiffinMate.DAL.Repositories.ProviderRepositories
             await _context.SaveChangesAsync();
             return "ok";
         }
+        public async Task<bool> DetailsExistOrNot(Guid providerId)
+        {
+            return await _context.ProvidersDetails.AnyAsync(o => o.provider_id == providerId);
+        }
         public async Task<bool>EmailExistOrNot(string email)
         {
             return await _context.Providers.AnyAsync(o => o.email == email);

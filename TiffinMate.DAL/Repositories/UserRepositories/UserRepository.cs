@@ -55,10 +55,9 @@ namespace TiffinMate.DAL.Repositories.UserRepositories
         {
             return await _context.subscriptions
                 .Include(s => s.details)
-                .Include(s=>s.user)
-                .Where(s=>s.is_active)
+                .Include(s => s.user)
+                .Where(s => s.is_active)
                 .ToListAsync();
         }
-
     }
 }

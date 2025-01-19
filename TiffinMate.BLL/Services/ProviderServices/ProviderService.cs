@@ -347,14 +347,14 @@ namespace TiffinMate.BLL.Services.ProviderServices
         {
             try
             {
-           
+
                 var provider = await _providerRepository.GetProviderById(providerDetailsdto.provider_id);
                 if (provider == null)
                 {
                     throw new Exception("No provider available with the specified ID.");
                 }
 
-           
+
                 var existingDetails = await _providerRepository.GetProviderDetailsByProviderIdAsync(providerDetailsdto.provider_id);
                 if (existingDetails == null)
                 {
@@ -366,9 +366,9 @@ namespace TiffinMate.BLL.Services.ProviderServices
                     var logoUrl = await _cloudinary.UploadDocumentAsync(logo);
                     existingDetails.logo = logoUrl;
                 }
-              
 
-                
+
+
                 existingDetails.Provider.email = providerDetailsdto.email;
                 existingDetails.Provider.user_name = providerDetailsdto.username;
                 existingDetails.address = providerDetailsdto.address;
@@ -383,6 +383,23 @@ namespace TiffinMate.BLL.Services.ProviderServices
             catch (Exception ex)
             {
                 throw new Exception("An error occurred while editing the provider details: " + ex.Message);
+            }
+        }
+        //details exist or not 
+        public async Task<bool> DetailsExist(Guid id)
+        {
+            try
+            {
+                var isExist = await _providerRepository.DetailsExistOrNot(id);
+                if (isExist)
+                {
+                    return false;
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception( ex.Message);
             }
         }
     }

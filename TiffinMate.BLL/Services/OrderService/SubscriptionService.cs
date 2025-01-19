@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TiffinMate.BLL.DTOs.OrderDTOs;
+using TiffinMate.BLL.Interfaces.NotificationInterface;
 using TiffinMate.BLL.Interfaces.OrderServiceInterface;
 using TiffinMate.DAL.DbContexts;
 using TiffinMate.DAL.Entities.OrderEntity;
@@ -19,11 +20,13 @@ namespace TiffinMate.BLL.Services.OrderService
         private readonly ISubscriptionRepository _subscriptionRepository;
         private readonly AppDbContext _context;
         private readonly IMapper _mapper;
-        public SubscriptionService(ISubscriptionRepository subscription, AppDbContext appDbContext, IMapper mapper)
+        private readonly INotificationService _notificationService;
+        public SubscriptionService(ISubscriptionRepository subscription, AppDbContext appDbContext, IMapper mapper,INotificationService notificationService)
         {
             _subscriptionRepository = subscription;
             _context = appDbContext;
             _mapper = mapper;
+            _notificationService = notificationService;
 
         }
 
@@ -39,6 +42,7 @@ namespace TiffinMate.BLL.Services.OrderService
             var isoStartDate = parsedDate.ToString("o");
 
             var orderId = Guid.NewGuid();
+            var paymentHistoryId = Guid.NewGuid();
             var newSubscription = new DAL.Entities.OrderEntity.Subscription
             {
                 id = orderId,
@@ -49,6 +53,16 @@ namespace TiffinMate.BLL.Services.OrderService
                 total_price = orderRequestDTO.total_price,
             };
             await _context.subscriptions.AddAsync(newSubscription);
+            var newPaymentHistory=new PaymentHistory
+            {
+                id = paymentHistoryId,
+                subscription_id = orderId,
+                amount = orderRequestDTO.total_price,
+                payment_date = DateTime.UtcNow,
+                user_id = orderRequestDTO.user_id,
+                
+            };
+            await _context.paymentHistory.AddAsync(newPaymentHistory);
             try
             {
                 await _context.SaveChangesAsync();
@@ -61,10 +75,6 @@ namespace TiffinMate.BLL.Services.OrderService
             return orderId;
 
         }
-
-      
-
-
 
         //Subscription details adding
         public async Task<OrderResponceDto> SubscriptionDetailsCreate(OrderDetailsRequestDto orderDetailsRequestDto, Guid orderId)
@@ -134,14 +144,23 @@ namespace TiffinMate.BLL.Services.OrderService
                     order.transaction_id = orderDetailsRequestDto.transaction_string;
                     _context.subscriptions.Update(order);
                     await _context.SaveChangesAsync();
+
+                    await _notificationService.NotifyProviderAsync(orderDetailsRequestDto.provider_id.ToString(),
+                                                           "New subscription",
+                                                           $"You have a new subscription from {orderDetailsRequestDto.user_name}.","Subscription");
+                }
+                var paymentHistory = await _context.paymentHistory.FirstOrDefaultAsync(p => p.subscription_id == orderId);
+                if(paymentHistory != null)
+                {
+                    paymentHistory.is_paid = true;
+                    _context.paymentHistory.Update(paymentHistory);
+                    await _context.SaveChangesAsync();
                 }
 
                 else
                 {
                     throw new Exception("Payment failed. Cannot complete the order.");
                 }
-
-
                 await transaction.CommitAsync();
 
                 return new OrderResponceDto
@@ -271,8 +290,6 @@ namespace TiffinMate.BLL.Services.OrderService
         }
        
 
-
-
         //All_Subsribtion_Orders
 
         public async Task<AllOrderDTO> GetSubscribtionOrders(int page, int pageSize, string search = null, string filter = null)
@@ -312,9 +329,6 @@ namespace TiffinMate.BLL.Services.OrderService
                 ).ToList();
             }
 
-          
-
-
             if (!string.IsNullOrEmpty(filter))
             {
                 if (filter.Equals("newest", StringComparison.OrdinalIgnoreCase))
@@ -344,6 +358,44 @@ namespace TiffinMate.BLL.Services.OrderService
             };
 
             return newResult;
+        }
+        public async Task<List<PaymentHistory>> GetPaymentHistory(Guid? id)
+        {
+            return await _subscriptionRepository.GetPaymentHistory(id);
+        }
+        public async Task<bool> HandleSubscription(PaymentHistoryRequestDto dto)
+        {
+            var paymentHistory = await _subscriptionRepository.GetPaymentHistory(dto.payment_id);
+            if (paymentHistory == null)
+            {
+                return false;
+            }
+
+            if (dto.action == "renew")
+            {
+                foreach (var payment in paymentHistory)
+                {
+                    payment.is_paid = true;
+                    payment.payment_date = DateTime.UtcNow;
+                    payment.updated_at = DateTime.UtcNow;
+                    await _subscriptionRepository.UpdatePaymentHistoryAsync(payment);
+
+                }
+                return true;
+            }
+            if (dto.action == "cancel")
+            {
+                var subscription = await _subscriptionRepository.GetSubscriptionByid(paymentHistory.First().subscription_id);
+                if (subscription != null)
+                {
+                    subscription.is_active = false;
+                    subscription.cancelled_at = DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss");
+                    subscription.updated_at = DateTime.UtcNow;
+                    await _subscriptionRepository.UpdateSubscriptionAsync(subscription);
+                    return true;
+                }
+            }
+            return false;
         }
 
 

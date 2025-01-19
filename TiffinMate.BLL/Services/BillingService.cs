@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Razorpay.Api;
 using System;
 using System.Collections.Generic;
@@ -7,8 +8,8 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using TiffinMate.BLL.Interfaces;
-using TiffinMate.BLL.Interfaces.OrderServiceInterface;
 using TiffinMate.BLL.Interfaces.UserInterfaces;
+using TiffinMate.DAL.DbContexts;
 using TiffinMate.DAL.Entities;
 using TiffinMate.DAL.Entities.OrderEntity;
 using TiffinMate.DAL.Interfaces.OrderInterface;
@@ -19,18 +20,18 @@ namespace TiffinMate.BLL.Services
 {
     public class BillingService:IBillingService
     {
-        private readonly IUserRepository _userRepository;
         private readonly ISubscriptionRepository _subscriptionRepository;
         private readonly IFoodItemRepository _foodItemRepository;
         private readonly IBrevoMailService _brevoMailService;
         private readonly BrevoSettings _brevoSettings;
+        private readonly AppDbContext _context;
 
-        public BillingService(IUserRepository userRepository,ISubscriptionRepository subscriptionRepository,IFoodItemRepository foodItemRepository, IOptions<BrevoSettings> brevoSettings)
+        public BillingService(ISubscriptionRepository subscriptionRepository,IFoodItemRepository foodItemRepository, IOptions<BrevoSettings> brevoSettings, AppDbContext context)
         {
             _subscriptionRepository = subscriptionRepository;
-            _userRepository = userRepository;
             _foodItemRepository = foodItemRepository;
             _brevoSettings = brevoSettings.Value;
+            _context = context;
 
         }
         public async Task SendMonthlyBills()
@@ -41,15 +42,22 @@ namespace TiffinMate.BLL.Services
                 {
                     return;
                 }
-                var subscriptions = await _userRepository.GetSubscribedUsers();
+                var subscriptions = await _subscriptionRepository.GetSubscribedUsers();
+                if (!subscriptions.Any())
+                {
+                    return;
+                }
                 foreach (var subscription in subscriptions)
                 {
                     var totalCategories = subscription.details.Count();
-                    decimal monthly_amount = await _foodItemRepository.GetMonthlyTotalAmount(subscription.menu_id);
-                    decimal total_amount = monthly_amount/totalCategories;
-
-                    var invoice = await GeneratePaymentHistory(subscription, total_amount);
-                    await SendBillEmail(subscription.user.email, invoice);
+                    decimal monthlyAmount = await _foodItemRepository.GetMonthlyTotalAmount(subscription.menu_id);
+                    if (monthlyAmount == 0)
+                    {
+                        continue;
+                    }
+                    decimal totalAmount = monthlyAmount/totalCategories;
+                    var paymentHistory = await SavePaymentHistory(subscription, totalAmount);
+                    await SendBillEmail(subscription.user.email, paymentHistory);
 
                 }
 
@@ -60,21 +68,25 @@ namespace TiffinMate.BLL.Services
             }
         }
 
-        private async Task<PaymentHistory> GeneratePaymentHistory(TiffinMate.DAL.Entities.OrderEntity.Subscription subscription, decimal amount)
+        private async Task<PaymentHistory> SavePaymentHistory(TiffinMate.DAL.Entities.OrderEntity.Subscription subscription, decimal amount)
         {
-            return new PaymentHistory
+            var paymentHistory = new PaymentHistory
             {
-                user_id = subscription.user_id,
+
+                subscription_id = subscription.id,
                 amount = amount,
                 payment_date = DateTime.UtcNow,
-                subscription_id = subscription.id
-                
+                user_id = subscription.user_id,
+
             };
+            await _context.paymentHistory.AddAsync(paymentHistory);
+            await _context.SaveChangesAsync();
+            return paymentHistory;
         }
 
-        public async Task<bool> SendBillEmail(string to, PaymentHistory invoice)
+        public async Task<bool> SendBillEmail(string to, PaymentHistory paymentHistory)
         {
-            string paymentLink = $"/pay/{invoice.subscription_id}";
+            string paymentLink = $"{Environment.GetEnvironmentVariable("BILL_PAYMENT_LINK")}={paymentHistory.id}";
             var emailData = new
                 {
                     sender = new { email = _brevoSettings.FromEmail },
@@ -82,9 +94,9 @@ namespace TiffinMate.BLL.Services
                     subject = "Monthly Bill",
                     textContent = $"Hello,\n\n" +
                     $"Your monthly bill is ready.\n\n" +
-                    $"Amount Due: {invoice.amount:C}\n" +
-                    $"Payment Date: {invoice.payment_date:MMMM dd, yyyy}\n\n" +
+                    $"Amount Due: {paymentHistory.amount:C}\n" +
                     $"Please click the link below to view and pay your bill:\n" +
+                     $"Payment ID: {paymentHistory.id}\n\n" +
                     $"{paymentLink}\n\n" +
                     $"Thank you,\nTiffinMate"
             };

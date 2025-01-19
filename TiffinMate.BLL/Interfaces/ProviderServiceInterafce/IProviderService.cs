@@ -21,6 +21,7 @@ namespace TiffinMate.BLL.Interfaces.ProviderServiceInterafce
         Task<ProviderDetailedDTO> GetProviderDetailsById(Guid id);
         Task<List<ProviderDetailResponse>> GetProvidersWithDetail();
         Task<bool> EditDetails(EditDetailsDto providerDetailsdto, IFormFile logo);
+        Task<bool> DetailsExist(Guid id);
 
     }
 }

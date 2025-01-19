@@ -45,6 +45,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<Folder Include="Controllers\NotificationController\" />
 		<Folder Include="Middlewares\" />
 	</ItemGroup>
 

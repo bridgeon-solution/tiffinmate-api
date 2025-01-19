@@ -53,6 +53,8 @@ using Microsoft.AspNetCore.Authentication;
 using System.Security.Claims;
 using TiffinMate.API.Controllers;
 using TiffinMate.BLL.Services.GoogleAuthService;
+using Microsoft.AspNetCore.SignalR;
+using TiffinMate.BLL.Custom;
 
 
 namespace TiffinMate.API
@@ -134,9 +136,6 @@ namespace TiffinMate.API
 
             builder.Services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
             builder.Services.AddScoped<IBillingService, BillingService>();
-
-
-
             builder.Services.Configure<BrevoSettings>(options =>
             {
                 options.ApiKey = brevoApiKey;
@@ -148,7 +147,7 @@ namespace TiffinMate.API
             {
                 options.AddPolicy("AllowSpecificOrigin", builder =>
                     builder
-                        .WithOrigins("http://localhost:5175", "http://localhost:5174", "http://localhost:5180", "https://beta.tiffinmate.online", "https://betaprovider.tiffinmate.online", "https://betaadmin.tiffinmate.online", "https://tiffinmate.online") 
+                        .WithOrigins("http://localhost:5175", "http://localhost:5174", "http://localhost:5180", "https://beta.tiffinmate.online", "https://betaprovider.tiffinmate.online", "https://betaadmin.tiffinmate.online", "https://tiffinmate.online", "https://admin.tiffinmate.online", "https://provider.tiffinmate.online") 
 
                         .AllowAnyMethod()
                         .AllowAnyHeader()
@@ -235,8 +234,6 @@ namespace TiffinMate.API
       options.ClaimActions.MapJsonKey(ClaimTypes.Name, "name");
       options.ClaimActions.MapJsonKey(ClaimTypes.Email, "email");
   });
-
-
 
             var app = builder.Build();
             

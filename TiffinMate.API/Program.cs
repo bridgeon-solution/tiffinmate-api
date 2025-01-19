@@ -129,10 +129,6 @@ namespace TiffinMate.API
 
             builder.Services.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
             builder.Services.AddScoped<IBillingService, BillingService>();
-
-
-
-
             builder.Services.Configure<BrevoSettings>(options =>
             {
                 options.ApiKey = brevoApiKey;
@@ -215,11 +211,8 @@ namespace TiffinMate.API
     options.CallbackPath = callbackpath;
 });
 
-            var app = builder.Build();
-            
-          
+            var app = builder.Build();                     
 
-           
             if (env == "Development")
             {
                 app.UseSwagger();

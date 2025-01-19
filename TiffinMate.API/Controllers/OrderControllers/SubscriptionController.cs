@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
+using System.Security.Claims;
 using TiffinMate.BLL.DTOs.OrderDTOs;
 using TiffinMate.BLL.Interfaces.OrderServiceInterface;
 using TiffinMate.BLL.Services.OrderService;
@@ -166,6 +167,22 @@ namespace TiffinMate.API.Controllers.OrderControllers
 
             }
         }
+        [HttpGet("user")]
+        public async Task<IActionResult> GetSubscriptionByUser(Guid userId)
+        {
+            try
+            {
+                var res = await _subscriptionService.GetSubscriptionByUser(userId);
+                var result = new TiffinMate.API.ApiRespons.ApiResponse<List<SubscriptionDetailsDto>>("succesfull", "Subscription details getted succesfully", res, HttpStatusCode.OK, "");
+                return Ok(result);
 
+            }
+            catch (Exception ex)
+            {
+                var response = new TiffinMate.API.ApiRespons.ApiResponse<string>("failed", "", ex.Message, HttpStatusCode.InternalServerError, "error occured");
+                return StatusCode((int)HttpStatusCode.InternalServerError, response);
+
+            }
+        }
     }
 }

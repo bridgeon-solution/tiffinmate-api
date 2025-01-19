@@ -18,5 +18,6 @@ namespace TiffinMate.BLL.Interfaces.OrderServiceInterface
         Task<Guid> SubscriptionCreate(OrderRequestDTO orderRequestDTO);
         Task<List<PaymentHistory>> GetPaymentHistory(Guid? id);
         Task<bool> HandleSubscription(PaymentHistoryRequestDto dto);
+        Task<List<SubscriptionDetailsDto>>GetSubscriptionByUser(Guid userId);
     }
 }

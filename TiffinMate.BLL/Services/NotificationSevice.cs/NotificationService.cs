@@ -30,14 +30,14 @@ namespace TiffinMate.BLL.Services.NotificationService
             {
                 title = title,
                 message = message,
-                recipient_type= recipient_type,
-                notification_type= notification_type,
-                recipient_id= recipient_id,
-                isread =false
-                
+                recipient_type = recipient_type,
+                notification_type = notification_type,
+                recipient_id = recipient_id,
+                isread = false
+
             };
             await _notificationRepository.AddAsync(notification);
-            await _hubContext.Clients.All.SendAsync("ReceiveMessage", recipient_type,title, message);
+            await _hubContext.Clients.All.SendAsync("ReceiveMessage", recipient_type, title, message);
         }
 
         public async Task NotifyProviderAsync(string providerId, string title, string message,string notification_type)

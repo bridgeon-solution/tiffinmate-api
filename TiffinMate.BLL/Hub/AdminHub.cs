@@ -9,9 +9,9 @@ namespace TiffinMate.BLL.Hubs
 {
     public class NotificationHub :Hub
     {
-        public async Task SendMessageToAdmin(string recipient_type ,string title,string message)
+        public async Task SendMessageToAdmin(string recipient_type, string title, string message)
         {
-            await Clients.All.SendAsync("ReceiveMessage",recipient_type,title, message);
+            await Clients.All.SendAsync("ReceiveMessage", recipient_type, title, message);
         }
 
 

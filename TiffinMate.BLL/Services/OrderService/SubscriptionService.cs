@@ -407,18 +407,16 @@ namespace TiffinMate.BLL.Services.OrderService
                 .Include(s => s.details)
                     .ThenInclude(sd => sd.Category)
                 .Where(s => s.user_id == userId) 
-                .GroupBy(s => new { s.user_id, s.provider.user_name }) 
-                .Select(g => new SubscriptionDetailsDto
+                .Select(s => new SubscriptionDetailsDto
                 {
-                    user_id = g.Key.user_id,
-                    provider = g.Key.user_name,
-                    total_amount = g.Sum(sub => sub.menu.monthly_plan_amount),
-                    subscription = g.SelectMany(sub => sub.details)
-                        .GroupBy(sd => sd.Category.category_name)
-                        .Select(catGroup => new SubscriptionDto
+                    user_id = s.user_id,
+                    provider = s.provider.user_name,
+                    total_amount = s.menu.monthly_plan_amount,
+                    subscription = s.details.GroupBy(sd => sd.Category.category_name)
+                        .Select(c => new SubscriptionDto
                         {
-                            category = catGroup.Key,
-                            fooditems = catGroup.SelectMany(cg => cg.subscription.menu.food_items)
+                            category = c.Key,
+                            fooditems = c.SelectMany(cg => cg.subscription.menu.food_items)
                                 .Select(f => new FoodItemDto
                                 {
                                     day = f.day,

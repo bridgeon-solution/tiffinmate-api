@@ -192,6 +192,11 @@ namespace TiffinMate.DAL.DbContexts
                 .HasForeignKey(od => od.subscription_id)
                 .OnDelete(DeleteBehavior.Cascade);
 
+                entity.HasOne(s=>s.menu)
+                .WithMany(m=>m.subscription)
+                .HasForeignKey(s=>s.menu_id)
+                .OnDelete(DeleteBehavior.Cascade);
+
             });
             modelBuilder.Entity<OrderDetails>(entity =>
             {

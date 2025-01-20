@@ -156,7 +156,8 @@ namespace TiffinMate.API
 
 
             builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(defaultConnection));
+    options.UseNpgsql(defaultConnection, npgsqlOptions => npgsqlOptions.CommandTimeout(60)
+));
 
             builder.Services.AddScoped<Supabase.Client>(_ => new Supabase.Client(hostUrl, hostApi,
                 new SupabaseOptions

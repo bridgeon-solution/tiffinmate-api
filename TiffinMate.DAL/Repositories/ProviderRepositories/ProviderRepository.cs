@@ -109,7 +109,7 @@ namespace TiffinMate.DAL.Repositories.ProviderRepositories
         }
         public async Task<List<ProviderDetails>> GetProvidersWithDetail()
         {
-            return await _context.ProvidersDetails.ToListAsync();
+            return await _context.ProvidersDetails.Include(pd=>pd.Provider).Where(pd=>pd.Provider.verification_status== "approved").ToListAsync();
         }
         public async Task<ProviderDetails> GetProviderDetailsById(Guid id)
         {

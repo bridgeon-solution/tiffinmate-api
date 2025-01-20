@@ -48,6 +48,11 @@ using TiffinMate.BLL.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Quartz;
 using TiffinMate.BLL.Jobs;
+using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Authentication;
+using System.Security.Claims;
+using TiffinMate.API.Controllers;
+using TiffinMate.BLL.Services.GoogleAuthService;
 using Microsoft.AspNetCore.SignalR;
 using TiffinMate.BLL.Custom;
 
@@ -116,6 +121,8 @@ namespace TiffinMate.API
             builder.Services.AddScoped<ISubscriptionRepository, SubscriptionRepository>();
             builder.Services.AddScoped<ISubscriptionService, SubscriptionService>();
             builder.Services.AddScoped<RefreshInterface, refreshService>();
+            builder.Services.AddScoped<IGoogleAuth, GoogleauthService>();
+
             builder.Services.AddQuartz(q =>
             {
                 q.UseMicrosoftDependencyInjectionJobFactory();
@@ -149,7 +156,8 @@ namespace TiffinMate.API
 
 
             builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(defaultConnection));
+    options.UseNpgsql(defaultConnection, npgsqlOptions => npgsqlOptions.CommandTimeout(60)
+));
 
             builder.Services.AddScoped<Supabase.Client>(_ => new Supabase.Client(hostUrl, hostApi,
                 new SupabaseOptions
@@ -200,19 +208,39 @@ namespace TiffinMate.API
 
             builder.Services.AddAuthentication(options =>
             {
+                // Use cookies for authentication
                 options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = "Google";
+                options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme; // Use GoogleDefaults for consistency
             })
-             .AddCookie()
-             .AddGoogle("Google", options =>
-{
-    options.ClientId = googleClientId;
-    options.ClientSecret = googleClientSecret;
-    options.CallbackPath = callbackpath;
-});
+  .AddCookie(options =>
+  {
+      options.LoginPath = "/google"; // Path to redirect for login
+      options.LogoutPath = "/login"; // Path to redirect for logout
+      options.AccessDeniedPath = "/login"; // Path for access denied
+      options.ExpireTimeSpan = TimeSpan.FromMinutes(15); // Adjusted expiration time
+      options.SlidingExpiration = true; // Enable sliding expiration
+  })
 
-            var app = builder.Build();                     
+  .AddGoogle(GoogleDefaults.AuthenticationScheme, options =>
+  {
+      options.ClientId = googleClientId;
+      options.ClientSecret = googleClientSecret;
+      options.CallbackPath = callbackpath; // Should match the registered callback in Google Console
 
+      // Add required scopes
+      options.Scope.Add("email");
+      options.Scope.Add("profile");
+
+      // Retrieve the user's name and email claims
+      options.ClaimActions.MapJsonKey(ClaimTypes.Name, "name");
+      options.ClaimActions.MapJsonKey(ClaimTypes.Email, "email");
+  });
+
+            var app = builder.Build();
+            
+          
+
+           
             if (env == "Development")
             {
                 app.UseSwagger();

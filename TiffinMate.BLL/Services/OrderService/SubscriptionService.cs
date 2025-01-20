@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TiffinMate.BLL.DTOs.OrderDTOs;
+using TiffinMate.BLL.DTOs.ProviderDTOs;
 using TiffinMate.BLL.Interfaces.NotificationInterface;
 using TiffinMate.BLL.Interfaces.OrderServiceInterface;
 using TiffinMate.DAL.DbContexts;
@@ -397,8 +398,37 @@ namespace TiffinMate.BLL.Services.OrderService
             }
             return false;
         }
+        public async Task<List<SubscriptionDetailsDto>> GetSubscriptionByUser(Guid userId)
+        {
+            var result = await _context.subscriptions
+                .Include(s => s.provider)
+                .Include(s => s.menu)
+                    .ThenInclude(m => m.food_items) 
+                .Include(s => s.details)
+                    .ThenInclude(sd => sd.Category)
+                .Where(s => s.user_id == userId) 
+                .Select(s => new SubscriptionDetailsDto
+                {
+                    user_id = s.user_id,
+                    provider = s.provider.user_name,
+                    total_amount = s.menu.monthly_plan_amount,
+                    subscription = s.details.GroupBy(sd => sd.Category.category_name)
+                        .Select(c => new SubscriptionDto
+                        {
+                            category = c.Key,
+                            fooditems = c.SelectMany(cg => cg.subscription.menu.food_items)
+                                .Select(f => new FoodItemDto
+                                {
+                                    day = f.day,
+                                    food_name = f.food_name,
+                                })
+                                .Distinct()
+                                .ToList()
+                        }).ToList()
+                }).ToListAsync();
 
-
+            return result;
+        }
 
     }
 

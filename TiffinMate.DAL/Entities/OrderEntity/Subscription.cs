@@ -24,6 +24,7 @@ namespace TiffinMate.DAL.Entities.OrderEntity
             public User user { get; set; }
             public Provider provider { get; set; }
             public List<PaymentHistory> payment_history { get; set; }
+            public Menu menu { get; set; }
 
     }
 }

@@ -30,6 +30,10 @@ namespace TiffinMate.DAL.Repositories.ProviderRepositories
             await _context.SaveChangesAsync();
             return "ok";
         }
+        public async Task<bool> DetailsExistOrNot(Guid providerId)
+        {
+            return await _context.ProvidersDetails.AnyAsync(o => o.provider_id == providerId);
+        }
         public async Task<bool>EmailExistOrNot(string email)
         {
             return await _context.Providers.AnyAsync(o => o.email == email);
@@ -105,7 +109,7 @@ namespace TiffinMate.DAL.Repositories.ProviderRepositories
         }
         public async Task<List<ProviderDetails>> GetProvidersWithDetail()
         {
-            return await _context.ProvidersDetails.ToListAsync();
+            return await _context.ProvidersDetails.Include(pd=>pd.Provider).Where(pd=>pd.Provider.verification_status== "approved").ToListAsync();
         }
         public async Task<ProviderDetails> GetProviderDetailsById(Guid id)
         {

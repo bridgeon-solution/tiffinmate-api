@@ -393,9 +393,9 @@ namespace TiffinMate.BLL.Services.ProviderServices
                 var isExist = await _providerRepository.DetailsExistOrNot(id);
                 if (isExist)
                 {
-                    return false;
+                    return true;
                 }
-                return true;
+                return false;
             }
             catch (Exception ex)
             {

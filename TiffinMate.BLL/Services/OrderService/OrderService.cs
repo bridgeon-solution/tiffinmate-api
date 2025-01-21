@@ -272,8 +272,8 @@ namespace TiffinMate.BLL.Services.OrderService
                 category_name = o.provider.food_items.FirstOrDefault().category.category_name,
                 total_price = o.total_price,
                 start_date = o.start_date,
-                fooditem_image=d.fooditem_image
-
+                fooditem_image=d.fooditem_image,
+                  order_status = o.order_status
             })).ToList();
             var pagedOrders = Allorder.Skip((page - 1) * pageSize).Take(pageSize).ToList();
 
@@ -392,7 +392,9 @@ namespace TiffinMate.BLL.Services.OrderService
                 menu_name = o.provider.menus.FirstOrDefault().name,
                 category_name = o.provider.food_items.FirstOrDefault().category.category_name,
                 total_price = o.total_price,
-                fooditem_image=d.fooditem_image
+                fooditem_image=d.fooditem_image,
+                order_status=o.order_status
+
             })).ToList();
             var pagedOrders = Allorder.Skip((page - 1) * pageSize).Take(pageSize).ToList();
 

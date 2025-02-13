@@ -140,11 +140,13 @@ namespace TiffinMate.API
             {
                 options.AddPolicy("AllowSpecificOrigin", builder =>
                     builder
-                                    .WithOrigins("http://localhost:5175", "http://localhost:5174", "http://localhost:5180", "https://beta.tiffinmate.online", "https://betaprovider.tiffinmate.online", "https://betaadmin.tiffinmate.online", "https://tiffinmate.online", "https://tiffinmate-api.onrender.com")
+                         .WithOrigins("http://localhost:5175", "http://localhost:5174" ,"https://beta.tiffinmate.online", "https://betaprovider.tiffinmate.online", "https://betaadmin.tiffinmate.online", "https://tiffinmate.online", "https://tiffinmate-api.onrender.com")
                         .AllowAnyMethod()
                         .AllowAnyHeader()
                         .AllowCredentials());
             });
+
+
 
 
             builder.Services.AddDbContext<AppDbContext>(options =>
@@ -223,7 +225,7 @@ namespace TiffinMate.API
             app.UseAuthentication();
             app.UseAuthorization();
             app.MapControllers();
-            app.MapHub<NotificationHub>("/adminHub");
+            app.MapHub<NotificationHub>("/adminHub").RequireCors("AllowSpecificOrigin");
 
             app.MapGet("/ping", () => "ping");
             app.Run();

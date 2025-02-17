@@ -66,6 +66,7 @@ namespace TiffinMate.API
             var builder = WebApplication.CreateBuilder(args);
 
             DotNetEnv.Env.Load();
+
             var jwtKey = Environment.GetEnvironmentVariable("JWT_KEY");
             var jwtRefreshKey = Environment.GetEnvironmentVariable("JWT_REFRESH_KEY");
             var env = Environment.GetEnvironmentVariable("IS_DEVELOPMENT");

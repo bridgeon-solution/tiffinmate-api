@@ -86,6 +86,7 @@ namespace TiffinMate.API
             builder.Services.AddControllers();
             builder.Services.AddSignalR();
 
+
             builder.Services.AddApiVersioning(options =>
             {
                 options.AssumeDefaultVersionWhenUnspecified = true;

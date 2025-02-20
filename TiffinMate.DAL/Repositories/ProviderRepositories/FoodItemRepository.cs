@@ -58,13 +58,21 @@ namespace TiffinMate.DAL.Repositories.ProviderRepositories
 
         public async Task<string> AddCategoryAsync(Categories category)
         {
-            var existingcategory=await _context.Categories.FirstOrDefaultAsync(c=>c.category_name== category.category_name);
-            if (existingcategory != null) {
-                return "category with same name already exists.";
+            try
+            {
+                var existingcategory = await _context.Categories.FirstOrDefaultAsync(c => c.category_name == category.category_name);
+                if (existingcategory != null)
+                {
+                    return "category with same name already exists.";
+                }
+                await _context.Categories.AddAsync(category);
+                await _context.SaveChangesAsync();
+                return "Category added";
             }
-            await _context.Categories.AddAsync(category);
-            await _context.SaveChangesAsync();
-            return "Category added";
+            catch(Exception ex)
+            {
+                return $"Error occurred: {ex.Message}";
+            }
         }
 
         public async Task<List<FoodItem>> GetByProviderAsync(Guid providerId)

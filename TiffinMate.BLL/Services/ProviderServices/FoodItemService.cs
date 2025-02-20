@@ -87,9 +87,16 @@ namespace TiffinMate.BLL.Services.ProviderServices
 
         public async Task<string> AddCategories(CategoryDto category)
         {
-            var Catgory=_mapper.Map<Categories>(category);
-            await _foodItemRepository.AddCategoryAsync(Catgory);
-            return "Added successfully";
+            try
+            {
+                var Catgory = _mapper.Map<Categories>(category);
+                await _foodItemRepository.AddCategoryAsync(Catgory);
+                return "Added successfully";
+            }
+            catch(Exception ex)
+            {
+                return $"Error occurred: {ex.Message}";
+            }
 
         }
         //foodbyprovider

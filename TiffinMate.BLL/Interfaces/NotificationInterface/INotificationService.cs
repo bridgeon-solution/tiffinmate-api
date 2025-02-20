@@ -10,7 +10,7 @@ namespace TiffinMate.BLL.Interfaces.NotificationInterface
 {
     public interface INotificationService
     {
-        Task NotifyAdminsAsync(string recipient_type, string title, string message, string notification_type, string? recipient_id = null);
+        Task NotifyAdminsAsync( string title, string message, string notification_type, string? recipient_id = null);
         Task<List<NotificationAdminResponceDto>> getnotification(string recipientType);
         Task<bool> MarkAsDeleted();
         Task NotifyProviderAsync(string providerId, string title, string message,string notification_type);

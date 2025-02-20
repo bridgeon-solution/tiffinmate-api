@@ -154,6 +154,8 @@ namespace TiffinMate.API
             });
 
 
+
+
             builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(defaultConnection, npgsqlOptions => npgsqlOptions.CommandTimeout(60)
 ));
@@ -251,7 +253,7 @@ namespace TiffinMate.API
             app.UseAuthentication();
             app.UseAuthorization();
             app.MapControllers();
-            app.MapHub<NotificationHub>("/adminHub");
+            app.MapHub<NotificationHub>("/adminHub").RequireCors("AllowSpecificOrigin");
 
             app.MapGet("/ping", () => "ping");
             app.Run();

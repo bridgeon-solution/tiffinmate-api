@@ -43,13 +43,22 @@ namespace TiffinMate.API.Controllers.ProviderControllers
         [HttpPost("categery")]
         public async Task<IActionResult> AddCategory([FromBody] CategoryDto category)
         {
-            var response= await _foodItemService.AddCategories(category);
-            if (response == "category with same name already exists.")
+            try
             {
-                return BadRequest(new ApiResponse<string>("failure", "Addition failed", null, HttpStatusCode.BadRequest, "category with same name already exists. "));
+
+                var response = await _foodItemService.AddCategories(category);
+                if (response == "category with same name already exists.")
+                {
+                    return BadRequest(new ApiResponse<string>("failure", "Addition failed", null, HttpStatusCode.BadRequest, "category with same name already exists. "));
+                }
+                var result = new ApiResponse<string>("success", "Addition Successful", response, HttpStatusCode.OK, "");
+                return Ok(result);
             }
-            var result = new ApiResponse<string>("success", "Addition Successful", response, HttpStatusCode.OK, "");
-            return Ok(result);
+            catch(Exception ex)
+            {
+                throw new Exception(ex.Message);
+
+            }
         }
 
 

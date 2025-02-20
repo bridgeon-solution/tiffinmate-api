@@ -83,8 +83,8 @@ namespace TiffinMate.BLL.Services.ProviderServices
             }
             catch (Exception ex)
             {
-                Console.Write(ex.InnerException?.Message ?? ex.Message);
-                throw new Exception("An error occurred while adding the product: " + ex.Message);
+                
+                throw new Exception(ex.Message);
             }
         }
 
@@ -95,14 +95,23 @@ namespace TiffinMate.BLL.Services.ProviderServices
             {
                 if (string.IsNullOrEmpty(providerdto.email) || string.IsNullOrEmpty(providerdto.password))
                 {
-                    throw new Exception("Email or password cannot be null or empty.");
+                    throw new Exception("Email or password cannot be empty");
                 }
 
                 var pro = await _providerRepository.Login(providerdto.email);
 
                 if (pro == null)
                 {
-                    throw new Exception("Provider not found.");
+                    throw new Exception("Invalid email");
+                }
+                else if (pro.verification_status == "rejected")
+                {
+                    throw new Exception("Your account has been rejected. Please contact support.");
+                }
+
+                else if (pro.verification_status == "pending")
+                {
+                    throw new Exception("Your account is pending approval Please wait for admin verification");
                 }
                 bool isValid = BCrypt.Net.BCrypt.Verify(providerdto.password, pro.password);
 
@@ -139,10 +148,8 @@ namespace TiffinMate.BLL.Services.ProviderServices
             }
             catch(Exception ex)
             {
-                Console.WriteLine($"Error during login: {ex.Message}");
-                Console.WriteLine($"Query Parameters - Email: {providerdto.email}, Password: {providerdto.password}");
-
-                throw new Exception("An error occurred: " + ex.Message);              
+                
+                throw new Exception(ex.Message);              
 
             }
         }

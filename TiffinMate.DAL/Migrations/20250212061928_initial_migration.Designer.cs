@@ -12,8 +12,8 @@ using TiffinMate.DAL.DbContexts;
 namespace TiffinMate.DAL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250121042635_update_providerDetails_20250121")]
-    partial class update_providerDetails_20250121
+    [Migration("20250212061928_initial_migration")]
+    partial class initial_migration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

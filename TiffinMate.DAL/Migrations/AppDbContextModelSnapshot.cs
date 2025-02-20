@@ -63,7 +63,7 @@ namespace TiffinMate.DAL.Migrations
 
                     b.HasKey("id");
 
-                    b.ToTable("Admins");
+                    b.ToTable("Admins", (string)null);
                 });
 
             modelBuilder.Entity("TiffinMate.DAL.Entities.ApiLog", b =>
@@ -105,7 +105,7 @@ namespace TiffinMate.DAL.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ApiLogs");
+                    b.ToTable("ApiLogs", (string)null);
                 });
 
             modelBuilder.Entity("TiffinMate.DAL.Entities.OrderEntity.Order", b =>
@@ -159,7 +159,7 @@ namespace TiffinMate.DAL.Migrations
 
                     b.HasIndex("user_id");
 
-                    b.ToTable("order");
+                    b.ToTable("order", (string)null);
                 });
 
             modelBuilder.Entity("TiffinMate.DAL.Entities.OrderEntity.OrderDetails", b =>
@@ -216,7 +216,7 @@ namespace TiffinMate.DAL.Migrations
 
                     b.HasIndex("order_id");
 
-                    b.ToTable("orderDetails");
+                    b.ToTable("orderDetails", (string)null);
                 });
 
             modelBuilder.Entity("TiffinMate.DAL.Entities.OrderEntity.PaymentHistory", b =>
@@ -255,7 +255,7 @@ namespace TiffinMate.DAL.Migrations
 
                     b.HasIndex("user_id");
 
-                    b.ToTable("paymentHistory");
+                    b.ToTable("paymentHistory", (string)null);
                 });
 
             modelBuilder.Entity("TiffinMate.DAL.Entities.OrderEntity.Subscription", b =>
@@ -312,7 +312,7 @@ namespace TiffinMate.DAL.Migrations
 
                     b.HasIndex("user_id");
 
-                    b.ToTable("subscriptions");
+                    b.ToTable("subscriptions", (string)null);
                 });
 
             modelBuilder.Entity("TiffinMate.DAL.Entities.OrderEntity.SubscriptionDetails", b =>
@@ -358,7 +358,7 @@ namespace TiffinMate.DAL.Migrations
 
                     b.HasIndex("subscription_id");
 
-                    b.ToTable("subscriptionDetails");
+                    b.ToTable("subscriptionDetails", (string)null);
                 });
 
             modelBuilder.Entity("TiffinMate.DAL.Entities.ProviderEntity.Categories", b =>
@@ -382,7 +382,7 @@ namespace TiffinMate.DAL.Migrations
 
                     b.HasKey("id");
 
-                    b.ToTable("Categories");
+                    b.ToTable("Categories", (string)null);
                 });
 
             modelBuilder.Entity("TiffinMate.DAL.Entities.ProviderEntity.FoodItem", b =>
@@ -436,7 +436,7 @@ namespace TiffinMate.DAL.Migrations
 
                     b.HasIndex("provider_id");
 
-                    b.ToTable("FoodItems");
+                    b.ToTable("FoodItems", (string)null);
                 });
 
             modelBuilder.Entity("TiffinMate.DAL.Entities.ProviderEntity.Menu", b =>
@@ -484,7 +484,7 @@ namespace TiffinMate.DAL.Migrations
 
                     b.HasIndex("provider_id");
 
-                    b.ToTable("menus");
+                    b.ToTable("menus", (string)null);
                 });
 
             modelBuilder.Entity("TiffinMate.DAL.Entities.ProviderEntity.Notification", b =>
@@ -528,7 +528,7 @@ namespace TiffinMate.DAL.Migrations
 
                     b.HasKey("id");
 
-                    b.ToTable("notifications");
+                    b.ToTable("notifications", (string)null);
                 });
 
             modelBuilder.Entity("TiffinMate.DAL.Entities.ProviderEntity.Provider", b =>
@@ -583,7 +583,7 @@ namespace TiffinMate.DAL.Migrations
 
                     b.HasKey("id");
 
-                    b.ToTable("Providers");
+                    b.ToTable("Providers", (string)null);
                 });
 
             modelBuilder.Entity("TiffinMate.DAL.Entities.ProviderEntity.ProviderDetails", b =>
@@ -640,7 +640,7 @@ namespace TiffinMate.DAL.Migrations
                     b.HasIndex("provider_id")
                         .IsUnique();
 
-                    b.ToTable("ProvidersDetails");
+                    b.ToTable("ProvidersDetails", (string)null);
                 });
 
             modelBuilder.Entity("TiffinMate.DAL.Entities.Rating", b =>
@@ -673,7 +673,7 @@ namespace TiffinMate.DAL.Migrations
 
                     b.HasIndex("user_id");
 
-                    b.ToTable("Ratings");
+                    b.ToTable("Ratings", (string)null);
                 });
 
             modelBuilder.Entity("TiffinMate.DAL.Entities.Review", b =>
@@ -707,7 +707,7 @@ namespace TiffinMate.DAL.Migrations
 
                     b.HasIndex("user_id");
 
-                    b.ToTable("Reviews");
+                    b.ToTable("Reviews", (string)null);
                 });
 
             modelBuilder.Entity("TiffinMate.DAL.Entities.User", b =>
@@ -774,7 +774,7 @@ namespace TiffinMate.DAL.Migrations
 
                     b.HasKey("id");
 
-                    b.ToTable("users");
+                    b.ToTable("users", (string)null);
                 });
 
             modelBuilder.Entity("TiffinMate.DAL.Entities.OrderEntity.Order", b =>

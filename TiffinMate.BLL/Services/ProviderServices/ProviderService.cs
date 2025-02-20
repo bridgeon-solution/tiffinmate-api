@@ -76,7 +76,7 @@ namespace TiffinMate.BLL.Services.ProviderServices
                 var adminTitle = "Provider Registration";
                 var adminMessage = $"New provider registered: {provider.user_name}.";
                 await _notificationService.NotifyAdminsAsync(
-                 "Admin", adminTitle, adminMessage, "Registration"
+                  adminTitle, adminMessage, "Registration"
                     
                 );
                 return true;

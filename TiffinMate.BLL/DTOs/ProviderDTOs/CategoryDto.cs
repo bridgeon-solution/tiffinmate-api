@@ -8,6 +8,6 @@ namespace TiffinMate.BLL.DTOs.ProviderDTOs
 {
     public class CategoryDto
     {
-        public string categoryname { get; set; }
+        public string category_name { get; set; }
     }
 }

@@ -147,7 +147,7 @@ namespace TiffinMate.API
             {
                 options.AddPolicy("AllowSpecificOrigin", builder =>
                     builder
-                         .WithOrigins("http://localhost:5175", "http://localhost:5174" ,"https://beta.tiffinmate.online", "https://betaprovider.tiffinmate.online", "https://betaadmin.tiffinmate.online", "https://tiffinmate.online", "https://tiffinmate-api.onrender.com", "https://provider.tiffinmate.online/", "https://admin.tiffinmate.online/")
+                         .WithOrigins("http://localhost:5175", "http://localhost:5174" ,"https://beta.tiffinmate.online", "https://betaprovider.tiffinmate.online", "https://betaadmin.tiffinmate.online", "https://tiffinmate.online", "https://tiffinmate-api.onrender.com", "https://provider.tiffinmate.online", "https://admin.tiffinmate.online")
                         .AllowAnyMethod()
                         .AllowAnyHeader()
                         .AllowCredentials());

@@ -17,7 +17,7 @@ namespace TiffinMate.DAL.Entities.ProviderEntity
         public string logo { get; set; }
         public string about { get; set; }
         public string image { get; set; }
-        public string account_no { get; set; }
+        public int account_no { get; set; }
         public Provider Provider { get; set; }
     }
 }

@@ -16,6 +16,6 @@ namespace TiffinMate.BLL.DTOs.ProviderDTOs
      
         public string about { get; set; }
      
-        public string account_no { get; set; }
+        public int account_no { get; set; }
     }
 }

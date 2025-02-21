@@ -104,20 +104,22 @@ namespace TiffinMate.BLL.Services.ProviderServices
                 {
                     throw new Exception("Invalid email");
                 }
-                else if (pro.verification_status == "rejected")
+                if (pro.is_blocked)
                 {
-                    throw new Exception("Your account has been rejected. Please contact support.");
+                    throw new Exception("Your account has been blocked. Please contact support");
                 }
-
-                else if (pro.verification_status == "pending")
+                switch (pro.verification_status?.ToLower())
                 {
-                    throw new Exception("Your account is pending approval Please wait for admin verification");
+                    case "rejected":
+                        throw new Exception("Your account has been rejected. Please contact support");
+                    case "pending":
+                        throw new Exception("Your account is pending approval. Please wait for admin verification");
                 }
                 bool isValid = BCrypt.Net.BCrypt.Verify(providerdto.password, pro.password);
 
                 if (!isValid)
                 {
-                    throw new Exception("Invalid password.");
+                    throw new Exception("Invalid password");
                 }
                 var tokenHelper = new TokenHelper();
 

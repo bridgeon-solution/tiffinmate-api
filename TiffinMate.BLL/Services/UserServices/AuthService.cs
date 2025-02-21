@@ -97,6 +97,13 @@ namespace TiffinMate.BLL.Services.UserService
                     message = "User Not Found"
                 };
             }
+          else if (user.is_blocked)
+            {
+                return new LoginResponseDto
+                {
+                    message = "User Blocked"
+                };
+            }
 
             bool isPasswordValid = BCrypt.Net.BCrypt.Verify(userDto.password, user.password);
             if (!isPasswordValid)

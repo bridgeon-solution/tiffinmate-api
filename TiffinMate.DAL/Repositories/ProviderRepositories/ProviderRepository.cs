@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TiffinMate.DAL.DbContexts;
+using TiffinMate.DAL.Entities.OrderEntity;
 using TiffinMate.DAL.Entities.ProviderEntity;
 using TiffinMate.DAL.Interfaces.ProviderInterface;
 
@@ -123,6 +124,13 @@ namespace TiffinMate.DAL.Repositories.ProviderRepositories
         {
             _context.ProvidersDetails.Update(provider);
 
+        }
+        public async Task<List<PaymentHistory>> GetPaymentByProvider(Guid pro_id)
+        {
+            return await _context.paymentHistory
+                .Include(o => o.subscription).ThenInclude(p => p.provider)
+                .Include(u => u.user)
+                .Where(u => u.subscription.provider_id == pro_id).ToListAsync();
         }
     }
 }

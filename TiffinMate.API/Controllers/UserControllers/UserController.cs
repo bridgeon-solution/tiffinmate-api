@@ -1,8 +1,10 @@
 ﻿using Asp.Versioning;
+using CloudinaryDotNet.Actions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Sprache;
+using Supabase.Storage;
 using System.Net;
 using TiffinMate.API.ApiRespons;
 using TiffinMate.BLL.DTOs.OrderDTOs;
@@ -103,6 +105,10 @@ namespace TiffinMate.API.Controllers.UserControllers
                 if (response.message == "Invalid Email")
                 {
                     return Ok(new ApiResponse<string>("failure", "Login Failed", null, HttpStatusCode.BadRequest, "Oops! The email or password you entered is incorrect. Please try again"));
+                }
+                if (response.message == "User Blocked")
+                {
+                    return Ok(new ApiResponse<string>("failure", "Login Failed", null, HttpStatusCode.BadRequest, "Your account has been blocked. Please contact support"));
                 }
 
                 var result = new ApiResponse<LoginResponseDto>("success", "Login Successful", response, HttpStatusCode.OK, "");

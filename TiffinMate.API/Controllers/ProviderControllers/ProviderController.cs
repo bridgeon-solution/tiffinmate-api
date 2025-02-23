@@ -12,6 +12,7 @@ using Supabase.Gotrue;
 using System.Collections.Generic;
 using System.Net;
 using TiffinMate.API.ApiRespons;
+using TiffinMate.BLL.DTOs;
 using TiffinMate.BLL.DTOs.ProviderDTOs;
 using TiffinMate.BLL.DTOs.UserDTOs;
 using TiffinMate.BLL.Interfaces.ProviderServiceInterafce;
@@ -465,6 +466,25 @@ namespace TiffinMate.API.Controllers.ControllerProvider
 
             }
         }
+        [HttpGet("Payment/{pro_id}")]
+        public async Task<IActionResult> GetPaymentDetails(Guid pro_id, int page, int pageSize, string search = null)
+        {
+            try
+            {
+                var response = await _providerService.GetTransactionByProviderId(pro_id,page,pageSize,search);
+
+                var result = new ApiResponse<List<AllTransactionByProviderDto>>("success", "Getting successfully", response, HttpStatusCode.OK, "");
+                return Ok(result);
+
+            }
+            catch (Exception ex)
+            {
+                var response = new ApiResponse<string>("failed", "", ex.Message, HttpStatusCode.InternalServerError, "error occured");
+                return StatusCode((int)HttpStatusCode.InternalServerError, response);
+
+            }
+        }
+
 
     }
 }

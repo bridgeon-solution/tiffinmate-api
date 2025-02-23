@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TiffinMate.BLL.DTOs;
 using TiffinMate.BLL.DTOs.OrderDTOs;
 using TiffinMate.BLL.DTOs.ProviderDTOs;
 using TiffinMate.BLL.Interfaces.NotificationInterface;
@@ -207,22 +208,35 @@ namespace TiffinMate.BLL.Services.OrderService
                 subscription = subscription.Where(o => !string.IsNullOrEmpty(o.start_date) && o.start_date.Substring(0, 10) == filter).ToList();
             }
             var totalCount = subscription.Count;
-         
-        
+
+
             var Allorder = subscription.Select(o => new GetSubscriptionDetailsDto
             {
-                user_name = o.user.name,
-                address = o.user.address,
-                city = o.user.city,
-                ph_no = o.user.phone,
-                fooditem_name = o.provider.food_items?.FirstOrDefault().food_name,
-                menu_name = o.provider.menus?.FirstOrDefault().name,
-                category_name=o.details?.FirstOrDefault()?.Category?.category_name, 
+                user_name = o.user?.name,
+                address = o.user?.address,
+                city = o.user?.city,
+                ph_no = o.user?.phone,
+                category = o.provider.food_items
+         .GroupBy(ph => ph.category?.category_name) 
+         .Select(group => new CategoryWithFoodItemsDto
+         {
+             category_name = group.Key, 
+             food_Items = group.Select(ph => new FoodItemsDto
+             {
+                 food_name = ph.food_name,
+                 price = ph.price,
+                 description = ph.description,
+                 day = ph.day,
+                 image = ph.image
+             }).ToList()
+         }).ToList(),
+                menu_name = o.provider.menus?.FirstOrDefault()?.name,
                 total_price = o.total_price,
                 start_date = o.start_date,
                 is_active = o.is_active
 
             }).ToList();
+
             var pagedOrders = Allorder.Skip((page - 1) * pageSize).Take(pageSize).ToList();
 
             var result = new AllSubByProviderDto
@@ -264,22 +278,35 @@ namespace TiffinMate.BLL.Services.OrderService
 
             }
             var totalCount = subscription.Count;
-           
+
 
             var Allorder = subscription.Select(o => new GetSubscriptionDetailsDto
             {
-                user_name = o.user.name,
-                address = o.user.address,
-                city = o.user.city,
-                ph_no = o.user.phone,
-                fooditem_name = o.provider.food_items?.FirstOrDefault().food_name,
-                menu_name = o.provider.menus?.FirstOrDefault().name,
-                category_name = o.details?.FirstOrDefault()?.Category?.category_name,
+                user_name = o.user?.name,
+                address = o.user?.address,
+                city = o.user?.city,
+                ph_no = o.user?.phone,
+                category = o.provider.food_items
+        .GroupBy(ph => ph.category?.category_name) 
+        .Select(group => new CategoryWithFoodItemsDto
+        {
+            category_name = group.Key, 
+            food_Items = group.Select(ph => new FoodItemsDto
+            {
+                food_name = ph.food_name,
+                price = ph.price,
+                description = ph.description,
+                day = ph.day,
+                image = ph.image
+            }).ToList()
+        }).ToList(),
+                menu_name = o.provider.menus?.FirstOrDefault()?.name,
                 total_price = o.total_price,
                 start_date = o.start_date,
                 is_active = o.is_active
 
             }).ToList();
+
             var pagedOrders = Allorder.Skip((page - 1) * pageSize).Take(pageSize).ToList();
 
             var result = new AllSubByProviderDto

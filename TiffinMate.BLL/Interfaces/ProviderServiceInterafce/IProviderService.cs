@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using TiffinMate.BLL.DTOs;
 using TiffinMate.BLL.DTOs.ProviderDTOs;
 using TiffinMate.BLL.DTOs.UserDTOs;
 using TiffinMate.DAL.Entities.ProviderEntity;
@@ -22,6 +23,7 @@ namespace TiffinMate.BLL.Interfaces.ProviderServiceInterafce
         Task<List<ProviderDetailResponse>> GetProvidersWithDetail();
         Task<bool> EditDetails(EditDetailsDto providerDetailsdto, IFormFile logo);
         Task<bool> DetailsExist(Guid id);
+        Task<List<AllTransactionByProviderDto>> GetTransactionByProviderId(Guid providerId, int page, int pageSize, string search = null);
 
     }
 }

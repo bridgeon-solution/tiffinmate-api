@@ -28,6 +28,8 @@ using Twilio.TwiML.Messaging;
 using static Supabase.Gotrue.Constants;
 using TiffinMate.BLL.Interfaces.NotificationInterface;
 using Provider = TiffinMate.DAL.Entities.ProviderEntity.Provider;
+using TiffinMate.BLL.DTOs;
+using System.Collections.Generic;
 namespace TiffinMate.BLL.Services.ProviderServices
 {
     public class ProviderService : IProviderService
@@ -411,6 +413,45 @@ namespace TiffinMate.BLL.Services.ProviderServices
                 throw new Exception( ex.Message);
             }
         }
+        public async Task<List<PaymentHistoryDto>> GetPaymentByProvider(Guid providerId)
+        {
+            var payment = await _providerRepository.GetPaymentByProvider(providerId);
+            var details = payment.Select(p => new PaymentHistoryDto
+            {
+                amount = p.amount,
+                payment_date = p.payment_date,
+                is_paid = p.is_paid,
+                user_name = p.user.name
+            }).ToList();
+            return details;
+        }
+        public async Task<List<AllTransactionByProviderDto>>GetTransactionByProviderId(Guid providerId,int page,int pageSize,string search=null )
+        {
+            var payment = await _providerRepository.GetPaymentByProvider(providerId);
+            if (!string.IsNullOrEmpty(search))
+            {
+                payment = payment.Where(u => u.user.name.Contains(search, StringComparison.OrdinalIgnoreCase)).ToList();
+            }
+            var paginatedPayments = payment.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+
+                var details = paginatedPayments.Select(p => new PaymentHistoryDto
+                {
+                    amount = p.amount,
+                    payment_date = p.payment_date,
+                    is_paid = p.is_paid,
+                    user_name = p.user.name
+                }).ToList();
+                return new  List < AllTransactionByProviderDto >
+                {
+                   new AllTransactionByProviderDto
+                   {
+                       TotalCount = payment.Count,
+                       PaymentHistory=details,
+                   }
+                };
+
+            }
+        }
     }
-}
+
 

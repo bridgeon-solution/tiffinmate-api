@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TiffinMate.DAL.Entities.OrderEntity;
 using TiffinMate.DAL.Entities.ProviderEntity;
 
 namespace TiffinMate.DAL.Interfaces.ProviderInterface
@@ -31,5 +32,6 @@ namespace TiffinMate.DAL.Interfaces.ProviderInterface
         Task<ProviderDetails> GetProviderDetailsById(Guid id);
         Task<ProviderDetails> GetProviderDetailsByProviderIdAsync(Guid providerId);
         void UpdateDetails(ProviderDetails provider);
+        Task<List<PaymentHistory>> GetPaymentByProvider(Guid pro_id);
     }
 }

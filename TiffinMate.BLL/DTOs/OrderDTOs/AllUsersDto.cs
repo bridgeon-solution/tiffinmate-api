@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TiffinMate.DAL.Entities.OrderEntity;
 
 namespace TiffinMate.BLL.DTOs.OrderDTOs
 {
@@ -19,6 +20,9 @@ namespace TiffinMate.BLL.DTOs.OrderDTOs
         public Guid order_id { get; set; }
         public DateTime? created_at { get; set; }
         public DateTime start_date { get; set; }
+        public List<PaymentHistoryDto> payment_history { get; set; }
+        
+        public List<GetOrderDetailsDto> order { get; set; }
 
 
     }

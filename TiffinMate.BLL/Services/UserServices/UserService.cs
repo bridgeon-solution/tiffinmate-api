@@ -169,12 +169,7 @@ namespace TiffinMate.BLL.Services.UserServices
 
         {
             var orders = (await _userRepository.GetOrdersByProvider(ProviderId)).ToList();
-            Console.WriteLine($"Orders Count: {orders.Count}");
-
-            foreach (var order in orders)
-            {
-                Console.WriteLine($"Order ID: {order.Order?.user_id}, Subscription ID: {order.Subscription?.user_id}");
-            }
+          
 
             if (!string.IsNullOrEmpty(search))
             {

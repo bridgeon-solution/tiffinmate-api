@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TiffinMate.BLL.DTOs;
 using TiffinMate.BLL.DTOs.OrderDTOs;
 using TiffinMate.BLL.DTOs.ProviderDTOs;
 using TiffinMate.BLL.DTOs.UserDTOs;
@@ -14,6 +15,7 @@ using TiffinMate.BLL.Interfaces.UserInterfaces;
 using TiffinMate.BLL.Services.CoudinaryService;
 using TiffinMate.DAL.DbContexts;
 using TiffinMate.DAL.Entities;
+using TiffinMate.DAL.Entities.OrderEntity;
 using TiffinMate.DAL.Interfaces.UserInterfaces;
 using TiffinMate.DAL.Interfaces.UserRepositoryInterface;
 
@@ -166,10 +168,9 @@ namespace TiffinMate.BLL.Services.UserServices
         }
 
         public async Task<List<AllUserOutputDto>> UsersLists(Guid ProviderId, int page, int pageSize, string search = null)
-
         {
+            // Fetch orders and subscriptions
             var orders = (await _userRepository.GetOrdersByProvider(ProviderId)).ToList();
-          
 
             if (!string.IsNullOrEmpty(search))
             {
@@ -181,24 +182,52 @@ namespace TiffinMate.BLL.Services.UserServices
                 ).ToList();
             }
 
+            // Group by user_id (avoiding duplicate data loss)
+            var allUsers = orders
+                .GroupBy(o => o.Order?.user_id ?? o.Subscription?.user_id)
+                .Select(g => g.First()) // Take the first order for each user
+                .Select(o => new AllUsersDto
+                {
+                    user_name = o.Order?.user.name ?? o.Subscription?.user.name,
+                    address = o.Order?.user.address ?? o.Subscription?.user.address,
+                    city = o.Order?.user.city ?? o.Subscription?.user.city,
+                    ph_no = o.Order?.user.phone ?? o.Subscription?.user.phone,
+                    image = o.Order?.user.image ?? o.Subscription?.user.image,
+                    email = o.Order?.user.email ?? o.Subscription?.user.email,
+                    user_id = (o.Order?.user_id ?? o.Subscription?.user_id).GetValueOrDefault(),
 
+                  
+                    payment_history = o.Order?.user.payment_history?
+    .Select(u => new PaymentHistoryDto
+    {
+        amount = u.amount,
+        user_name = u.user.name,
+        payment_date = u.payment_date,
+        is_paid = u.is_paid
+    }).ToList() ?? new List<PaymentHistoryDto> () ,
 
+                   
+                    order = o.Order?.user.order?
+                        .Select(u => new GetOrderDetailsDto
+                        {
+                            user_name = u.user.name,
+                            address = u.user.address,
+                            city = u.user.city,
+                            ph_no = u.user.phone,
+                            fooditem_name = u.details.FirstOrDefault().fooditem_name, 
+                            menu_name = u.provider?.menus?.FirstOrDefault()?.name ,
+                            category_name = u.provider?.food_items?.FirstOrDefault()?.category?.category_name ,
+                            total_price = u.total_price,
+                            start_date = u.start_date,
+                            fooditem_image = u.details.FirstOrDefault()?.fooditem_image ,
+                            order_status = u.order_status
+                        }).ToList() ?? new List<GetOrderDetailsDto>()
+                })
+                .ToList();
 
-
-            var Allusers = orders.GroupBy(o => o.Order?.user.name ?? o.Subscription?.user.name).Select(g => g.First()).Select(o => new AllUsersDto
-            {
-
-                user_name = o.Order?.user.name ?? o.Subscription?.user.name,
-                address = o.Order?.user.address ?? o.Subscription?.user.address,
-                city = o.Order?.user.city ?? o.Subscription?.user.city,
-                ph_no = o.Order?.user.phone ?? o.Subscription?.user.phone,
-                image = o.Order?.user.image ?? o.Subscription?.user.image,
-                email = o.Order?.user.email ?? o.Subscription?.user.email,
-                user_id = (o.Order?.user_id ?? o.Subscription?.user_id).GetValueOrDefault()
-
-            }).ToList();
-            var totalCount = Allusers.Count;
-            var pagedOrders = Allusers.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+            
+            var totalCount = allUsers.Count;
+            var pagedOrders = allUsers.Skip((page - 1) * pageSize).Take(pageSize).ToList();
 
             var result = new AllUserOutputDto
             {
@@ -208,9 +237,6 @@ namespace TiffinMate.BLL.Services.UserServices
 
             return new List<AllUserOutputDto> { result };
         }
-
-
-
 
 
 

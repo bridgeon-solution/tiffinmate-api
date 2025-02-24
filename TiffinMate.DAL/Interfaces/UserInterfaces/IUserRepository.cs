@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TiffinMate.DAL.Entities;
 using TiffinMate.DAL.Entities.OrderEntity;
+using TiffinMate.DAL.Repositories.UserRepositories;
 
 namespace TiffinMate.DAL.Interfaces.UserInterfaces
 {
@@ -14,7 +15,7 @@ namespace TiffinMate.DAL.Interfaces.UserInterfaces
         Task<User> GetUserById(Guid id);
         Task UpdateUser(User user);
         Task<List<User>> GetUsers();
-        Task<List<Order>> GetOrdersByProvider(Guid providerId);
+        Task<List<ProviderUserDto>> GetOrdersByProvider(Guid providerId);
         Task<List<Subscription>> GetSubscribedUsers();
 
     }

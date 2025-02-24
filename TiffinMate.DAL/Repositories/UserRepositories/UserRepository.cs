@@ -43,12 +43,29 @@ namespace TiffinMate.DAL.Repositories.UserRepositories
             return await _context.users.ToListAsync();
 
         }
-        public async Task<List<Order>> GetOrdersByProvider(Guid providerId)
+        public async Task<List<ProviderUserDto>> GetOrdersByProvider(Guid providerId)
         {
-            return await _context.order.Where(u => u.provider_id == providerId).Include(o => o.details)
+            var order= await _context.order.Where(u => u.provider_id == providerId).Include(o => o.details)
                 .Include(o => o.user).
                 Include(o => o.provider).ThenInclude(p => p.menus).Include(o => o.provider)
-                .ThenInclude(p => p.food_items).ThenInclude(f => f.category).ToListAsync();
+                .ThenInclude(p => p.food_items).ThenInclude(f => f.category)
+                .Select(o => new ProviderUserDto
+                {
+                    Order = o,
+                    Subscription = null
+                })
+                .ToListAsync();
+            var sub= await _context.subscriptions.Where(u=>u.provider_id==providerId).Include(o => o.details)
+                .Include(o=>o.user).
+                Include(o=>o.provider).ThenInclude(p=>p.menus).Include(o => o.provider)
+                .ThenInclude(p=>p.food_items).ThenInclude(f=>f.category)
+                .Select(o => new ProviderUserDto
+                {
+                    Order = null,
+                    Subscription = o
+                })
+                .ToListAsync();
+            return order.Concat(sub).ToList();
 
         }
         public async Task<List<Subscription>> GetSubscribedUsers()

@@ -13,6 +13,7 @@ namespace TiffinMate.DAL.Entities.OrderEntity
         public decimal amount { get; set; }
         public DateTime payment_date { get; set; }
         public bool is_paid { get; set; } = false;
+        public string order_type { get; set; }
         public Guid subscription_id { get; set; }
         public Subscription subscription { get; set; }
         public User user { get; set; }  

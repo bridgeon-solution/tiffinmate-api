@@ -169,27 +169,38 @@ namespace TiffinMate.BLL.Services.UserServices
 
         {
             var orders = (await _userRepository.GetOrdersByProvider(ProviderId)).ToList();
+            Console.WriteLine($"Orders Count: {orders.Count}");
+
+            foreach (var order in orders)
+            {
+                Console.WriteLine($"Order ID: {order.Order?.user_id}, Subscription ID: {order.Subscription?.user_id}");
+            }
 
             if (!string.IsNullOrEmpty(search))
             {
-                orders = orders
-            .Where(u => u.user.name.Contains(search, StringComparison.OrdinalIgnoreCase) ||
-                        u.user.email.Contains(search, StringComparison.OrdinalIgnoreCase)).ToList();
-
+                orders = orders.Where(u =>
+                    (u.Order != null && (u.Order.user.name.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                                         u.Order.user.email.Contains(search, StringComparison.OrdinalIgnoreCase))) ||
+                    (u.Subscription != null && (u.Subscription.user.name.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                                                u.Subscription.user.email.Contains(search, StringComparison.OrdinalIgnoreCase)))
+                ).ToList();
             }
 
 
 
 
-            var Allusers = orders.GroupBy(o => o.user_id).Select(g => g.First()).Select(o => new AllUsersDto
+
+            var Allusers = orders.GroupBy(o => o.Order?.user.name ?? o.Subscription?.user.name).Select(g => g.First()).Select(o => new AllUsersDto
             {
-                user_name = o.user.name,
-                address = o.user.address,
-                city = o.user.city,
-                ph_no = o.user.phone,
-                image = o.user.image,
-                email = o.user.email,
-                user_id=o.user_id
+
+                user_name = o.Order?.user.name ?? o.Subscription?.user.name,
+                address = o.Order?.user.address ?? o.Subscription?.user.address,
+                city = o.Order?.user.city ?? o.Subscription?.user.city,
+                ph_no = o.Order?.user.phone ?? o.Subscription?.user.phone,
+                image = o.Order?.user.image ?? o.Subscription?.user.image,
+                email = o.Order?.user.email ?? o.Subscription?.user.email,
+                user_id = (o.Order?.user_id ?? o.Subscription?.user_id).GetValueOrDefault()
+
             }).ToList();
             var totalCount = Allusers.Count;
             var pagedOrders = Allusers.Skip((page - 1) * pageSize).Take(pageSize).ToList();
@@ -199,6 +210,7 @@ namespace TiffinMate.BLL.Services.UserServices
                 TotalCount = totalCount,
                 AllUsers = pagedOrders
             };
+
             return new List<AllUserOutputDto> { result };
         }
 

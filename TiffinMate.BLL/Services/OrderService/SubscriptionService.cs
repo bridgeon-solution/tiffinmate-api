@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Razorpay.Api;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -320,52 +321,56 @@ namespace TiffinMate.BLL.Services.OrderService
 
         //All_Subsribtion_Orders
 
-        public async Task<AllOrderDTO> GetSubscribtionOrders(int page, int pageSize, string search = null, string filter = null)
+        public async Task<AllSubByProviderDto> GetSubscribtionOrders(int page, int pageSize, string search = null, string filter = null)
         {
-            var orders = await _context.subscriptions
-                .Include(o => o.provider).Include(o => o.user).Include(o => o.details).ThenInclude(d => d.Category)
-               .Where(o => o.order_status==OrderStatus.Confirmed)
-               .ToListAsync();
 
-            var result = orders.Select(order => new OrderDetailsResponseDTO
+            var subscription = (await _subscriptionRepository.GetAllSubscription()).ToList();
+            var result = subscription.Select(o => new GetSubscriptionDetailsDto
             {
-                date = order.start_date,
-                menu_id = order.menu_id,
-                order_id = order.id,
-                provider = order.provider.user_name,
-                user = order.user.name,
-                user_id = order.user_id,
-                total_price = order.total_price,
-                order_status=order.order_status,
-                cancelled_at=order.cancelled_at,
-                details = order.details.Select(d => new OrderDetailsDto
-                {
-                    Id = d.id,
-                    UserName = d.user_name,
-                    Address = d.address,
-                    City = d.city,
-                    Category = d.Category.category_name,
-                }).ToList()
+                user_name = o.user?.name,
+                provider_name=o.provider.user_name,
+                address = o.user?.address,
+                city = o.user?.city,
+                ph_no = o.user?.phone,
+                category = o.provider.food_items
+        .GroupBy(ph => ph.category?.category_name)
+        .Select(group => new CategoryWithFoodItemsDto
+        {
+            category_name = group.Key,
+            food_Items = group.Select(ph => new FoodItemsDto
+            {
+                food_name = ph.food_name,
+                price = ph.price,
+                description = ph.description,
+                day = ph.day,
+                image = ph.image
+            }).ToList()
+        }).ToList(),
+                menu_name = o.provider.menus?.FirstOrDefault()?.name,
+                total_price = o.total_price,
+                start_date = o.start_date,
+                is_active = o.is_active
+
             }).ToList();
 
 
             if (!string.IsNullOrEmpty(search))
             {
-                result = result.Where(u =>
-                   u.user.Contains(search, StringComparison.OrdinalIgnoreCase) ||
-                   u.provider.Contains(search, StringComparison.OrdinalIgnoreCase)
-                ).ToList();
+                subscription = subscription
+            .Where(u => u.user.name.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                        u.provider.food_items.FirstOrDefault().food_name.Contains(search, StringComparison.OrdinalIgnoreCase)).ToList();
+
             }
 
             if (!string.IsNullOrEmpty(filter))
             {
                 if (filter.Equals("newest", StringComparison.OrdinalIgnoreCase))
                 {
-                    result = result.OrderByDescending(u => u.date).ToList();
+                    result = result.OrderByDescending(u => u.start_date).ToList();
                 }
                 else if (filter.Equals("oldest", StringComparison.OrdinalIgnoreCase))
                 {
-                    result = result.OrderBy(u => u.date).ToList();
+                    result = result.OrderBy(u => u.start_date).ToList();
                 }
             }
 
@@ -379,10 +384,10 @@ namespace TiffinMate.BLL.Services.OrderService
                 .ToList();
 
 
-            var newResult = new AllOrderDTO
+            var newResult = new AllSubByProviderDto
             {
                 TotalCount = total,
-                AllDetails = pagedUsers
+                Allsubscription = pagedUsers
             };
 
             return newResult;

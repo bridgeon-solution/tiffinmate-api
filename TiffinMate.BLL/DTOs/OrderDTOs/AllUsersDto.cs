@@ -21,8 +21,10 @@ namespace TiffinMate.BLL.DTOs.OrderDTOs
         public DateTime? created_at { get; set; }
         public DateTime start_date { get; set; }
         public List<PaymentHistoryDto> payment_history { get; set; }
-        
-        public List<GetOrderDetailsDto> order { get; set; }
+        public List<orderDataDto> order { get; set; }
+
+        public List<subscriptionDataDto> subscription { get; set; }
+
 
 
     }

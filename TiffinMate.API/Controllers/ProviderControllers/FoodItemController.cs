@@ -225,8 +225,32 @@ namespace TiffinMate.API.Controllers.ProviderControllers
                 return StatusCode((int)HttpStatusCode.InternalServerError, response);
             }
         }
-
-
+        [HttpDelete("menuitems")]
+        public async Task <IActionResult>DeleteMenu(Guid menu_id)
+        {
+            try
+            {
+                bool val = await _foodItemService.DeleteMenu(menu_id);
+                return Ok(new ApiResponse<bool>("success", "menu deleted successfully", val, HttpStatusCode.OK, ""));
+            }catch(Exception ex) {
+                var response = new ApiResponse<string>("failed", "An error occurred", ex.Message, HttpStatusCode.InternalServerError, "Error occurred");
+                return StatusCode((int)HttpStatusCode.InternalServerError, response);
+            }
+        }
+        [HttpDelete("fooditems")]
+        public async Task<IActionResult> DeleteFoodItems(Guid fooditem_id)
+        {
+            try
+            {
+                bool val = await _foodItemService.DeleteFoodItems(fooditem_id);
+                return Ok(new ApiResponse<bool>("success", "fooditems deleted successfully", val, HttpStatusCode.OK, ""));
+            }
+            catch (Exception ex)
+            {
+                var response = new ApiResponse<string>("failed", "An error occurred", ex.Message, HttpStatusCode.InternalServerError, "Error occurred");
+                return StatusCode((int)HttpStatusCode.InternalServerError, response);
+            }
+        }
     }
 
 }

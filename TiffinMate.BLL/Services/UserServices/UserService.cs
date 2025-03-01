@@ -182,10 +182,10 @@ namespace TiffinMate.BLL.Services.UserServices
                 ).ToList();
             }
 
-            // Group by user_id (avoiding duplicate data loss)
+            
             var allUsers = orders
                 .GroupBy(o => o.Order?.user_id ?? o.Subscription?.user_id)
-                .Select(g => g.First()) // Take the first order for each user
+                .Select(g => g.First()) 
                 .Select(o => new AllUsersDto
                 {
                     user_name = o.Order?.user.name ?? o.Subscription?.user.name,
@@ -208,21 +208,27 @@ namespace TiffinMate.BLL.Services.UserServices
 
                    
                     order = o.Order?.user.order?
-                        .Select(u => new GetOrderDetailsDto
+                        .Select(u => new orderDataDto
                         {
-                            user_name = u.user.name,
-                            address = u.user.address,
-                            city = u.user.city,
-                            ph_no = u.user.phone,
-                            fooditem_name = u.details.FirstOrDefault().fooditem_name, 
-                            menu_name = u.provider?.menus?.FirstOrDefault()?.name ,
-                            category_name = u.provider?.food_items?.FirstOrDefault()?.category?.category_name ,
-                            total_price = u.total_price,
-                            start_date = u.start_date,
-                            fooditem_image = u.details.FirstOrDefault()?.fooditem_image ,
-                            order_status = u.order_status
-                        }).ToList() ?? new List<GetOrderDetailsDto>()
+                           order_id=u.id,
+                           menu_id=u.menu_id,
+                            start_date=u.start_date,
+                         total_price=u.total_price,
+                           transaction_id=u.transaction_id,
+                          order_string=u.order_string
+                         }).ToList() ?? new List<orderDataDto>(),
+                    subscription=o.Order?.user.subscription?
+                    .Select(u=>new subscriptionDataDto
+                    {
+                        sub_id = u.id,
+                        menu_id = u.menu_id,
+                        start_date = u.start_date,
+                        total_price = u.total_price,
+                        transaction_id = u.transaction_id,
+                        order_string = u.order_string
+                    }).ToList()?? new List<subscriptionDataDto>()
                 })
+                
                 .ToList();
 
             

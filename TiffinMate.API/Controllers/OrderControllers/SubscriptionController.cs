@@ -102,7 +102,7 @@ namespace TiffinMate.API.Controllers.OrderControllers
             try
             {
                 var res = await _subscriptionService.GetSubscribtionOrders(page, pageSize, search, filter);
-                var result = new TiffinMate.API.ApiRespons.ApiResponse<AllOrderDTO>("succesfull", "Subscription details getted succesfully", res, HttpStatusCode.OK, "");
+                var result = new TiffinMate.API.ApiRespons.ApiResponse<AllSubByProviderDto>("succesfull", "Subscription details getted succesfully", res, HttpStatusCode.OK, "");
                 return Ok(result);
 
             }

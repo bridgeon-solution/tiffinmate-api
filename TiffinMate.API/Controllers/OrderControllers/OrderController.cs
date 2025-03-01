@@ -43,10 +43,6 @@ namespace TiffinMate.API.Controllers.OrderControllers
                 var response = new TiffinMate.API.ApiRespons.ApiResponse<string>("failed", "", ex.Message, HttpStatusCode.InternalServerError, "error occured");
                 return StatusCode((int)HttpStatusCode.InternalServerError, response);
             }
-
-
-
-
         }
 
         [HttpPost("details")]

@@ -305,8 +305,6 @@ namespace TiffinMate.BLL.Services.ProviderServices
                 Providers = _mapper.Map<List<ProviderResponseDTO>>(pagedProviders)
             };
         }
-
-
         public async Task<ProviderByIdDto> ProviderById(Guid providerId)
         {
             var provider = await _providerRepository.GetAProviderById(providerId);
@@ -328,13 +326,17 @@ namespace TiffinMate.BLL.Services.ProviderServices
             }).FirstOrDefault();
             return result;
         }
-
         public async Task<ProviderDetailedDTO> GetProviderDetailsById(Guid id)
         {
             try
             {
                 var res = await _providerRepository.GetProviderDetailsById(id);
-                return _mapper.Map<ProviderDetailedDTO>(res);
+                var provider= _mapper.Map<ProviderDetailedDTO>(res);
+                provider.certificate = res.Provider.certificate;
+                provider.email = res.Provider.email;
+                provider.user_name = res.Provider.user_name;
+
+                return provider;
             }
             catch (Exception ex)
             {
@@ -436,6 +438,7 @@ namespace TiffinMate.BLL.Services.ProviderServices
 
                 var details = paginatedPayments.Select(p => new PaymentHistoryDto
                 {
+                    id=p.id,
                     amount = p.amount,
                     payment_date = p.payment_date,
                     is_paid = p.is_paid,

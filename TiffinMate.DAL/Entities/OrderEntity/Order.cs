@@ -27,8 +27,9 @@ namespace TiffinMate.DAL.Entities.OrderEntity
         public OrderStatus order_status { get; set; }=OrderStatus.Pending;
         public List<OrderDetails> details { get; set; }
         public User user { get; set; }
-
+        public List<PaymentHistory> payment_history { get; set; }
         public Provider provider { get; set; }
+        public Menu menu { get; set; }
        
 
     }

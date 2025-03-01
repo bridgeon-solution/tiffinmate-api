@@ -10,7 +10,7 @@ namespace TiffinMate.BLL.Interfaces.OrderServiceInterface
 {
     public interface ISubscriptionService
     {
-        Task<AllOrderDTO> GetSubscribtionOrders(int page, int pageSize, string search = null, string filter = null);
+        Task<AllSubByProviderDto> GetSubscribtionOrders(int page, int pageSize, string search = null, string filter = null);
         Task<List<AllSubByProviderDto>> SubscriptionLists(Guid ProviderId, int page, int pageSize, string search = null, string filter = null, string toggle = null);
         Task<List<AllSubByProviderDto>> SubscriptionLists(Guid ProviderId, int page, int pageSize, string search = null, string filter = null);
         Task<OrderRequestDTO> SubscriptionGetedById(Guid OrderId);

@@ -214,7 +214,30 @@ namespace TiffinMate.BLL.Services.ProviderServices
             return foodItemResponses;
         }
 
-
+        public async Task<bool>DeleteMenu(Guid menu_id)
+        {
+            try
+            {
+                await _foodItemRepository.DeleteMenu(menu_id);
+                return true;
+            }
+            catch (Exception err)
+            {
+                throw new Exception(err.Message);
+            }
+        }
+        public async Task<bool> DeleteFoodItems(Guid fooditem_id)
+        {
+            try
+            {
+                await _foodItemRepository.DeleteFooditem(fooditem_id);
+                return true;
+            }
+            catch (Exception err)
+            {
+                throw new Exception(err.Message);
+            }
+        }
 
 
 

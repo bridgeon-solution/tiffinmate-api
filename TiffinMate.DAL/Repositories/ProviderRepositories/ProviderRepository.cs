@@ -114,7 +114,7 @@ namespace TiffinMate.DAL.Repositories.ProviderRepositories
         }
         public async Task<ProviderDetails> GetProviderDetailsById(Guid id)
         {
-            return await _context.ProvidersDetails.FirstOrDefaultAsync(p => p.provider_id == id);
+            return await _context.ProvidersDetails.Include(pd=>pd.Provider).FirstOrDefaultAsync(p => p.provider_id == id);
         }
         public async Task<ProviderDetails> GetProviderDetailsByProviderIdAsync(Guid providerId)
         {
@@ -128,9 +128,9 @@ namespace TiffinMate.DAL.Repositories.ProviderRepositories
         public async Task<List<PaymentHistory>> GetPaymentByProvider(Guid pro_id)
         {
             return await _context.paymentHistory
-                .Include(o => o.subscription).ThenInclude(p => p.provider)
+                .Include(o => o.subscription).Include(o=>o.order).ThenInclude(p => p.provider)
                 .Include(u => u.user)
-                .Where(u => u.subscription.provider_id == pro_id).ToListAsync();
+                .Where(u => (u.subscription!=null && u.subscription.provider_id==pro_id)||(u.order!=null&& u.order.provider_id==pro_id)).ToListAsync();
         }
     }
 }

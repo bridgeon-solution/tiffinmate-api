@@ -8,6 +8,7 @@ namespace TiffinMate.BLL.DTOs.ProviderDTOs
 {
     public class FoodItemResponceDto
     {
+        public Guid id { get; set; }
         public Guid category_id { get; set; }
         public Guid provider_id { get; set; }
 

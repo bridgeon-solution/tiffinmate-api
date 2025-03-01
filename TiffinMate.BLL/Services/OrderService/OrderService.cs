@@ -235,6 +235,8 @@ namespace TiffinMate.BLL.Services.OrderService
            var order=await _context.order.Include(o=>o.provider).Include(o => o.details).ThenInclude(d=>d.Category). FirstOrDefaultAsync(o=>o.id==OrderId);
             var items = new OrderDetailsResponseDTO
             {
+                order_id=order.id,
+                provider_id=order.provider.id,
                 date = order.start_date,
                 menu_id = order.menu_id,
                 provider = order.provider.user_name,

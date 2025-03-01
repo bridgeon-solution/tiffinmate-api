@@ -22,5 +22,7 @@ namespace TiffinMate.DAL.Interfaces.ProviderInterface
         Task<decimal> GetTotalAmount(Guid menuId,List<Guid> categoryIds, string day);
         Task<decimal> GetMonthlyTotalAmount(Guid menuId);
         Task<List<FoodItem>> GetAllFoodItem(Guid? menuId, List<Guid> category_id);
+        Task<bool> DeleteMenu(Guid id);
+        Task<bool> DeleteFooditem(Guid id);
     }
 }

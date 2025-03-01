@@ -20,6 +20,7 @@ namespace TiffinMate.DAL.Interfaces.OrderInterface
         Task UpdateSubscriptionAsync(Subscription subscription);
         Task UpdatePaymentHistoryAsync(PaymentHistory paymentHistory);
         Task<List<PaymentHistory>> GetPaymentHistory(Guid?id);
+        Task<List<Subscription>> GetAllSubscription();
 
 
     }

@@ -143,7 +143,19 @@ namespace TiffinMate.DAL.Repositories.ProviderRepositories
                 .Where(f => f.menu_id == menuId && category_id.Contains(f.category_id))
                 .ToListAsync();
         }
-
-
+        public async Task <bool>DeleteMenu(Guid id)
+        {
+           var menu= await _context.menus.FirstOrDefaultAsync(u => u.id == id);
+             _context.menus.Remove(menu);
+            _context.SaveChangesAsync();
+            return true;
+        }
+        public async Task<bool> DeleteFooditem(Guid id)
+        {
+            var FoodItems = await _context.FoodItems.FirstOrDefaultAsync(u => u.id == id);
+            _context.FoodItems.Remove(FoodItems);
+            _context.SaveChangesAsync();
+            return true;
+        }
     } 
 }

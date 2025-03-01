@@ -10,6 +10,7 @@ namespace TiffinMate.BLL.DTOs.OrderDTOs
    public class GetSubscriptionDetailsDto
     {
         public string user_name { get; set; }
+        public string provider_name { get; set; }   
         public string address { get; set; }
         public string city { get; set; }
         public string ph_no { get; set; }

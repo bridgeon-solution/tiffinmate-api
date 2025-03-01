@@ -35,6 +35,14 @@ public async Task<List<Subscription>> GetProviderSubscription(Guid providerId)
          .Include(u => u.user)
          .ToListAsync();
         }        
+        public async Task<List<Subscription>> GetAllSubscription()
+        {
+            return await _context.subscriptions.Include(p => p.provider).ThenInclude(o => o.menus)
+         .Include(f => f.provider).ThenInclude(f => f.food_items)
+         .Include(p => p.details).ThenInclude(o => o.Category)
+         .Include(u => u.user)
+         .ToListAsync();
+        }
         public async Task<string> categoryById(Guid id)
         {
             var category = await _context.Categories

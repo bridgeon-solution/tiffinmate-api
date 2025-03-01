@@ -21,7 +21,7 @@ namespace TiffinMate.DAL.Repositories.OrderRepository
         {
             return await _context.Categories.ToListAsync();
         }
-        public async Task<Subscription> GetSubscriptionByid(Guid OrderId)
+        public async Task<Subscription> GetSubscriptionByid(Guid? OrderId)
         {
             return await _context.subscriptions.FirstOrDefaultAsync(o => o.id == OrderId);
         }

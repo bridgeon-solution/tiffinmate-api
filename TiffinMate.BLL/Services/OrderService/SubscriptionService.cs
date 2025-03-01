@@ -57,11 +57,12 @@ namespace TiffinMate.BLL.Services.OrderService
             await _context.subscriptions.AddAsync(newSubscription);
             var newPaymentHistory=new PaymentHistory
             {
-                id = paymentHistoryId,
+                id = paymentHistoryId,     
                 subscription_id = orderId,
                 amount = orderRequestDTO.total_price,
                 payment_date = DateTime.UtcNow,
                 user_id = orderRequestDTO.user_id,
+                order_type="subscription"
                 
             };
             await _context.paymentHistory.AddAsync(newPaymentHistory);

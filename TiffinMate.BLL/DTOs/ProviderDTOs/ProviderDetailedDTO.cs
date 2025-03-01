@@ -15,5 +15,9 @@ namespace TiffinMate.BLL.DTOs.ProviderDTOs
         public string location { get; set; }
         public string image { get; set; }
         public string about { get; set; }
+        public string? certificate { get; set; }
+        public string? user_name { get; set; }
+        public string? email { get; set; }
+
     }
 }

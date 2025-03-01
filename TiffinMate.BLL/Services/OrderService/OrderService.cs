@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using CloudinaryDotNet;
 using Microsoft.EntityFrameworkCore;
 using Razorpay.Api;
 using sib_api_v3_sdk.Model;
@@ -65,8 +66,18 @@ namespace TiffinMate.BLL.Services.OrderService
 
               
             };
+            var newPayment = new PaymentHistory
+            {
+                order_id = orderId,
+                amount = orderRequestDTO.total_price,
+                payment_date = DateTime.UtcNow,
+                user_id = orderRequestDTO.user_id,
+                order_type = "order",
+
+            };
 
             await _context.order.AddAsync(newOrder);
+            await _context.paymentHistory.AddAsync(newPayment);
             await _context.SaveChangesAsync();
 
             return orderId;
@@ -141,6 +152,13 @@ namespace TiffinMate.BLL.Services.OrderService
                     order.order_string = orderDetailsRequestDto.order_string;
                     order.transaction_id=orderDetailsRequestDto.transaction_string;
                         _context.order.Update(order);
+
+                    var payment = await _context.paymentHistory.FirstOrDefaultAsync(p => p.order_id == orderId);
+                    if (payment != null)
+                    {
+                        payment.is_paid = true;
+                    }
+                    _context.paymentHistory.Update(payment);
                         await _context.SaveChangesAsync();
 
                     await _notificationService.NotifyProviderAsync(orderDetailsRequestDto.provider_id.ToString(),"New Order",$"You have a new order from {orderDetailsRequestDto.user_name}.","Order");

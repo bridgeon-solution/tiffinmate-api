@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TiffinMate.DAL.DbContexts;
@@ -11,9 +12,11 @@ using TiffinMate.DAL.DbContexts;
 namespace TiffinMate.DAL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250228084053_add_order_to_payment_history")]
+    partial class add_order_to_payment_history
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -114,6 +117,9 @@ namespace TiffinMate.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<Guid?>("Menuid")
+                        .HasColumnType("uuid");
+
                     b.Property<DateTime?>("created_at")
                         .HasColumnType("timestamp with time zone");
 
@@ -150,7 +156,7 @@ namespace TiffinMate.DAL.Migrations
 
                     b.HasKey("id");
 
-                    b.HasIndex("menu_id");
+                    b.HasIndex("Menuid");
 
                     b.HasIndex("provider_id");
 
@@ -234,7 +240,7 @@ namespace TiffinMate.DAL.Migrations
                     b.Property<bool>("is_paid")
                         .HasColumnType("boolean");
 
-                    b.Property<Guid?>("order_id")
+                    b.Property<Guid>("order_id")
                         .HasColumnType("uuid");
 
                     b.Property<string>("order_type")
@@ -243,9 +249,6 @@ namespace TiffinMate.DAL.Migrations
 
                     b.Property<DateTime>("payment_date")
                         .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid?>("subscription_id")
-                        .HasColumnType("uuid");
 
                     b.Property<DateTime?>("updated_at")
                         .HasColumnType("timestamp with time zone");
@@ -256,8 +259,6 @@ namespace TiffinMate.DAL.Migrations
                     b.HasKey("id");
 
                     b.HasIndex("order_id");
-
-                    b.HasIndex("subscription_id");
 
                     b.HasIndex("user_id");
 
@@ -786,11 +787,9 @@ namespace TiffinMate.DAL.Migrations
 
             modelBuilder.Entity("TiffinMate.DAL.Entities.OrderEntity.Order", b =>
                 {
-                    b.HasOne("TiffinMate.DAL.Entities.ProviderEntity.Menu", "menu")
+                    b.HasOne("TiffinMate.DAL.Entities.ProviderEntity.Menu", null)
                         .WithMany("order")
-                        .HasForeignKey("menu_id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("Menuid");
 
                     b.HasOne("TiffinMate.DAL.Entities.ProviderEntity.Provider", "provider")
                         .WithMany("order")
@@ -803,8 +802,6 @@ namespace TiffinMate.DAL.Migrations
                         .HasForeignKey("user_id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("menu");
 
                     b.Navigation("provider");
 
@@ -834,11 +831,15 @@ namespace TiffinMate.DAL.Migrations
                 {
                     b.HasOne("TiffinMate.DAL.Entities.OrderEntity.Order", "order")
                         .WithMany("payment_history")
-                        .HasForeignKey("order_id");
+                        .HasForeignKey("order_id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("TiffinMate.DAL.Entities.OrderEntity.Subscription", "subscription")
                         .WithMany("payment_history")
-                        .HasForeignKey("subscription_id");
+                        .HasForeignKey("order_id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("TiffinMate.DAL.Entities.User", "user")
                         .WithMany("payment_history")

@@ -77,6 +77,7 @@ namespace TiffinMate.BLL.Services
                 amount = amount,
                 payment_date = DateTime.UtcNow,
                 user_id = subscription.user_id,
+                order_type="subscription"
 
             };
             await _context.paymentHistory.AddAsync(paymentHistory);

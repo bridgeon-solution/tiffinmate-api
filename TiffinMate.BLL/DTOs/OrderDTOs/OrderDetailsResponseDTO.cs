@@ -17,6 +17,9 @@ namespace TiffinMate.BLL.DTOs.OrderDTOs
         public string provider { get; set; }
         public Guid user_id { get; set; }
         public string user {  get; set; }
+        public string address { get; set; }
+        public string ph_no { get; set; }
+        public string city { get; set; }
 
         public decimal total_price { get; set; }
         public OrderStatus order_status { get; set; }

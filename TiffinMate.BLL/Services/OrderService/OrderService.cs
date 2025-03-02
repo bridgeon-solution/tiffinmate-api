@@ -232,7 +232,7 @@ namespace TiffinMate.BLL.Services.OrderService
         public async Task<OrderDetailsResponseDTO> OrderGetedByOrderId(Guid OrderId)
         {
 
-           var order=await _context.order.Include(o=>o.provider).Include(o => o.details).ThenInclude(d=>d.Category). FirstOrDefaultAsync(o=>o.id==OrderId);
+           var order=await _context.order.Include(o=>o.provider).Include(o=>o.user).Include(o => o.details).ThenInclude(d=>d.Category). FirstOrDefaultAsync(o=>o.id==OrderId);
             var items = new OrderDetailsResponseDTO
             {
                 date = order.start_date,
@@ -240,6 +240,10 @@ namespace TiffinMate.BLL.Services.OrderService
                 provider = order.provider.user_name,
                 total_price = order.total_price,
                 user_id = order.user_id,
+                user=order.user.name,
+                address=order.user.address,
+                city=order.user.city,
+                ph_no=order.user.phone,
                 details = order.details.Select(d => new OrderDetailsDto
                 {
                     Id = d.id,

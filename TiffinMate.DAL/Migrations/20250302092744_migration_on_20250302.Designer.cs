@@ -12,8 +12,8 @@ using TiffinMate.DAL.DbContexts;
 namespace TiffinMate.DAL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250212061928_initial_migration")]
-    partial class initial_migration
+    [Migration("20250302092744_migration_on_20250302")]
+    partial class migration_on_20250302
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -66,7 +66,7 @@ namespace TiffinMate.DAL.Migrations
 
                     b.HasKey("id");
 
-                    b.ToTable("Admins", (string)null);
+                    b.ToTable("Admins");
                 });
 
             modelBuilder.Entity("TiffinMate.DAL.Entities.ApiLog", b =>
@@ -108,16 +108,13 @@ namespace TiffinMate.DAL.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ApiLogs", (string)null);
+                    b.ToTable("ApiLogs");
                 });
 
             modelBuilder.Entity("TiffinMate.DAL.Entities.OrderEntity.Order", b =>
                 {
                     b.Property<Guid>("id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid?>("Menuid")
                         .HasColumnType("uuid");
 
                     b.Property<DateTime?>("created_at")
@@ -156,13 +153,13 @@ namespace TiffinMate.DAL.Migrations
 
                     b.HasKey("id");
 
-                    b.HasIndex("Menuid");
+                    b.HasIndex("menu_id");
 
                     b.HasIndex("provider_id");
 
                     b.HasIndex("user_id");
 
-                    b.ToTable("order", (string)null);
+                    b.ToTable("order");
                 });
 
             modelBuilder.Entity("TiffinMate.DAL.Entities.OrderEntity.OrderDetails", b =>
@@ -219,7 +216,7 @@ namespace TiffinMate.DAL.Migrations
 
                     b.HasIndex("order_id");
 
-                    b.ToTable("orderDetails", (string)null);
+                    b.ToTable("orderDetails");
                 });
 
             modelBuilder.Entity("TiffinMate.DAL.Entities.OrderEntity.PaymentHistory", b =>
@@ -240,10 +237,17 @@ namespace TiffinMate.DAL.Migrations
                     b.Property<bool>("is_paid")
                         .HasColumnType("boolean");
 
+                    b.Property<Guid?>("order_id")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("order_type")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<DateTime>("payment_date")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("subscription_id")
+                    b.Property<Guid?>("subscription_id")
                         .HasColumnType("uuid");
 
                     b.Property<DateTime?>("updated_at")
@@ -254,11 +258,13 @@ namespace TiffinMate.DAL.Migrations
 
                     b.HasKey("id");
 
+                    b.HasIndex("order_id");
+
                     b.HasIndex("subscription_id");
 
                     b.HasIndex("user_id");
 
-                    b.ToTable("paymentHistory", (string)null);
+                    b.ToTable("paymentHistory");
                 });
 
             modelBuilder.Entity("TiffinMate.DAL.Entities.OrderEntity.Subscription", b =>
@@ -315,7 +321,7 @@ namespace TiffinMate.DAL.Migrations
 
                     b.HasIndex("user_id");
 
-                    b.ToTable("subscriptions", (string)null);
+                    b.ToTable("subscriptions");
                 });
 
             modelBuilder.Entity("TiffinMate.DAL.Entities.OrderEntity.SubscriptionDetails", b =>
@@ -361,7 +367,7 @@ namespace TiffinMate.DAL.Migrations
 
                     b.HasIndex("subscription_id");
 
-                    b.ToTable("subscriptionDetails", (string)null);
+                    b.ToTable("subscriptionDetails");
                 });
 
             modelBuilder.Entity("TiffinMate.DAL.Entities.ProviderEntity.Categories", b =>
@@ -385,7 +391,7 @@ namespace TiffinMate.DAL.Migrations
 
                     b.HasKey("id");
 
-                    b.ToTable("Categories", (string)null);
+                    b.ToTable("Categories");
                 });
 
             modelBuilder.Entity("TiffinMate.DAL.Entities.ProviderEntity.FoodItem", b =>
@@ -439,7 +445,7 @@ namespace TiffinMate.DAL.Migrations
 
                     b.HasIndex("provider_id");
 
-                    b.ToTable("FoodItems", (string)null);
+                    b.ToTable("FoodItems");
                 });
 
             modelBuilder.Entity("TiffinMate.DAL.Entities.ProviderEntity.Menu", b =>
@@ -487,7 +493,7 @@ namespace TiffinMate.DAL.Migrations
 
                     b.HasIndex("provider_id");
 
-                    b.ToTable("menus", (string)null);
+                    b.ToTable("menus");
                 });
 
             modelBuilder.Entity("TiffinMate.DAL.Entities.ProviderEntity.Notification", b =>
@@ -531,7 +537,7 @@ namespace TiffinMate.DAL.Migrations
 
                     b.HasKey("id");
 
-                    b.ToTable("notifications", (string)null);
+                    b.ToTable("notifications");
                 });
 
             modelBuilder.Entity("TiffinMate.DAL.Entities.ProviderEntity.Provider", b =>
@@ -586,7 +592,7 @@ namespace TiffinMate.DAL.Migrations
 
                     b.HasKey("id");
 
-                    b.ToTable("Providers", (string)null);
+                    b.ToTable("Providers");
                 });
 
             modelBuilder.Entity("TiffinMate.DAL.Entities.ProviderEntity.ProviderDetails", b =>
@@ -644,7 +650,7 @@ namespace TiffinMate.DAL.Migrations
                     b.HasIndex("provider_id")
                         .IsUnique();
 
-                    b.ToTable("ProvidersDetails", (string)null);
+                    b.ToTable("ProvidersDetails");
                 });
 
             modelBuilder.Entity("TiffinMate.DAL.Entities.Rating", b =>
@@ -677,7 +683,7 @@ namespace TiffinMate.DAL.Migrations
 
                     b.HasIndex("user_id");
 
-                    b.ToTable("Ratings", (string)null);
+                    b.ToTable("Ratings");
                 });
 
             modelBuilder.Entity("TiffinMate.DAL.Entities.Review", b =>
@@ -711,7 +717,7 @@ namespace TiffinMate.DAL.Migrations
 
                     b.HasIndex("user_id");
 
-                    b.ToTable("Reviews", (string)null);
+                    b.ToTable("Reviews");
                 });
 
             modelBuilder.Entity("TiffinMate.DAL.Entities.User", b =>
@@ -778,14 +784,16 @@ namespace TiffinMate.DAL.Migrations
 
                     b.HasKey("id");
 
-                    b.ToTable("users", (string)null);
+                    b.ToTable("users");
                 });
 
             modelBuilder.Entity("TiffinMate.DAL.Entities.OrderEntity.Order", b =>
                 {
-                    b.HasOne("TiffinMate.DAL.Entities.ProviderEntity.Menu", null)
+                    b.HasOne("TiffinMate.DAL.Entities.ProviderEntity.Menu", "menu")
                         .WithMany("order")
-                        .HasForeignKey("Menuid");
+                        .HasForeignKey("menu_id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("TiffinMate.DAL.Entities.ProviderEntity.Provider", "provider")
                         .WithMany("order")
@@ -798,6 +806,8 @@ namespace TiffinMate.DAL.Migrations
                         .HasForeignKey("user_id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("menu");
 
                     b.Navigation("provider");
 
@@ -825,17 +835,21 @@ namespace TiffinMate.DAL.Migrations
 
             modelBuilder.Entity("TiffinMate.DAL.Entities.OrderEntity.PaymentHistory", b =>
                 {
+                    b.HasOne("TiffinMate.DAL.Entities.OrderEntity.Order", "order")
+                        .WithMany("payment_history")
+                        .HasForeignKey("order_id");
+
                     b.HasOne("TiffinMate.DAL.Entities.OrderEntity.Subscription", "subscription")
                         .WithMany("payment_history")
-                        .HasForeignKey("subscription_id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("subscription_id");
 
                     b.HasOne("TiffinMate.DAL.Entities.User", "user")
                         .WithMany("payment_history")
                         .HasForeignKey("user_id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("order");
 
                     b.Navigation("subscription");
 
@@ -978,6 +992,8 @@ namespace TiffinMate.DAL.Migrations
             modelBuilder.Entity("TiffinMate.DAL.Entities.OrderEntity.Order", b =>
                 {
                     b.Navigation("details");
+
+                    b.Navigation("payment_history");
                 });
 
             modelBuilder.Entity("TiffinMate.DAL.Entities.OrderEntity.Subscription", b =>
